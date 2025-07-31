@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:popups="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
+             x:Class="SampleApp.Views.AnchoredPopup"
+             Size="250,150"
+             OverlayColor="#80000000"
+             CanBeDismissedByTappingOutsideOfPopup="True">
+    
+    <Border BackgroundColor="LightYellow" 
+            StrokeThickness="1" 
+            Stroke="Orange"
+            StrokeShape="RoundRectangle 8">
+        <StackLayout Padding="15" Spacing="10">
+            <Label Text="Anchored Popup" 
+                   FontSize="16" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   TextColor="DarkOrange" />
+            
+            <Label Text="This popup is anchored to a specific button!" 
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center"
+                   FontSize="12"
+                   TextColor="Gray" />
+            
+            <Button Text="Got it!" 
+                    BackgroundColor="Orange" 
+                    TextColor="White"
+                    FontSize="12"
+                    Clicked="OnGotItClicked" />
+        </StackLayout>
+    </Border>
+    
+</popups:Popup>

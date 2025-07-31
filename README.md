@@ -1,2 +1,2 @@
-# Maui.Popups
-AppoMobi.Maui.Popups
+# Maui Popups
+
