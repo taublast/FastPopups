@@ -28,11 +28,6 @@ public partial class Popup : View, IPopup
 	public static readonly BindableProperty IgnoreSafeAreaProperty =
 		BindableProperty.Create(nameof(IgnoreSafeArea), typeof(bool), typeof(Popup), false);
 
-	/// <summary>
-	///  Backing BindableProperty for the <see cref="Size"/> property.
-	/// </summary>
-	public static readonly BindableProperty SizeProperty =
-		BindableProperty.Create(nameof(Size), typeof(Size), typeof(Popup), default(Size));
 
 	/// <summary>
 	///  Backing BindableProperty for the <see cref="CloseWhenBackgroundIsClicked"/> property.
@@ -101,21 +96,6 @@ public partial class Popup : View, IPopup
 
 
 
-	/// <summary>
-	/// Gets or sets the <see cref="Size"/> of the Popup Display.
-	/// </summary>
-	/// <remarks>
-	/// The Popup will always try to constrain the actual size of the <see cref="Popup" />
-	/// to the <see cref="Popup" /> of the View unless a <see cref="Size"/> is specified.
-	/// If the <see cref="Popup" /> contains <see cref="LayoutOptions"/> a <see cref="Size"/>
-	/// will be required. This will allow the View to have a concept of <see cref="Size"/>
-	/// that varies from the actual <see cref="Size"/> of the <see cref="Popup" />
-	/// </remarks>
-	public Size Size
-	{
-		get => (Size)GetValue(SizeProperty);
-		set => SetValue(SizeProperty, value);
-	}
 
 	/// <summary>
 	/// Controls whether the popup should respect safe insets like status bar etc. 
@@ -218,7 +198,6 @@ public partial class Popup : View, IPopup
 
 		RemoveBinding(Popup.IgnoreSafeAreaProperty);
 		RemoveBinding(Popup.ContentProperty);
-		RemoveBinding(Popup.SizeProperty);
 		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
 		RemoveBinding(Popup.StyleProperty);
 

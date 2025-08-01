@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:popups="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
              x:Class="SampleApp.Views.AnchoredPopup"
-             Size="250,150"
+             WidthRequest="250"
+             HeightRequest="150"
              BackgroundColor="#80000000"
              CloseWhenBackgroundIsClicked="False">
     

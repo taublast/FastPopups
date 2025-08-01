@@ -131,7 +131,13 @@ public static partial class PopupExtensions
 
 		CGSize currentSize;
 
-		if (popup.Size.IsZero)
+		// Check if popup has explicit size requests
+		// Cast to VisualElement to access HeightRequest/WidthRequest properties
+		var visualElement = popup as VisualElement;
+		var hasExplicitWidth = visualElement?.WidthRequest > 0;
+		var hasExplicitHeight = visualElement?.HeightRequest > 0;
+		
+		if (hasExplicitWidth != true && hasExplicitHeight != true)
 		{
 			if (double.IsNaN(popup.Content.Width) || double.IsNaN(popup.Content.Height))
 			{
@@ -168,9 +174,18 @@ public static partial class PopupExtensions
 				currentSize = new CGSize(popup.Content.Width, popup.Content.Height);
 			}
 		}
+		else if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
+		{
+			currentSize = new CGSize(visualElement.WidthRequest, visualElement.HeightRequest);
+		}
 		else
 		{
-			currentSize = new CGSize(popup.Size.Width, popup.Size.Height);
+			// Mixed case: some explicit, some calculated
+			var width = hasExplicitWidth == true && visualElement != null ? visualElement.WidthRequest : 
+				double.IsNaN(popup.Content.Width) ? adjustedFrame.Width : popup.Content.Width;
+			var height = hasExplicitHeight == true && visualElement != null ? visualElement.HeightRequest : 
+				double.IsNaN(popup.Content.Height) ? adjustedFrame.Height : popup.Content.Height;
+			currentSize = new CGSize(width, height);
 		}
 
 		currentSize.Width = NMath.Min(currentSize.Width, adjustedFrame.Width);

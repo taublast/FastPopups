@@ -4,8 +4,15 @@
 
 ## TODO
 
-* Android anchor is lower by the amount for either bottom navbar or shell navbar can't 
-* Test/fix Tizen
+### Required
+
+* Android anchor is lower by the amount for either bottom navbar or shell navbar..
+* Test (and then fix) Tizen
+
+### Optional
+
+* Add Blur effect below on every platform
+* Add animations like we had in RG popups, working separately separate for overlay and content
 
 ## Features
 

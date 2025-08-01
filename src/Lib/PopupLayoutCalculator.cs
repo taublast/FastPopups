@@ -80,12 +80,17 @@ public static class PopupLayoutCalculator
 				parentBounds.Width - safeAreaInsets.Left - safeAreaInsets.Right,
 				parentBounds.Height - safeAreaInsets.Top - safeAreaInsets.Bottom);
 
-		// If popup has explicit size, use it (but constrain to parent bounds)
-		if (!popup.Size.IsZero)
+		// If popup has explicit HeightRequest/WidthRequest, use them (but constrain to parent bounds)
+		// Cast to VisualElement to access HeightRequest/WidthRequest properties
+		var visualElement = popup as VisualElement;
+		var hasExplicitWidth = visualElement?.WidthRequest > 0;
+		var hasExplicitHeight = visualElement?.HeightRequest > 0;
+		
+		if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
 		{
 			return new Size(
-				Math.Min(popup.Size.Width, adjustedBounds.Width),
-				Math.Min(popup.Size.Height, adjustedBounds.Height));
+				Math.Min(visualElement.WidthRequest, adjustedBounds.Width),
+				Math.Min(visualElement.HeightRequest, adjustedBounds.Height));
 		}
 
 		// If content has explicit size, use it
@@ -102,17 +107,21 @@ public static class PopupLayoutCalculator
 			}
 		}
 
-		// Calculate size based on layout options
+		// Calculate size based on layout options and any explicit requests
 		var horizontalAlignment = GetLayoutAlignment(popup.HorizontalOptions);
 		var verticalAlignment = GetLayoutAlignment(popup.VerticalOptions);
 		
-		var width = horizontalAlignment == LayoutAlignment.Fill 
-			? adjustedBounds.Width 
-			: Math.Min(600, adjustedBounds.Width); // Default width, constrained by parent
+		var width = hasExplicitWidth == true && visualElement != null
+			? Math.Min(visualElement.WidthRequest, adjustedBounds.Width)
+			: horizontalAlignment == LayoutAlignment.Fill 
+				? adjustedBounds.Width 
+				: Math.Min(600, adjustedBounds.Width); // Default width, constrained by parent
 
-		var height = verticalAlignment == LayoutAlignment.Fill 
-			? adjustedBounds.Height 
-			: Math.Min(400, adjustedBounds.Height); // Default height, constrained by parent
+		var height = hasExplicitHeight == true && visualElement != null
+			? Math.Min(visualElement.HeightRequest, adjustedBounds.Height)
+			: verticalAlignment == LayoutAlignment.Fill 
+				? adjustedBounds.Height 
+				: Math.Min(400, adjustedBounds.Height); // Default height, constrained by parent
 
 		return new Size(width, height);
 	}

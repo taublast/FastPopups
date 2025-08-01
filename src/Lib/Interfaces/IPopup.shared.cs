@@ -33,10 +33,6 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </summary>
 	bool CloseWhenBackgroundIsClicked { get; }
 
-	/// <summary>
-	/// Gets the Popup's size.
-	/// </summary>
-	Size Size { get; }
 
 	/// <summary>
 	/// Gets the vertical aspect of this element's arrangement in a container.

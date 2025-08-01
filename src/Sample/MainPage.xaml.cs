@@ -30,7 +30,8 @@ public partial class MainPage : ContentPage
 		Popup popup = null!;
 		popup = new Popup
 		{
-			Size = new Size(350, 250),
+			HeightRequest = 250,
+			WidthRequest = 350,
             BackgroundColor = Colors.Black.WithAlpha(0.6f),
 			CloseWhenBackgroundIsClicked = true,
 			HorizontalOptions = LayoutOptions.Center,
@@ -82,7 +83,8 @@ public partial class MainPage : ContentPage
 		Popup popup = null!;
 		popup = new Popup
 		{
-			Size = new Size(400, 300),
+			HeightRequest = 300,
+			WidthRequest = 400,
             BackgroundColor = Colors.Purple.WithAlpha(0.4f),
 			CloseWhenBackgroundIsClicked = true,
 			HorizontalOptions = LayoutOptions.Start,

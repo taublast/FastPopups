@@ -368,10 +368,44 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	/// </summary>
 	void OnWindowSizeChanged(object? sender, Microsoft.UI.Xaml.WindowSizeChangedEventArgs e)
 	{
-		if (VirtualView is not null && PopupView.IsOpen)
+		if (VirtualView is not null && PopupView.IsOpen && Content is not null)
 		{
-			// Recalculate and update popup position
-			Layout();
+			// Find the actual content element within the composite popup and update its margin
+			if (PopupView.Child is Grid container && container.Children.Count > 1)
+			{
+				var actualContent = container.Children.LastOrDefault() as FrameworkElement;
+				if (actualContent != null)
+				{
+					// Recalculate position using the same logic as initial positioning
+					var window = mauiContext.GetPlatformWindow();
+					var windowBounds = window.Bounds;
+					var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
+
+					// Get content size
+					var contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
+					if (contentSize.Width == 0 || contentSize.Height == 0)
+					{
+						contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+					}
+
+					// Calculate position based on popup alignment or anchor
+					double x, y;
+					if (VirtualView.Anchor != null)
+					{
+						// Handle anchored positioning
+						var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
+						(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
+					}
+					else
+					{
+						// Handle regular alignment-based positioning
+						(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+					}
+
+					// Update the content's margin to reposition it
+					actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+				}
+			}
 		}
 	}
 

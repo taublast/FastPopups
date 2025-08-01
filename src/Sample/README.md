@@ -49,7 +49,8 @@ This sample application demonstrates the usage of the **AppoMobi.Maui.Popups** l
 ```csharp
 var popup = new Popup
 {
-    Size = new Size(300, 200),
+    HeightRequest = 200,
+    WidthRequest = 300,
     OverlayColor = Colors.Black.WithAlpha(0.5f),
     Content = new Label { Text = "Hello from popup!" }
 };
@@ -60,7 +61,8 @@ await this.ShowPopupAsync(popup);
 ### XAML Popup
 ```xml
 <popup:Popup x:Class="MyApp.MyPopup"
-             Size="300,200"
+             HeightRequest="200"
+             WidthRequest="300"
              OverlayColor="Black"
              CloseWhenBackgroundIsClicked="True">
     <!-- Your content here -->
