@@ -5,7 +5,7 @@
              x:Class="SampleApp.Views.AnchoredPopup"
              Size="250,150"
              BackgroundColor="#80000000"
-             CloseWhenBackgroundIsClicked="True">
+             CloseWhenBackgroundIsClicked="False">
     
     <Border BackgroundColor="LightYellow" 
             StrokeThickness="1" 

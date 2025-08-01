@@ -253,7 +253,24 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		var locationOnScreen = new int[2];
 		anchorView.GetLocationOnScreen(locationOnScreen);
 		
-		return new Rect(locationOnScreen[0], locationOnScreen[1], anchorView.Width, anchorView.Height);
+		// Since our dialog is fullscreen and our container fills the dialog,
+		// the screen coordinates should work directly without adjustment.
+		// However, we need to ensure coordinates are relative to our container.
+		var anchorX = locationOnScreen[0];
+		var anchorY = locationOnScreen[1];
+		
+		// Get our dialog's window position to adjust coordinates if needed
+		if (Window?.DecorView != null)
+		{
+			var dialogLocation = new int[2];
+			Window.DecorView.GetLocationOnScreen(dialogLocation);
+			
+			// Adjust anchor coordinates relative to dialog position
+			anchorX -= dialogLocation[0];
+			anchorY -= dialogLocation[1];
+		}
+		
+		return new Rect(anchorX, anchorY, anchorView.Width, anchorView.Height);
 	}
 
 	/// <summary>

@@ -109,7 +109,7 @@ public partial class MainPage : ContentPage
 						},
 						new Label
 						{
-							Text = "This popup demonstrates custom sizing and positioning. It's positioned at the top-left with a purple theme.",
+							Text = "This popup demonstrates custom sizing and positioning. It's positioned at the top-left with a purple theme. Will close if you tap anywhere on the screen!",
 							HorizontalOptions = LayoutOptions.Center,
 							HorizontalTextAlignment = TextAlignment.Center,
 							TextColor = Colors.DarkSlateGray

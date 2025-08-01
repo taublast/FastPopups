@@ -27,7 +27,7 @@
                    HorizontalOptions="Center"
                    TextColor="DarkBlue" />
 
-            <Label Text="This is a basic popup demonstration using the AppoMobi.Maui.Popups library."
+            <Label Text="This is a basic popup, will close only when button is clicked."
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
