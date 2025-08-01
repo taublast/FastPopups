@@ -83,7 +83,13 @@ public static partial class PopupExtensions
     public static void SetAnchor(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
     {
         ArgumentNullException.ThrowIfNull(mauiContext);
-        mauiPopup.PopupView.PlacementTarget = popup.Anchor?.ToPlatform(mauiContext);
+        
+        // With fullscreen overlay architecture, we can't use native PlacementTarget
+        // because it conflicts with fullscreen sizing. Instead, we'll handle anchor
+        // positioning using our custom layout logic in SetLayout method.
+        
+        // Clear any existing placement target since we handle positioning manually
+        mauiPopup.PopupView.PlacementTarget = null;
     }
 
     /// <summary>
@@ -210,13 +216,9 @@ public static partial class PopupExtensions
             mauiContentSize = new Size(300, 200); // Reasonable default
         }
 
-        // Handle anchor positioning
-        if (popup.Anchor is not null)
-        {
-            mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Top;
-            // Let WinUI handle anchor positioning automatically
-            return;
-        }
+        // Handle anchor positioning using our custom logic
+        // (native PlacementTarget conflicts with fullscreen popup)
+        // Content positioning will be handled in MauiPopup.PositionContentInContainer
 
         // WinUI Popup is now fullscreen, so no need to position it
         // Content positioning is handled within the fullscreen popup by the composite content
@@ -256,5 +258,37 @@ public static partial class PopupExtensions
     static bool IsLayoutFill(LayoutOptions layoutOptions)
     {
         return (int)layoutOptions.Alignment == 3; // Fill = 3
+    }
+
+    /// <summary>
+    /// Gets the bounds of the anchor view in screen coordinates for Windows.
+    /// </summary>
+    /// <param name="anchor">The anchor view.</param>
+    /// <param name="mauiContext">The MAUI context.</param>
+    /// <returns>The bounds of the anchor view.</returns>
+    public static Rect GetAnchorBounds(IView anchor, IMauiContext mauiContext)
+    {
+        if (anchor.Handler?.PlatformView is not FrameworkElement anchorElement)
+        {
+            return new Rect(0, 0, 100, 50); // Default if anchor not found
+        }
+
+        // Get anchor position relative to the window
+        var window = mauiContext.GetPlatformWindow();
+        var windowBounds = window.Bounds;
+        
+        try
+        {
+            // Transform anchor bounds to screen coordinates
+            var transform = anchorElement.TransformToVisual(window.Content as FrameworkElement);
+            var anchorPosition = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+            
+            return new Rect(anchorPosition.X, anchorPosition.Y, anchorElement.ActualWidth, anchorElement.ActualHeight);
+        }
+        catch
+        {
+            // Fallback if transform fails
+            return new Rect(0, 0, anchorElement.ActualWidth, anchorElement.ActualHeight);
+        }
     }
 }

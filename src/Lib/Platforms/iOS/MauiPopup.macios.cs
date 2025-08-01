@@ -214,7 +214,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 	}
 
-	void AddToCurrentPageViewController(UIViewController viewController)
+	public void AddToCurrentPageViewController(UIViewController viewController)
 	{
 		viewController.PresentViewController(this, true, null);
 	}

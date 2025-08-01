@@ -209,8 +209,19 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 			contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
 		}
 
-		// Use unified layout calculator for positioning
-		var (x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+		// Calculate position based on popup alignment or anchor
+		double x, y;
+		if (VirtualView.Anchor != null)
+		{
+			// Handle anchored positioning
+			var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
+			(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
+		}
+		else
+		{
+			// Handle regular alignment-based positioning
+			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+		}
 
 		// Set positioning using margins
 		actualContent.HorizontalAlignment = HorizontalAlignment.Left;

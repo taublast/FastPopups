@@ -11,6 +11,7 @@
             StrokeThickness="1" 
             Stroke="Orange"
             StrokeShape="RoundRectangle 8">
+
         <StackLayout Padding="15" Spacing="10">
             <Label Text="Anchored Popup" 
                    FontSize="16" 

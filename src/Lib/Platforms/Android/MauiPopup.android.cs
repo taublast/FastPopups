@@ -191,7 +191,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		var screenSize = GetScreenSize(windowManager, VirtualView.IgnoreSafeArea);
 		var parentBounds = new Rect(0, 0, screenSize.Width, screenSize.Height);
 
-		// Get safe area insets if needed (in pixels for Android)
+		// Get safe area insets in DIPs for use with shared layout logic
 		var safeAreaInsets = new Microsoft.Maui.Thickness();
 		if (!VirtualView.IgnoreSafeArea)
 		{
@@ -200,12 +200,15 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			safeAreaInsets = new Microsoft.Maui.Thickness(0, statusBarHeight, 0, navigationBarHeight);
 		}
 
-		// Always measure the actual content to get its natural size
+		// Always measure the actual content to get its natural size (Android measure uses pixels)
 		actualContent.Measure(
-			Android.Views.View.MeasureSpec.MakeMeasureSpec((int)screenSize.Width, MeasureSpecMode.AtMost),
-			Android.Views.View.MeasureSpec.MakeMeasureSpec((int)screenSize.Height, MeasureSpecMode.AtMost));
+			Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Width), MeasureSpecMode.AtMost),
+			Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Height), MeasureSpecMode.AtMost));
 		
-		var contentSize = new Size(actualContent.MeasuredWidth, actualContent.MeasuredHeight);
+		// Convert measured size from pixels to DIPs for use with shared layout logic
+		var contentSize = new Size(
+			PixelsToDips(actualContent.MeasuredWidth), 
+			PixelsToDips(actualContent.MeasuredHeight));
 		
 		// If content has no natural size, fall back to layout calculator
 		if (contentSize.Width == 0 || contentSize.Height == 0)
@@ -213,26 +216,35 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
 		}
 
-		// Calculate position based on popup alignment or anchor
+		// Calculate position based on popup alignment or anchor (all in DIPs)
 		double x, y;
 		if (VirtualView.Anchor != null)
 		{
-			// Handle anchored positioning
+			// Get anchor bounds and calculate position using shared logic (all in DIPs)
 			var anchorBounds = GetAnchorBounds(VirtualView.Anchor);
 			(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
+			
+			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Anchor bounds (DIPs): {anchorBounds}");
+			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Calculated position (DIPs): X={x}, Y={y}");
+			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Content size (DIPs): {contentSize}");
 		}
 		else
 		{
-			// Handle regular alignment-based positioning
+			// Handle regular alignment-based positioning (all in DIPs)
 			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, safeAreaInsets);
 		}
 
-		// Create layout parameters with calculated position and size
-		var layoutParams = new FrameLayout.LayoutParams((int)contentSize.Width, (int)contentSize.Height)
+		// Convert final position and size from DIPs to pixels for Android layout parameters
+		var layoutParams = new FrameLayout.LayoutParams(
+			DipsToPixels(contentSize.Width), 
+			DipsToPixels(contentSize.Height))
 		{
-			LeftMargin = (int)x,
-			TopMargin = (int)y
+			LeftMargin = DipsToPixels(x),
+			TopMargin = DipsToPixels(y)
 		};
+		
+		System.Diagnostics.Debug.WriteLine($"[LAYOUT DEBUG] Final layout (pixels): X={DipsToPixels(x)}, Y={DipsToPixels(y)}, W={DipsToPixels(contentSize.Width)}, H={DipsToPixels(contentSize.Height)}");
+		System.Diagnostics.Debug.WriteLine($"[LAYOUT DEBUG] Density factor: {GetDensity()}");
 
 		actualContent.LayoutParameters = layoutParams;
 		container.AddView(actualContent);
@@ -250,76 +262,100 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			return new Rect(0, 0, 100, 50); // Default if anchor not found
 		}
 
-		var locationOnScreen = new int[2];
-		anchorView.GetLocationOnScreen(locationOnScreen);
+		// Get density factor to convert pixels to DIPs
+		var density = Context?.Resources?.DisplayMetrics?.Density ?? 1.0f;
+
+		// Get anchor coordinates relative to dialog window
+		var windowLocationOnScreen = new int[2];
+		var anchorLocationOnScreen = new int[2];
 		
-		// Since our dialog is fullscreen and our container fills the dialog,
-		// the screen coordinates should work directly without adjustment.
-		// However, we need to ensure coordinates are relative to our container.
-		var anchorX = locationOnScreen[0];
-		var anchorY = locationOnScreen[1];
-		
-		// Get our dialog's window position to adjust coordinates if needed
+		// Get our dialog window position
 		if (Window?.DecorView != null)
 		{
-			var dialogLocation = new int[2];
-			Window.DecorView.GetLocationOnScreen(dialogLocation);
-			
-			// Adjust anchor coordinates relative to dialog position
-			anchorX -= dialogLocation[0];
-			anchorY -= dialogLocation[1];
+			Window.DecorView.GetLocationOnScreen(windowLocationOnScreen);
 		}
 		
-		return new Rect(anchorX, anchorY, anchorView.Width, anchorView.Height);
+		// Get anchor position
+		anchorView.GetLocationOnScreen(anchorLocationOnScreen);
+		
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Dialog DecorView screen position (pixels): X={windowLocationOnScreen[0]}, Y={windowLocationOnScreen[1]}");
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Anchor view screen position (pixels): X={anchorLocationOnScreen[0]}, Y={anchorLocationOnScreen[1]}");
+		
+		// Calculate relative position (anchor relative to our dialog window) in pixels
+		var relativeXPixels = anchorLocationOnScreen[0] - windowLocationOnScreen[0];
+		var relativeYPixels = anchorLocationOnScreen[1] - windowLocationOnScreen[1];
+		
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Relative position (pixels): X={relativeXPixels}, Y={relativeYPixels}");
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Anchor size (pixels): W={anchorView.Width}, H={anchorView.Height}");
+		
+		// Convert from pixels to DIPs (density-independent pixels)
+		var relativeX = relativeXPixels / density;
+		var relativeY = relativeYPixels / density;
+		var width = anchorView.Width / density;
+		var height = anchorView.Height / density;
+		
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Final anchor bounds (DIPs): X={relativeX}, Y={relativeY}, W={width}, H={height}");
+		System.Diagnostics.Debug.WriteLine($"[ANCHOR COORDS] Density factor: {density}");
+		
+		return new Rect(relativeX, relativeY, width, height);
 	}
 
 	/// <summary>
-	/// Gets the screen size, optionally accounting for safe areas.
+	/// Gets the screen size in MAUI DIPs (density-independent pixels).
 	/// </summary>
 	/// <param name="windowManager">The window manager.</param>
 	/// <param name="ignoresSafeArea">Whether to ignore safe areas.</param>
-	/// <returns>The screen size.</returns>
+	/// <returns>The screen size in DIPs.</returns>
 	Size GetScreenSize(IWindowManager windowManager, bool ignoresSafeArea)
 	{
+		var density = GetDensity();
+		
 		if (OperatingSystem.IsAndroidVersionAtLeast(30))
 		{
 			var windowMetrics = windowManager.CurrentWindowMetrics;
-			return new Size(windowMetrics.Bounds.Width(), windowMetrics.Bounds.Height());
+			// Convert from pixels to DIPs
+			return new Size(
+				windowMetrics.Bounds.Width() / density, 
+				windowMetrics.Bounds.Height() / density);
 		}
 		else if (windowManager.DefaultDisplay != null)
 		{
 			var realSize = new Android.Graphics.Point();
 			windowManager.DefaultDisplay.GetRealSize(realSize);
-			return new Size(realSize.X, realSize.Y);
+			// Convert from pixels to DIPs
+			return new Size(realSize.X / density, realSize.Y / density);
 		}
 		
 		return new Size(1000, 1000); // Fallback
 	}
 
 	/// <summary>
-	/// Gets the status bar height.
+	/// Gets the status bar height in MAUI DIPs (density-independent pixels).
 	/// </summary>
 	/// <param name="context">The context.</param>
-	/// <returns>The status bar height in pixels.</returns>
-	static int GetStatusBarHeight(Context context)
+	/// <returns>The status bar height in DIPs.</returns>
+	double GetStatusBarHeight(Context context)
 	{
 		if (context.Resources != null)
 		{
 			int resourceId = context.Resources.GetIdentifier("status_bar_height", "dimen", "android");
 			if (resourceId > 0)
 			{
-				return context.Resources.GetDimensionPixelSize(resourceId);
+				var pixelSize = context.Resources.GetDimensionPixelSize(resourceId);
+				var density = GetDensity();
+				// Convert from pixels to DIPs
+				return pixelSize / density;
 			}
 		}
 		return 0;
 	}
 
 	/// <summary>
-	/// Gets the navigation bar height.
+	/// Gets the navigation bar height in MAUI DIPs (density-independent pixels).
 	/// </summary>
 	/// <param name="windowManager">The window manager.</param>
-	/// <returns>The navigation bar height in pixels.</returns>
-	static int GetNavigationBarHeight(IWindowManager windowManager)
+	/// <returns>The navigation bar height in DIPs.</returns>
+	double GetNavigationBarHeight(IWindowManager windowManager)
 	{
 		int heightPixels = 0;
 		
@@ -344,7 +380,38 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 				: (realSize.Y - displaySize.Y);
 		}
 
-		return heightPixels;
+		var density = GetDensity();
+		// Convert from pixels to DIPs
+		return heightPixels / density;
+	}
+
+	/// <summary>
+	/// Gets the display density factor for converting between pixels and DIPs.
+	/// </summary>
+	/// <returns>The density factor (pixels per DIP).</returns>
+	float GetDensity()
+	{
+		return Context?.Resources?.DisplayMetrics?.Density ?? 1.0f;
+	}
+
+	/// <summary>
+	/// Converts DIPs to pixels for use with Android layout parameters.
+	/// </summary>
+	/// <param name="dips">Value in DIPs.</param>
+	/// <returns>Value in pixels.</returns>
+	int DipsToPixels(double dips)
+	{
+		return (int)(dips * GetDensity());
+	}
+
+	/// <summary>
+	/// Converts pixels to DIPs for use with MAUI layout calculations.
+	/// </summary>
+	/// <param name="pixels">Value in pixels.</param>
+	/// <returns>Value in DIPs.</returns>
+	double PixelsToDips(int pixels)
+	{
+		return pixels / GetDensity();
 	}
 
 	/// <summary>
