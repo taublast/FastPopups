@@ -67,18 +67,9 @@ public partial class PopupHandler : ElementHandler<IPopup, MauiPopup>
 		handler.PlatformView.SetCanBeDismissedByTappingOutsideOfPopup(view);
 	}
 
-	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.Color"/> property changes.
-	/// </summary>
-	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
-	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
-	public static void MapColor(PopupHandler handler, IPopup view)
-	{
-		handler.PlatformView.SetColor(view);
-	}
 
 	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.OverlayColor"/> property changes.
+	/// Action that's triggered when the Popup BackgroundColor property changes.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>

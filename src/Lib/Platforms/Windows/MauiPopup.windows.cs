@@ -18,6 +18,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	readonly IMauiContext mauiContext;
 	bool attached;
 	Grid? overlay;
+	bool windowResizeHandlerAttached;
 
 	/// <summary>
 	/// The native popup view.
@@ -64,6 +65,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 
 		HorizontalAlignment = HorizontalAlignment.Stretch;
 		VerticalAlignment = VerticalAlignment.Stretch;
+		Background = null; // Ensure MauiPopup itself has no background blocking transparency
 
 		PopupView = new ()
 		{
@@ -106,6 +108,9 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 				Content.SizeChanged -= OnSizeChanged;
 				Content = null;
 			}
+			
+			// Detach window resize handler
+			DetachWindowResizeHandler();
 
 			return null;
 		}
@@ -134,11 +139,12 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	/// <returns>A Grid containing both overlay and content.</returns>
 	FrameworkElement CreateCompositePopupContent(FrameworkElement actualContent)
 	{
-		// Create a full-screen container
+		// Create a full-screen container with no background to avoid transparency issues
 		var container = new Grid
 		{
 			HorizontalAlignment = HorizontalAlignment.Stretch,
-			VerticalAlignment = VerticalAlignment.Stretch
+			VerticalAlignment = VerticalAlignment.Stretch,
+			Background = null // Explicitly null to avoid any white background blocking transparency
 		};
 
 		if (VirtualView == null)
@@ -147,8 +153,8 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		}
 
 
-		// Create the full-screen overlay
-		var backgroundColor = VirtualView.OverlayColor.ToWindowsColor();
+		// Create the full-screen overlay with proper transparency handling
+		var overlayColor = ((Popup)VirtualView).BackgroundColor;
 		overlay = new BackgroundDimmer(() =>
 		{
 			if (CanBeDismissedByTappingOutside)
@@ -157,10 +163,20 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 			}
 		})
 		{
-			Background = new SolidColorBrush(backgroundColor),
 			HorizontalAlignment = HorizontalAlignment.Stretch,
 			VerticalAlignment = VerticalAlignment.Stretch
 		};
+
+		// Set background with proper transparency - avoid any white blocking issues
+		if (overlayColor != Colors.Transparent)
+		{
+			var windowsColor = overlayColor.ToWindowsColor();
+			overlay.Background = new SolidColorBrush(windowsColor);
+		}
+		else
+		{
+			overlay.Background = null; // Explicitly null for transparent overlays
+		}
 
 		// Add overlay first (behind content)
 		container.Children.Add(overlay);
@@ -189,12 +205,23 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 				// cover everything that was visible before this popup opened
 				rootPanel.Children.Add(this);
 			}
+			
+			// Attach window resize handler to maintain popup positioning
+			AttachWindowResizeHandler();
 		}
 
 		PopupView.XamlRoot = this.XamlRoot;
 		PopupView.IsOpen = true;
 
 		_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null");
+		
+		// Delay layout until after the popup is shown and content is measured
+		// This fixes the initial positioning issue
+		DispatcherQueue.TryEnqueue(() =>
+		{
+			Layout(); // Re-layout after popup is fully shown
+		});
+		
 		VirtualView.OnOpened();
 	}
 
@@ -251,6 +278,58 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		//Children.Add(container);
 
 		return true;
+	}
+
+	/// <summary>
+	/// Attaches window resize handler to maintain popup positioning when window is resized.
+	/// </summary>
+	void AttachWindowResizeHandler()
+	{
+		if (windowResizeHandlerAttached)
+			return;
+
+		try
+		{
+			var window = mauiContext.GetPlatformWindow();
+			window.SizeChanged += OnWindowSizeChanged;
+			windowResizeHandlerAttached = true;
+		}
+		catch (Exception e)
+		{
+			Trace.WriteLine($"Failed to attach window resize handler: {e}");
+		}
+	}
+
+	/// <summary>
+	/// Detaches window resize handler.
+	/// </summary>
+	void DetachWindowResizeHandler()
+	{
+		if (!windowResizeHandlerAttached)
+			return;
+
+		try
+		{
+			var window = mauiContext.GetPlatformWindow();
+			window.SizeChanged -= OnWindowSizeChanged;
+			windowResizeHandlerAttached = false;
+		}
+		catch (Exception e)
+		{
+			Trace.WriteLine($"Failed to detach window resize handler: {e}");
+		}
+	}
+
+	/// <summary>
+	/// Handles window resize events to maintain popup positioning.
+	/// </summary>
+	void OnWindowSizeChanged(object? sender, Microsoft.UI.Xaml.WindowSizeChangedEventArgs e)
+	{
+		if (VirtualView is not null && PopupView.IsOpen)
+		{
+			// Recalculate and update popup position
+			Layout();
+		}
 	}
 
 

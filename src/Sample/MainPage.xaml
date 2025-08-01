@@ -9,7 +9,7 @@
             Spacing="25">
             
             <Label
-                Text="AppoMobi.Maui.Popups"
+                Text="Maui Popups"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" 
                 HorizontalOptions="Center" />

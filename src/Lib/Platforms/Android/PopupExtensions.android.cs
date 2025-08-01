@@ -83,20 +83,9 @@ public static partial class PopupExtensions
 		}
 	}
 
-	/// <summary>
-	/// Method to update the <see cref="IPopup.Color"/> property.
-	/// </summary>
-	/// <param name="dialog">An instance of <see cref="Dialog"/>.</param>
-	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	public static void SetColor(this Dialog dialog, in IPopup popup)
-	{
-		var color = popup.Color ?? Colors.Transparent;
-		var window = GetWindow(dialog);
-		window.SetBackgroundDrawable(new ColorDrawable(color.ToPlatform(AColorRes.BackgroundLight, dialog.Context)));
-	}
 
 	/// <summary>
-	/// Method to update the <see cref="IPopup.OverlayColor"/> property.
+	/// Method to update the popup background color.
 	/// </summary>
 	/// <param name="dialog">An instance of <see cref="Dialog"/>.</param>
 	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
@@ -104,7 +93,7 @@ public static partial class PopupExtensions
 	{
 		if (dialog.Overlay != null)
 		{
-			var color = popup.OverlayColor ?? Colors.Transparent;
+			var color = ((Popup)popup).BackgroundColor ?? Colors.Transparent;
 			dialog.Overlay.SetBackgroundColor(color.ToPlatform());
 		}
 	}

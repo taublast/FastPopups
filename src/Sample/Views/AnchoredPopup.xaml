@@ -4,7 +4,7 @@
              xmlns:popups="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
              x:Class="SampleApp.Views.AnchoredPopup"
              Size="250,150"
-             OverlayColor="#80000000"
+             BackgroundColor="#80000000"
              CanBeDismissedByTappingOutsideOfPopup="True">
     
     <Border BackgroundColor="LightYellow" 

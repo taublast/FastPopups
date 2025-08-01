@@ -20,17 +20,7 @@ public partial class Popup : VisualElement, IPopup
 	public static readonly BindableProperty ContentProperty = BindableProperty.Create(nameof(Content), typeof(View),
 		typeof(Popup), propertyChanged: OnContentChanged);
 
-	/// <summary>
-	///  Backing BindableProperty for the <see cref="Color"/> property.
-	/// </summary>
-	public static readonly BindableProperty ColorProperty = BindableProperty.Create(nameof(Color), typeof(Color),
-		typeof(Popup), Colors.LightGray, propertyChanged: OnColorChanged);
 
-	/// <summary>
-	///  Backing BindableProperty for the <see cref="OverlayColor"/> property.
-	/// </summary>
-	public static readonly BindableProperty OverlayColorProperty = BindableProperty.Create(nameof(OverlayColor),
-		typeof(Color), typeof(Popup), Color.FromRgba(1, 0, 0, 153), propertyChanged: OnColorChanged);
 
 	/// <summary>
 	/// Backing BindableProperty for the <see cref="IgnoreSafeArea"/> property.
@@ -79,6 +69,9 @@ public partial class Popup : VisualElement, IPopup
 	{
         //cannot do this otherwise default styles will not be applied
 		//VerticalOptions = HorizontalOptions = LayoutAlignment.Center;
+		
+		// Set default overlay color using BackgroundColor (replaces old OverlayColor default)
+		BackgroundColor = Color.FromRgba(1, 0, 0, 153); // Same default as old OverlayColor
 	}
 
 	/// <summary>
@@ -116,31 +109,7 @@ public partial class Popup : VisualElement, IPopup
 		set => SetValue(ContentProperty, value);
 	}
 
-	/// <summary>
-	/// Gets or sets the <see cref="Color"/> of the Popup.
-	/// </summary>
-	/// <remarks>
-	/// This color sets the native background color of the <see cref="Popup"/>, which is
-	/// independent of any background color configured in the actual View.
-	/// </remarks>
-	public Color Color
-	{
-		get => (Color)GetValue(ColorProperty);
-		set => SetValue(ColorProperty, value);
-	}
 
-	/// <summary>
-	/// Gets or sets the <see cref="OverlayColor"/> of the Popup.
-	/// </summary>
-	/// <remarks>
-	/// This color sets the background color of the <see cref="Popup"/> fullscreen overlay, which is
-	/// independent of any background color configured in the actual View.
-	/// </remarks>
-	public Color OverlayColor
-	{
-		get => (Color)GetValue(OverlayColorProperty);
-		set => SetValue(OverlayColorProperty, value);
-	}
 
 	/// <summary>
 	/// Gets or sets the <see cref="LayoutOptions"/> for positioning the <see cref="Popup"/> vertically on the screen.
@@ -277,8 +246,6 @@ public partial class Popup : VisualElement, IPopup
 
 		RemoveBinding(Popup.IgnoreSafeAreaProperty);
 		RemoveBinding(Popup.ContentProperty);
-		RemoveBinding(Popup.ColorProperty);
-		RemoveBinding(Popup.OverlayColorProperty);
 		RemoveBinding(Popup.SizeProperty);
 		RemoveBinding(Popup.CanBeDismissedByTappingOutsideOfPopupProperty);
 		RemoveBinding(Popup.VerticalOptionsProperty);
@@ -327,10 +294,6 @@ public partial class Popup : VisualElement, IPopup
 		popup.OnBindingContextChanged();
 	}
 
-	static void OnColorChanged(BindableObject bindable, object oldValue, object newValue)
-	{
-		ArgumentNullException.ThrowIfNull(newValue);
-	}
 
 	void IPopup.OnClosed(object? result) => Handler?.Invoke(nameof(IPopup.OnClosed), result);
 	void IPopup.OnOpened() => OnOpened();

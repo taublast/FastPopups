@@ -152,7 +152,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 				ViewGroup.LayoutParams.MatchParent,
 				ViewGroup.LayoutParams.MatchParent)
 		};
-		var color = VirtualView.OverlayColor ?? Colors.Transparent;
+		var color = ((Popup)VirtualView).BackgroundColor ?? Colors.Transparent;
 		overlay.SetBackgroundColor(color.ToPlatform());
 
 		// Add overlay first (behind content)

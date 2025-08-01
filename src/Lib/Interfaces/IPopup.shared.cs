@@ -14,16 +14,6 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	IView? Anchor { get; }
 
 	/// <summary>
-	/// Gets the Popup's color.
-	/// </summary>
-	Color? Color { get; }
-
-	/// <summary>
-	/// Gets the color of the fullscreen overlay.
-	/// </summary>
-	Color OverlayColor { get; }
-
-	/// <summary>
 	/// Gets the Popup's Content.
 	/// </summary>
 	IView? Content { get; }

@@ -3,7 +3,6 @@ using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
 using Window = Microsoft.UI.Xaml.Window;
 using AppoMobi.Maui.Popups;
-using AppoMobi.Maui.Popups;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Page = Microsoft.Maui.Controls.Page;
 using Popup = AppoMobi.Maui.Popups.Popup;
@@ -15,7 +14,6 @@ namespace AppoMobi.Maui.Popups;
 /// </summary>
 public static partial class PopupExtensions
 {
-
     static void PlatformShowPopup(Popup popup, IMauiContext mauiContext)
     {
         var window = mauiContext.GetPlatformWindow().GetWindow();
@@ -53,294 +51,198 @@ public static partial class PopupExtensions
     }
 
     /// <summary>
-    /// Method to update the <see cref="IPopup.OverlayColor"/>
+    /// Method to update the popup overlay background color using popup's BackgroundColor
     /// </summary>
     /// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
     /// <param name="popup">An instance of <see cref="IPopup"/>.</param>
     public static void SetBackgroundColor(this MauiPopup mauiPopup, IPopup popup)
-	{
-		if (mauiPopup.Overlay != null)
-		{
-			mauiPopup.Overlay.Background = new SolidColorBrush(popup.OverlayColor.ToWindowsColor());
-		}
-	}
+    {
+        if (mauiPopup.Overlay != null)
+        {
+            // Handle transparency properly - avoid white blocking issues
+            var backgroundColor = ((Popup)popup).BackgroundColor;
+            if (backgroundColor != Colors.Transparent)
+            {
+                var windowsColor = backgroundColor.ToWindowsColor();
+                mauiPopup.Overlay.Background = new SolidColorBrush(windowsColor);
+            }
+            else
+            {
+                mauiPopup.Overlay.Background = null; // Explicitly null for transparent overlays
+            }
+        }
+    }
 
-	/// <summary>
-	/// Method to update the <see cref="IPopup.Color"/> based on the <see cref="IPopup.Color"/>.
-	/// </summary>
-	/// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
-	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	public static void SetColor(this MauiPopup mauiPopup, IPopup popup)
-	{
+
+    /// <summary>
+    /// Method to update the popup anchor based on the <see cref="IPopup.Anchor"/>.
+    /// </summary>
+    /// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
+    /// <param name="popup">An instance of <see cref="IPopup"/>.</param>
+    /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
+    public static void SetAnchor(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
+    {
+        ArgumentNullException.ThrowIfNull(mauiContext);
+        mauiPopup.PopupView.PlacementTarget = popup.Anchor?.ToPlatform(mauiContext);
+    }
+
+    /// <summary>
+    /// Method to update the popup size based on the <see cref="IPopup.Size"/>.
+    /// </summary>
+    /// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
+    /// <param name="popup">An instance of <see cref="IPopup"/>.</param>
+    /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
+    public static void SetSize(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
+    {
+        ArgumentNullException.ThrowIfNull(mauiContext);
+        ArgumentNullException.ThrowIfNull(popup.Content);
+
+        const double defaultBorderThickness = 0;
+        const double defaultSize = 600;
+
+        var currentSize = new Size { Width = defaultSize, Height = defaultSize / 2 };
+
+        var popupParent = mauiContext.GetPlatformWindow();
+        var fullBounds = popupParent.Bounds;
+
+        var popupParentFrame = fullBounds;
+        if (!popup.IgnoreSafeArea)
+        {
+            popupParentFrame = GetSafeArea(mauiContext);
+        }
 
 
-		var color = popup.Color ?? Colors.Transparent;
-		if (mauiPopup.PopupView.Child is Panel panel)
-		{
-			panel.Background = color.ToPlatform();
-		}
-	}
+        if (double.IsNaN(popup.Content.Width) || (double.IsNaN(popup.Content.Height)))
+        {
+            currentSize = popup.Content.Measure(
+                double.IsNaN(popup.Content.Width) ? popupParentFrame.Width : popup.Content.Width,
+                double.IsNaN(popup.Content.Height) ? popupParentFrame.Height : popup.Content.Height);
 
-	/// <summary>
-	/// Method to update the popup anchor based on the <see cref="IPopup.Anchor"/>.
-	/// </summary>
-	/// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
-	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	/// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
-	public static void SetAnchor(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
-	{
-		ArgumentNullException.ThrowIfNull(mauiContext);
-		mauiPopup.PopupView.PlacementTarget = popup.Anchor?.ToPlatform(mauiContext);
-	}
+            if (double.IsNaN(popup.Content.Width))
+            {
+                currentSize.Width = popup.HorizontalOptions == LayoutAlignment.Fill
+                    ? popupParentFrame.Width
+                    : currentSize.Width;
+            }
 
-	/// <summary>
-	/// Method to update the popup size based on the <see cref="IPopup.Size"/>.
-	/// </summary>
-	/// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
-	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	/// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
-	public static void SetSize(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
-	{
-		ArgumentNullException.ThrowIfNull(mauiContext);
-		ArgumentNullException.ThrowIfNull(popup.Content);
+            if (double.IsNaN(popup.Content.Height))
+            {
+                currentSize.Height = popup.VerticalOptions == LayoutAlignment.Fill
+                    ? popupParentFrame.Height
+                    : currentSize.Height;
+            }
+        }
+        else
+        {
+            currentSize.Width = popup.HorizontalOptions == LayoutAlignment.Fill
+                ? popupParentFrame.Width
+                : popup.Content.Width;
+            currentSize.Height = popup.VerticalOptions == LayoutAlignment.Fill
+                ? popupParentFrame.Height
+                : popup.Content.Height;
+        }
 
-		const double defaultBorderThickness = 0;
-		const double defaultSize = 600;
 
-		var currentSize = new Size { Width = defaultSize, Height = defaultSize / 2 };
+        currentSize.Width = Math.Min(currentSize.Width, popupParentFrame.Width);
+        currentSize.Height = Math.Min(currentSize.Height, popupParentFrame.Height);
 
-		var popupParent = mauiContext.GetPlatformWindow();
-		var fullBounds = popupParent.Bounds;
+        mauiPopup.PopupView.Width = currentSize.Width;
+        mauiPopup.PopupView.Height = currentSize.Height;
+        mauiPopup.PopupView.MinWidth = mauiPopup.PopupView.MaxWidth = currentSize.Width + (defaultBorderThickness * 2);
+        mauiPopup.PopupView.MinHeight =
+            mauiPopup.PopupView.MaxHeight = currentSize.Height + (defaultBorderThickness * 2);
 
-		var popupParentFrame = fullBounds;
-		if (!popup.IgnoreSafeArea)
-		{
-			popupParentFrame = GetSafeArea(mauiContext);
-		}
+        if (mauiPopup.PopupView.Child is FrameworkElement control)
+        {
+            control.Width = mauiPopup.PopupView.Width;
+            control.Height = mauiPopup.PopupView.Height;
+        }
+    }
 
-		if (popup.Size.IsZero)
-		{
-			if (double.IsNaN(popup.Content.Width) || (double.IsNaN(popup.Content.Height)))
-			{
-				currentSize = popup.Content.Measure(double.IsNaN(popup.Content.Width) ? popupParentFrame.Width : popup.Content.Width,
-					double.IsNaN(popup.Content.Height) ? popupParentFrame.Height : popup.Content.Height);
+    /// <summary>
+    ///  Method to update the popup layout.
+    /// </summary>
+    /// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
+    /// <param name="popup">An instance of <see cref="IPopup"/>.</param>
+    /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
+    public static void SetLayout(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
+    {
+        ArgumentNullException.ThrowIfNull(mauiContext);
+        ArgumentNullException.ThrowIfNull(popup.Content);
 
-				if (double.IsNaN(popup.Content.Width))
-				{
-					currentSize.Width = popup.HorizontalOptions == LayoutAlignment.Fill ? popupParentFrame.Width : currentSize.Width;
-				}
-				if (double.IsNaN(popup.Content.Height))
-				{
-					currentSize.Height = popup.VerticalOptions == LayoutAlignment.Fill ? popupParentFrame.Height : currentSize.Height;
-				}
-			}
-			else
-			{
-				currentSize.Width = popup.Content.Width;
-				currentSize.Height = popup.Content.Height;
-			}
-		}
-		else
-		{
-			currentSize.Width = popup.Size.Width;
-			currentSize.Height = popup.Size.Height;
-		}
+        var popupParent = mauiContext.GetPlatformWindow();
+        var fullBounds = popupParent.Bounds;
 
-		currentSize.Width = Math.Min(currentSize.Width, popupParentFrame.Width);
-		currentSize.Height = Math.Min(currentSize.Height, popupParentFrame.Height);
+        // Convert Windows.Foundation.Rect to Microsoft.Maui.Graphics.Rect
+        var parentBounds = new Rect(fullBounds.X, fullBounds.Y, fullBounds.Width, fullBounds.Height);
+        
+        // Get safe area if needed
+        Microsoft.Maui.Thickness safeAreaInsets = default;
+        if (!popup.IgnoreSafeArea)
+        {
+            var safeArea = GetSafeArea(mauiContext);
+            safeAreaInsets = new Microsoft.Maui.Thickness(
+                safeArea.X - fullBounds.X,
+                safeArea.Y - fullBounds.Y,
+                fullBounds.Right - safeArea.Right,
+                fullBounds.Bottom - safeArea.Bottom);
+        }
 
-		mauiPopup.PopupView.Width = currentSize.Width;
-		mauiPopup.PopupView.Height = currentSize.Height;
-		mauiPopup.PopupView.MinWidth = mauiPopup.PopupView.MaxWidth = currentSize.Width + (defaultBorderThickness * 2);
-		mauiPopup.PopupView.MinHeight = mauiPopup.PopupView.MaxHeight = currentSize.Height + (defaultBorderThickness * 2);
+        // Get content size - ensure proper measurement
+        var platformContent = popup.Content.ToPlatform(mauiContext);
+        
+        // If DesiredSize is empty, measure the content first
+        if (platformContent.DesiredSize.Width == 0 || platformContent.DesiredSize.Height == 0)
+        {
+            platformContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+        }
+        
+        var contentSize = platformContent.DesiredSize;
+        var mauiContentSize = new Size(contentSize.Width, contentSize.Height);
+        
+        // If still zero size, fall back to reasonable defaults or skip layout
+        if (mauiContentSize.Width == 0 || mauiContentSize.Height == 0)
+        {
+            mauiContentSize = new Size(300, 200); // Reasonable default
+        }
 
-		if (mauiPopup.PopupView.Child is FrameworkElement control)
-		{
-			control.Width = mauiPopup.PopupView.Width;
-			control.Height = mauiPopup.PopupView.Height;
-		}
-	}
+        // Handle anchor positioning
+        if (popup.Anchor is not null)
+        {
+            mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Top;
+            // Let WinUI handle anchor positioning automatically
+            return;
+        }
 
-	/// <summary>
-	///  Method to update the popup layout.
-	/// </summary>
-	/// <param name="mauiPopup">An instance of <see cref="Popup"/>.</param>
-	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	/// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
-	public static void SetLayout(this MauiPopup mauiPopup, IPopup popup, IMauiContext? mauiContext)
-	{
-		ArgumentNullException.ThrowIfNull(mauiContext);
-		ArgumentNullException.ThrowIfNull(popup.Content);
+        // Use unified layout calculator
+        var (x, y) = PopupLayoutCalculator.CalculatePosition(popup, mauiContentSize, parentBounds, safeAreaInsets);
 
-		var popupParent = mauiContext.GetPlatformWindow();
-		var fullBounds = popupParent.Bounds;
+        // Set WinUI popup properties
+        mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
+        mauiPopup.PopupView.HorizontalOffset = x;
+        mauiPopup.PopupView.VerticalOffset = y;
 
-		var popupParentFrame = fullBounds;
-		if (!popup.IgnoreSafeArea)
-		{
-			popupParentFrame = GetSafeArea(mauiContext);
-		}
+    }
 
-		var contentSize = popup.Content.ToPlatform(mauiContext).DesiredSize;
+    /// <summary>
+    /// Returns offsets taken by stem UI
+    /// </summary>
+    /// <param name="mauiContext"></param>
+    /// <returns></returns>
+    static Windows.Foundation.Rect GetSafeArea(IMauiContext mauiContext)
+    {
+        var platformWindow = mauiContext.GetPlatformWindow();
+        var topOffset = 0;
+        if (platformWindow.AppWindow.TitleBar != null)
+        {
+            var scale = platformWindow.AppWindow.Size.Width / platformWindow.Bounds.Width;
+            topOffset = (int)(platformWindow.AppWindow.TitleBar.Height / scale + 4);
+        }
 
-		var isFlowDirectionRightToLeft = popup.Content?.FlowDirection == Microsoft.Maui.FlowDirection.RightToLeft;
-		var horizontalOptionsPositiveNegativeMultiplier = isFlowDirectionRightToLeft ? -1 : 1;
-
-		var verticalOptions = popup.VerticalOptions;
-		var horizontalOptions = popup.HorizontalOptions;
-
-		var center = 0;
-		var verticalCenter = popupParentFrame.Top / 2;
-
-		var horizontalEnd = (popupParentFrame.Width - contentSize.Width * horizontalOptionsPositiveNegativeMultiplier) / 2;
-		var horizontalStart = -horizontalEnd;
-
-		var verticalStart = popupParentFrame.Top / 2 - (popupParentFrame.Height - contentSize.Height) / 2;
-		var verticalEnd = (popupParentFrame.Height - contentSize.Height + popupParentFrame.Top) / 2;
-
-		if (popup.Anchor is not null)
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Top;
-		}
-		else if (IsTopLeft(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.TopEdgeAlignedLeft;
-			mauiPopup.PopupView.HorizontalOffset = horizontalStart; 
-			mauiPopup.PopupView.VerticalOffset = verticalStart;
-		}
-		else if (IsTop(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Top;
-			mauiPopup.PopupView.HorizontalOffset = center; 
-			mauiPopup.PopupView.VerticalOffset = verticalStart;
-		}
-		else if (IsTopRight(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.TopEdgeAlignedRight;
-			mauiPopup.PopupView.HorizontalOffset = horizontalEnd;//(popupParentFrame.Width + popupParentFrame.Width * horizontalOptionsPositiveNegativeMultiplier) / 2 - contentSize.Width * horizontalOptionsPositiveNegativeMultiplier;
-			mauiPopup.PopupView.VerticalOffset = verticalStart;
-		}
-		else if (IsRight(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Right;
-			mauiPopup.PopupView.HorizontalOffset = horizontalEnd;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsBottomRight(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.BottomEdgeAlignedRight;
-			mauiPopup.PopupView.HorizontalOffset = horizontalEnd;
-			mauiPopup.PopupView.VerticalOffset = verticalEnd;
-		}
-		else if (IsBottom(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Bottom;
-			mauiPopup.PopupView.HorizontalOffset = center;
-			mauiPopup.PopupView.VerticalOffset = verticalEnd;
-		}
-		else if (IsBottomLeft(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.BottomEdgeAlignedLeft;
-			mauiPopup.PopupView.HorizontalOffset = verticalStart;
-			mauiPopup.PopupView.VerticalOffset = verticalEnd;
-		}
-		else if (IsLeft(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Left;
-			mauiPopup.PopupView.HorizontalOffset = horizontalStart;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsCenter(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = center;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsFillLeft(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = horizontalStart;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsFillCenter(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = center;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsFillRight(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = horizontalEnd;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsTopFill(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = center;
-			mauiPopup.PopupView.VerticalOffset = verticalStart;
-		}
-		else if (IsCenterFill(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = 0;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else if (IsBottomFill(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = 0;
-			mauiPopup.PopupView.VerticalOffset = verticalEnd;
-		}
-		else if (IsFill(verticalOptions, horizontalOptions))
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = 0;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-		else
-		{
-			mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-			mauiPopup.PopupView.HorizontalOffset = 0;
-			mauiPopup.PopupView.VerticalOffset = verticalCenter;
-		}
-
-		static bool IsTopLeft(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Start && horizontalOptions == LayoutAlignment.Start;
-		static bool IsTop(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Start && horizontalOptions == LayoutAlignment.Center;
-		static bool IsTopRight(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Start && horizontalOptions == LayoutAlignment.End;
-		static bool IsRight(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Center && horizontalOptions == LayoutAlignment.End;
-		static bool IsBottomRight(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.End && horizontalOptions == LayoutAlignment.End;
-		static bool IsBottom(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.End && horizontalOptions == LayoutAlignment.Center;
-		static bool IsBottomLeft(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.End && horizontalOptions == LayoutAlignment.Start;
-		static bool IsLeft(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Center && horizontalOptions == LayoutAlignment.Start;
-		static bool IsCenter(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Center && horizontalOptions == LayoutAlignment.Center;
-		static bool IsFillLeft(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Fill && horizontalOptions == LayoutAlignment.Start;
-		static bool IsFillCenter(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Fill && horizontalOptions == LayoutAlignment.Center;
-		static bool IsFillRight(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Fill && horizontalOptions == LayoutAlignment.End;
-		static bool IsTopFill(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Start && horizontalOptions == LayoutAlignment.Fill;
-		static bool IsCenterFill(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Center && horizontalOptions == LayoutAlignment.Fill;
-		static bool IsBottomFill(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.End && horizontalOptions == LayoutAlignment.Fill;
-		static bool IsFill(LayoutAlignment verticalOptions, LayoutAlignment horizontalOptions) => verticalOptions == LayoutAlignment.Fill && horizontalOptions == LayoutAlignment.Fill;
-	}
-
-	/// <summary>
-	/// Returns offsets taken by stem UI
-	/// </summary>
-	/// <param name="mauiContext"></param>
-	/// <returns></returns>
-	static Windows.Foundation.Rect GetSafeArea(IMauiContext mauiContext)
-	{
-		var platformWindow = mauiContext.GetPlatformWindow();
-		var topOffset = 0;
-		if (platformWindow.AppWindow.TitleBar != null)
-		{
-			var scale = platformWindow.AppWindow.Size.Width / platformWindow.Bounds.Width;
-			topOffset = (int)(platformWindow.AppWindow.TitleBar.Height / scale + 4);
-		}
-		return new Windows.Foundation.Rect(platformWindow.Bounds.X, topOffset, platformWindow.Bounds.Width, platformWindow.Bounds.Height - topOffset);
-	}
+        return new Windows.Foundation.Rect(platformWindow.Bounds.X, topOffset, platformWindow.Bounds.Width,
+            platformWindow.Bounds.Height - topOffset);
+    }
 
     public static Window GetPlatformWindow(this IMauiContext mauiContext) =>
         mauiContext.Services.GetRequiredService<Window>();
-
 }

@@ -11,8 +11,7 @@ public partial class PopupHandler
 	public static IPropertyMapper<IPopup, PopupHandler> PopUpMapper = new PropertyMapper<IPopup, PopupHandler>(ElementMapper)
 	{
 		[nameof(IPopup.Anchor)] = MapAnchor,
-		[nameof(IPopup.Color)] = MapColor,
-		[nameof(IPopup.OverlayColor)] = MapBackgroundColor,
+		[nameof(IView.Background)] = MapBackgroundColor,
 		[nameof(IPopup.Size)] = MapSize,
 		[nameof(IPopup.VerticalOptions)] = MapSize,
 		[nameof(IPopup.HorizontalOptions)] = MapSize,

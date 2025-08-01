@@ -170,7 +170,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 			overlay = new UIView(this.View.Bounds)
 			{
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
-				BackgroundColor = virtualView.OverlayColor.ToPlatform()
+				BackgroundColor = ((Popup)virtualView).BackgroundColor.ToPlatform()
 			};
 
 			if (virtualView.CanBeDismissedByTappingOutsideOfPopup)
@@ -212,10 +212,6 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 		view.SafeLeadingAnchor().ConstraintEqualTo(control.ViewController.View.SafeLeadingAnchor()).Active = true;
 		view.SafeTrailingAnchor().ConstraintEqualTo(control.ViewController.View.SafeTrailingAnchor()).Active = true;
 
-		if (VirtualView is not null)
-		{
-			this.SetColor(VirtualView);
-		}
 	}
 
 	void AddToCurrentPageViewController(UIViewController viewController)

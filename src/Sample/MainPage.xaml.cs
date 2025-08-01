@@ -31,7 +31,7 @@ public partial class MainPage : ContentPage
 		popup = new Popup
 		{
 			Size = new Size(350, 250),
-			OverlayColor = Colors.Black.WithAlpha(0.6f),
+            BackgroundColor = Colors.Black.WithAlpha(0.6f),
 			CanBeDismissedByTappingOutsideOfPopup = true,
 			HorizontalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Center,
 			VerticalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Center,
@@ -83,7 +83,7 @@ public partial class MainPage : ContentPage
 		popup = new Popup
 		{
 			Size = new Size(400, 300),
-			OverlayColor = Colors.Purple.WithAlpha(0.4f),
+            BackgroundColor = Colors.Purple.WithAlpha(0.4f),
 			CanBeDismissedByTappingOutsideOfPopup = true,
 			HorizontalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Start,
 			VerticalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Start,
