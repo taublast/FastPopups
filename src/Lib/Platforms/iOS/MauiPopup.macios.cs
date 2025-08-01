@@ -55,6 +55,18 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 		Control?.ContainerView?.SizeThatFits(size);
 
 	/// <inheritdoc/>
+	public override void ViewDidLoad()
+	{
+		base.ViewDidLoad();
+		
+		// Set transparent background to avoid white background behind rounded corners
+		if (View != null)
+		{
+			View.BackgroundColor = UIColor.Clear;
+		}
+	}
+
+	/// <inheritdoc/>
 	public override void ViewDidLayoutSubviews()
 	{
 		base.ViewDidLayoutSubviews();

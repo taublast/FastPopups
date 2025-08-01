@@ -58,10 +58,11 @@ public class MauiPopupView : UIView
         {
             popup.CreateControl(virtualView => 
             {
-                // Create a ContentPage to wrap the popup content
+                // Create a ContentPage to wrap the popup content with transparent background
                 var contentPage = new ContentPage
                 {
-                    Content = virtualView.Content as Microsoft.Maui.Controls.View
+                    Content = virtualView.Content as Microsoft.Maui.Controls.View,
+                    BackgroundColor = Colors.Transparent
                 };
                 
                 var mauiContext = virtualView.Handler?.MauiContext ?? throw new InvalidOperationException("MauiContext cannot be null");
