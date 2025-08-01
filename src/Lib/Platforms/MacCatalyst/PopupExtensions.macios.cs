@@ -1,6 +1,7 @@
 
 using Microsoft.Maui.Platform;
 using ObjCRuntime;
+using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
 namespace AppoMobi.Maui.Popups;
 /// <summary>
@@ -8,6 +9,45 @@ namespace AppoMobi.Maui.Popups;
 /// </summary>
 public static partial class PopupExtensions
 {
+	/// <summary>
+	/// Helper method to check if LayoutOptions represents Fill alignment.
+	/// </summary>
+	/// <param name="options">The LayoutOptions to check.</param>
+	/// <returns>True if the options represent Fill alignment, false otherwise.</returns>
+	static bool IsLayoutFill(LayoutOptions options)
+	{
+		return (int)options.Alignment == 3; // Fill = 3
+	}
+
+	/// <summary>
+	/// Helper method to check if LayoutOptions represents Center alignment.
+	/// </summary>
+	/// <param name="options">The LayoutOptions to check.</param>
+	/// <returns>True if the options represent Center alignment, false otherwise.</returns>
+	static bool IsLayoutCenter(LayoutOptions options)
+	{
+		return (int)options.Alignment == 1; // Center = 1
+	}
+
+	/// <summary>
+	/// Helper method to check if LayoutOptions represents Start alignment.
+	/// </summary>
+	/// <param name="options">The LayoutOptions to check.</param>
+	/// <returns>True if the options represent Start alignment, false otherwise.</returns>
+	static bool IsLayoutStart(LayoutOptions options)
+	{
+		return (int)options.Alignment == 0; // Start = 0
+	}
+
+	/// <summary>
+	/// Helper method to check if LayoutOptions represents End alignment.
+	/// </summary>
+	/// <param name="options">The LayoutOptions to check.</param>
+	/// <returns>True if the options represent End alignment, false otherwise.</returns>
+	static bool IsLayoutEnd(LayoutOptions options)
+	{
+		return (int)options.Alignment == 2; // End = 2
+	}
 
 #if MACCATALYST
 	// https://github.com/CommunityToolkit/Maui/pull/1361#issuecomment-1736487174
@@ -88,11 +128,11 @@ public static partial class PopupExtensions
 
 				if (double.IsNaN(popup.Content.Width))
 				{
-					width = popup.HorizontalOptions == Microsoft.Maui.Primitives.LayoutAlignment.Fill ? adjustedFrame.Width : width;
+					width = IsLayoutFill(popup.HorizontalOptions) ? adjustedFrame.Width : width;
 				}
 				if (double.IsNaN(popup.Content.Height))
 				{
-					height = popup.VerticalOptions == Microsoft.Maui.Primitives.LayoutAlignment.Fill ? adjustedFrame.Height : height;
+					height = IsLayoutFill(popup.VerticalOptions) ? adjustedFrame.Height : height;
 				}
 
 				currentSize = new CGSize(width, height);
@@ -148,32 +188,52 @@ public static partial class PopupExtensions
 		{
 			// Calculate the intrinsic content size.
 			CGSize contentSize = mauiPopup.PreferredContentSize;
-			if (!double.IsNaN(popup.Content.Width) && popup.HorizontalOptions != Microsoft.Maui.Primitives.LayoutAlignment.Fill)
+			if (!double.IsNaN(popup.Content.Width) && !IsLayoutFill(popup.HorizontalOptions))
 			{
 				contentSize.Width = (nfloat)popup.Content.Width;
 			}
-			if (!double.IsNaN(popup.Content.Height) && popup.VerticalOptions != Microsoft.Maui.Primitives.LayoutAlignment.Fill)
+			if (!double.IsNaN(popup.Content.Height) && !IsLayoutFill(popup.VerticalOptions))
 			{
 				contentSize.Height = (nfloat)popup.Content.Height;
 			}
 
 			// Compute the horizontal position based on the HorizontalOptions within the adjusted frame.
-			nfloat x = popup.HorizontalOptions switch
+			nfloat x;
+			if (IsLayoutStart(popup.HorizontalOptions))
 			{
-				Microsoft.Maui.Primitives.LayoutAlignment.Start => adjustedFrame.X,
-				Microsoft.Maui.Primitives.LayoutAlignment.End => adjustedFrame.X + adjustedFrame.Width - contentSize.Width,
-				Microsoft.Maui.Primitives.LayoutAlignment.Center or Microsoft.Maui.Primitives.LayoutAlignment.Fill => adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2,
-				_ => adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2,
-			};
+				x = adjustedFrame.X;
+			}
+			else if (IsLayoutEnd(popup.HorizontalOptions))
+			{
+				x = adjustedFrame.X + adjustedFrame.Width - contentSize.Width;
+			}
+			else if (IsLayoutCenter(popup.HorizontalOptions) || IsLayoutFill(popup.HorizontalOptions))
+			{
+				x = adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2;
+			}
+			else
+			{
+				x = adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2;
+			}
 
 			// Compute the vertical position based on the VerticalOptions within the adjusted frame.
-			nfloat y = popup.VerticalOptions switch
+			nfloat y;
+			if (IsLayoutStart(popup.VerticalOptions))
 			{
-				Microsoft.Maui.Primitives.LayoutAlignment.Start => adjustedFrame.Y + additionalVerticalOffset,
-				Microsoft.Maui.Primitives.LayoutAlignment.End => adjustedFrame.Y + adjustedFrame.Height - contentSize.Height - additionalVerticalOffset,
-				Microsoft.Maui.Primitives.LayoutAlignment.Center or Microsoft.Maui.Primitives.LayoutAlignment.Fill => adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2 - additionalVerticalOffset,
-				_ => adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2,
-			};
+				y = adjustedFrame.Y + additionalVerticalOffset;
+			}
+			else if (IsLayoutEnd(popup.VerticalOptions))
+			{
+				y = adjustedFrame.Y + adjustedFrame.Height - contentSize.Height - additionalVerticalOffset;
+			}
+			else if (IsLayoutCenter(popup.VerticalOptions) || IsLayoutFill(popup.VerticalOptions))
+			{
+				y = adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2 - additionalVerticalOffset;
+			}
+			else
+			{
+				y = adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2;
+			}
 
 			if (mauiPopup.Control?.ViewController?.View is UIView contentView)
 			{

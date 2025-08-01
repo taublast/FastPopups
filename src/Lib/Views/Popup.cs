@@ -11,7 +11,7 @@ namespace AppoMobi.Maui.Popups;
 /// Represents a small View that pops up at front the Page. Implements <see cref="IPopup"/>.
 /// </summary>
 [ContentProperty(nameof(Content))]
-public partial class Popup : VisualElement, IPopup
+public partial class Popup : View, IPopup
     //, IWindowController, IPropertyPropagationController, IResourcesProvider, IStyleSelectable, IStyleElement
 {
 	/// <summary>
@@ -40,18 +40,6 @@ public partial class Popup : VisualElement, IPopup
 	public static readonly BindableProperty CanBeDismissedByTappingOutsideOfPopupProperty =
 		BindableProperty.Create(nameof(CanBeDismissedByTappingOutsideOfPopup), typeof(bool), typeof(Popup), true);
 
-	/// <summary>
-	///  Backing BindableProperty for the <see cref="VerticalOptions"/> property.
-	/// </summary>
-	public static readonly BindableProperty VerticalOptionsProperty = BindableProperty.Create(nameof(VerticalOptions),
-		typeof(LayoutAlignment), typeof(Popup), LayoutAlignment.Center);
-
-	/// <summary>
-	///  Backing BindableProperty for the <see cref="HorizontalOptions"/> property.
-	/// </summary>
-	public static readonly BindableProperty HorizontalOptionsProperty =
-		BindableProperty.Create(nameof(HorizontalOptions), typeof(LayoutAlignment), typeof(Popup),
-			LayoutAlignment.Center);
 
  
 	readonly WeakEventManager dismissWeakEventManager = new();
@@ -67,8 +55,9 @@ public partial class Popup : VisualElement, IPopup
 	/// </summary>
 	public Popup()
 	{
-        //cannot do this otherwise default styles will not be applied
-		//VerticalOptions = HorizontalOptions = LayoutAlignment.Center;
+		// Set default layout alignment to center (equivalent to old custom properties)
+		HorizontalOptions = LayoutOptions.Center;
+		VerticalOptions = LayoutOptions.Center;
 		
 		// Set default overlay color using BackgroundColor (replaces old OverlayColor default)
 		BackgroundColor = Color.FromRgba(1, 0, 0, 153); // Same default as old OverlayColor
@@ -111,23 +100,6 @@ public partial class Popup : VisualElement, IPopup
 
 
 
-	/// <summary>
-	/// Gets or sets the <see cref="LayoutOptions"/> for positioning the <see cref="Popup"/> vertically on the screen.
-	/// </summary>
-	public LayoutAlignment VerticalOptions
-	{
-		get => (LayoutAlignment)GetValue(VerticalOptionsProperty);
-		set => SetValue(VerticalOptionsProperty, value);
-	}
-
-	/// <summary>
-	/// Gets or sets the <see cref="LayoutOptions"/> for positioning the <see cref="Popup"/> horizontally on the screen.
-	/// </summary>
-	public LayoutAlignment HorizontalOptions
-	{
-		get => (LayoutAlignment)GetValue(HorizontalOptionsProperty);
-		set => SetValue(HorizontalOptionsProperty, value);
-	}
 
 	/// <summary>
 	/// Gets or sets the <see cref="Size"/> of the Popup Display.
@@ -248,8 +220,6 @@ public partial class Popup : VisualElement, IPopup
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.SizeProperty);
 		RemoveBinding(Popup.CanBeDismissedByTappingOutsideOfPopupProperty);
-		RemoveBinding(Popup.VerticalOptionsProperty);
-		RemoveBinding(Popup.HorizontalOptionsProperty);
 		RemoveBinding(Popup.StyleProperty);
 
 		await popupDismissedTaskCompletionSource.Task.WaitAsync(token);
@@ -300,6 +270,10 @@ public partial class Popup : VisualElement, IPopup
 
 	async void IPopup.OnDismissedByTappingOutsideOfPopup() =>
 		await OnDismissedByTappingOutsideOfPopup(CancellationToken.None);
+
+	// Explicit interface implementations to resolve conflict with View properties
+	LayoutOptions IPopup.HorizontalOptions => HorizontalOptions;
+	LayoutOptions IPopup.VerticalOptions => VerticalOptions;
 
 
 	IReadOnlyList<IVisualTreeElement> IVisualTreeElement.GetVisualChildren()

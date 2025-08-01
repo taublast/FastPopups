@@ -33,8 +33,8 @@ public partial class MainPage : ContentPage
 			Size = new Size(350, 250),
             BackgroundColor = Colors.Black.WithAlpha(0.6f),
 			CanBeDismissedByTappingOutsideOfPopup = true,
-			HorizontalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Center,
-			VerticalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Center,
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center,
 			Content = new Border
 			{
 				BackgroundColor = Colors.White,
@@ -85,8 +85,8 @@ public partial class MainPage : ContentPage
 			Size = new Size(400, 300),
             BackgroundColor = Colors.Purple.WithAlpha(0.4f),
 			CanBeDismissedByTappingOutsideOfPopup = true,
-			HorizontalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Start,
-			VerticalOptions = Microsoft.Maui.Primitives.LayoutAlignment.Start,
+			HorizontalOptions = LayoutOptions.Start,
+			VerticalOptions = LayoutOptions.Start,
 			Content = new Border
 			{
 				BackgroundColor = Colors.LightPink,

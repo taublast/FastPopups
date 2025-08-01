@@ -21,7 +21,7 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// <summary>
 	/// Gets the horizontal aspect of this element's arrangement in a container.
 	/// </summary>
-	LayoutAlignment HorizontalOptions { get; }
+	LayoutOptions HorizontalOptions { get; }
 
 	/// <summary>
 	/// Controls whether the popup should respect safe insets like status bar etc. 
@@ -41,7 +41,7 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// <summary>
 	/// Gets the vertical aspect of this element's arrangement in a container.
 	/// </summary>
-	LayoutAlignment VerticalOptions { get; }
+	LayoutOptions VerticalOptions { get; }
 
 	/// <summary>
 	/// Occurs when the Popup is closed.

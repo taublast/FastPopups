@@ -120,24 +120,24 @@ public static partial class PopupExtensions
 
             if (double.IsNaN(popup.Content.Width))
             {
-                currentSize.Width = popup.HorizontalOptions == LayoutAlignment.Fill
+                currentSize.Width = IsLayoutFill(popup.HorizontalOptions)
                     ? popupParentFrame.Width
                     : currentSize.Width;
             }
 
             if (double.IsNaN(popup.Content.Height))
             {
-                currentSize.Height = popup.VerticalOptions == LayoutAlignment.Fill
+                currentSize.Height = IsLayoutFill(popup.VerticalOptions)
                     ? popupParentFrame.Height
                     : currentSize.Height;
             }
         }
         else
         {
-            currentSize.Width = popup.HorizontalOptions == LayoutAlignment.Fill
+            currentSize.Width = IsLayoutFill(popup.HorizontalOptions)
                 ? popupParentFrame.Width
                 : popup.Content.Width;
-            currentSize.Height = popup.VerticalOptions == LayoutAlignment.Fill
+            currentSize.Height = IsLayoutFill(popup.VerticalOptions)
                 ? popupParentFrame.Height
                 : popup.Content.Height;
         }
@@ -247,4 +247,14 @@ public static partial class PopupExtensions
 
     public static Window GetPlatformWindow(this IMauiContext mauiContext) =>
         mauiContext.Services.GetRequiredService<Window>();
+
+    /// <summary>
+    /// Helper method to check if LayoutOptions is Fill
+    /// </summary>
+    /// <param name="layoutOptions">The LayoutOptions to check</param>
+    /// <returns>True if Fill, false otherwise</returns>
+    static bool IsLayoutFill(LayoutOptions layoutOptions)
+    {
+        return (int)layoutOptions.Alignment == 3; // Fill = 3
+    }
 }
