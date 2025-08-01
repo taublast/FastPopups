@@ -66,7 +66,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	/// <param name="result">The result that should return from this Popup.</param>
 	public static void MapOnDismissedByTappingOutsideOfPopup(PopupHandler handler, IPopup view, object? result)
 	{
-		if (view.CanBeDismissedByTappingOutsideOfPopup)
+		if (view.CloseWhenBackgroundIsClicked)
 		{
 			view.OnDismissedByTappingOutsideOfPopup();
 		}
@@ -83,13 +83,13 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	}
 
 	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.CanBeDismissedByTappingOutsideOfPopup"/> property changes.
+	/// Action that's triggered when the Popup <see cref="IPopup.CloseWhenBackgroundIsClicked"/> property changes.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
-	public static void MapCanBeDismissedByTappingOutsideOfPopup(PopupHandler handler, IPopup view)
+	public static void MapCloseWhenBackgroundIsClicked(PopupHandler handler, IPopup view)
 	{
-		handler.PlatformView.Dialog?.SetCanBeDismissedByTappingOutsideOfPopup(view);
+		handler.PlatformView.Dialog?.SetCloseWhenBackgroundIsClicked(view);
 	}
 
 

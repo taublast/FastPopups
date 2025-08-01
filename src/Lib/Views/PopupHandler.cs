@@ -16,7 +16,7 @@ public partial class PopupHandler
 		[nameof(IPopup.VerticalOptions)] = MapSize,
 		[nameof(IPopup.HorizontalOptions)] = MapSize,
 		[nameof(IPopup.IgnoreSafeArea)] = MapSize,
-		[nameof(IPopup.CanBeDismissedByTappingOutsideOfPopup)] = MapCanBeDismissedByTappingOutsideOfPopup
+		[nameof(IPopup.CloseWhenBackgroundIsClicked)] = MapCloseWhenBackgroundIsClicked
 	};
 
 	/// <summary>

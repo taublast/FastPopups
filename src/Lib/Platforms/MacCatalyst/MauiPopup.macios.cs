@@ -173,7 +173,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 				BackgroundColor = ((Popup)virtualView).BackgroundColor.ToPlatform()
 			};
 
-			if (virtualView.CanBeDismissedByTappingOutsideOfPopup)
+			if (virtualView.CloseWhenBackgroundIsClicked)
 			{
 				var tapGesture = new UITapGestureRecognizer(tapEvent =>
 				{

@@ -35,10 +35,10 @@ public partial class Popup : View, IPopup
 		BindableProperty.Create(nameof(Size), typeof(Size), typeof(Popup), default(Size));
 
 	/// <summary>
-	///  Backing BindableProperty for the <see cref="CanBeDismissedByTappingOutsideOfPopup"/> property.
+	///  Backing BindableProperty for the <see cref="CloseWhenBackgroundIsClicked"/> property.
 	/// </summary>
-	public static readonly BindableProperty CanBeDismissedByTappingOutsideOfPopupProperty =
-		BindableProperty.Create(nameof(CanBeDismissedByTappingOutsideOfPopup), typeof(bool), typeof(Popup), true);
+	public static readonly BindableProperty CloseWhenBackgroundIsClickedProperty =
+		BindableProperty.Create(nameof(CloseWhenBackgroundIsClicked), typeof(bool), typeof(Popup), true);
 
 
  
@@ -127,16 +127,16 @@ public partial class Popup : View, IPopup
 	}
 
 	/// <summary>
-	/// Gets or sets a value indicating whether the popup can be dismissed by tapping outside the Popup.
+	/// Gets or sets a value indicating whether the popup can be dismissed by tapping anywhere where gestures are not processed.
 	/// </summary>
 	/// <remarks>
 	/// When true and the user taps outside the popup, it will dismiss.
 	/// On Android - when false the hardware back button is disabled.
 	/// </remarks>
-	public bool CanBeDismissedByTappingOutsideOfPopup
+	public bool CloseWhenBackgroundIsClicked
 	{
-		get => (bool)GetValue(CanBeDismissedByTappingOutsideOfPopupProperty);
-		set => SetValue(CanBeDismissedByTappingOutsideOfPopupProperty, value);
+		get => (bool)GetValue(CloseWhenBackgroundIsClickedProperty);
+		set => SetValue(CloseWhenBackgroundIsClickedProperty, value);
 	}
 
 	/// <summary>
@@ -219,7 +219,7 @@ public partial class Popup : View, IPopup
 		RemoveBinding(Popup.IgnoreSafeAreaProperty);
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.SizeProperty);
-		RemoveBinding(Popup.CanBeDismissedByTappingOutsideOfPopupProperty);
+		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
 		RemoveBinding(Popup.StyleProperty);
 
 		await popupDismissedTaskCompletionSource.Task.WaitAsync(token);

@@ -273,13 +273,13 @@ public static partial class PopupExtensions
 
 
 	/// <summary>
-	/// Method to update the <see cref="IPopup.CanBeDismissedByTappingOutsideOfPopup"/> property of the Popup.
+	/// Method to update the <see cref="IPopup.CloseWhenBackgroundIsClicked"/> property of the Popup.
 	/// </summary>
 	/// <param name="mauiPopup">An instance of <see cref="MauiPopup"/>.</param>
 	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	public static void SetCanBeDismissedByTappingOutsideOfPopup(this MauiPopup mauiPopup, in IPopup popup)
+	public static void SetCloseWhenBackgroundIsClicked(this MauiPopup mauiPopup, in IPopup popup)
 	{
-		mauiPopup.CanBeDismissedByTappingInternal = popup.CanBeDismissedByTappingOutsideOfPopup;
+		mauiPopup.CanBeDismissedByTappingInternal = popup.CloseWhenBackgroundIsClicked;
 	}
 
 }

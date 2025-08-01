@@ -32,7 +32,7 @@ public partial class MainPage : ContentPage
 		{
 			Size = new Size(350, 250),
             BackgroundColor = Colors.Black.WithAlpha(0.6f),
-			CanBeDismissedByTappingOutsideOfPopup = true,
+			CloseWhenBackgroundIsClicked = true,
 			HorizontalOptions = LayoutOptions.Center,
 			VerticalOptions = LayoutOptions.Center,
 			Content = new Border
@@ -84,7 +84,7 @@ public partial class MainPage : ContentPage
 		{
 			Size = new Size(400, 300),
             BackgroundColor = Colors.Purple.WithAlpha(0.4f),
-			CanBeDismissedByTappingOutsideOfPopup = true,
+			CloseWhenBackgroundIsClicked = true,
 			HorizontalOptions = LayoutOptions.Start,
 			VerticalOptions = LayoutOptions.Start,
 			Content = new Border

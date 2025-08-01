@@ -158,7 +158,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		overlay.SetBackgroundColor(color.ToPlatform());
 
 		// Add click handler for dismissing popup when tapping outside
-		if (VirtualView.CanBeDismissedByTappingOutsideOfPopup)
+		if (VirtualView.CloseWhenBackgroundIsClicked)
 		{
 			overlay.Click += (sender, e) =>
 			{
@@ -380,7 +380,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 	{
 		if (VirtualView is not null)
 		{
-			if (VirtualView.CanBeDismissedByTappingOutsideOfPopup &&
+			if (VirtualView.CloseWhenBackgroundIsClicked &&
 				e.Action == MotionEventActions.Up)
 			{
 				if (Window?.DecorView is AView decorView)

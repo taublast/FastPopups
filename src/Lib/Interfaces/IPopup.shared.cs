@@ -29,9 +29,9 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	bool IgnoreSafeArea { get; }
 
 	/// <summary>
-	/// Gets the CanBeDismissedByTappingOutsideOfPopup property.
+	/// Gets the CloseWhenBackgroundIsClicked property.
 	/// </summary>
-	bool CanBeDismissedByTappingOutsideOfPopup { get; }
+	bool CloseWhenBackgroundIsClicked { get; }
 
 	/// <summary>
 	/// Gets the Popup's size.

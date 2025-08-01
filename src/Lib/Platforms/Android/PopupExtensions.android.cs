@@ -52,14 +52,14 @@ public static partial class PopupExtensions
 	}
 
 	/// <summary>
-	/// Method to update the <see cref="IPopup.CanBeDismissedByTappingOutsideOfPopup"/> property.
+	/// Method to update the <see cref="IPopup.CloseWhenBackgroundIsClicked"/> property.
 	/// </summary>
 	/// <param name="dialog">An instance of <see cref="Dialog"/>.</param>
 	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	public static void SetCanBeDismissedByTappingOutsideOfPopup(this Dialog dialog, in IPopup popup)
+	public static void SetCloseWhenBackgroundIsClicked(this Dialog dialog, in IPopup popup)
 	{
-		dialog.SetCancelable(popup.CanBeDismissedByTappingOutsideOfPopup);
-		dialog.SetCanceledOnTouchOutside(popup.CanBeDismissedByTappingOutsideOfPopup);
+		dialog.SetCancelable(popup.CloseWhenBackgroundIsClicked);
+		dialog.SetCanceledOnTouchOutside(popup.CloseWhenBackgroundIsClicked);
 	}
 
     /// <summary>

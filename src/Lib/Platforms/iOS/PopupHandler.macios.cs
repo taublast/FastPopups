@@ -39,7 +39,7 @@ public partial class PopupHandler : ElementHandler<IPopup, MauiPopup>
 			throw new InvalidOperationException($"{nameof(handler.PlatformView)} must be of type {typeof(PopupHandler)}.");
 		}
 
-		if (popupRenderer.IsViewLoaded && view.CanBeDismissedByTappingOutsideOfPopup)
+		if (popupRenderer.IsViewLoaded && view.CloseWhenBackgroundIsClicked)
 		{
 			view.OnDismissedByTappingOutsideOfPopup();
 		}
@@ -58,13 +58,13 @@ public partial class PopupHandler : ElementHandler<IPopup, MauiPopup>
 	}
 
 	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.CanBeDismissedByTappingOutsideOfPopup"/> property changes.
+	/// Action that's triggered when the Popup <see cref="IPopup.CloseWhenBackgroundIsClicked"/> property changes.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
-	public static void MapCanBeDismissedByTappingOutsideOfPopup(PopupHandler handler, IPopup view)
+	public static void MapCloseWhenBackgroundIsClicked(PopupHandler handler, IPopup view)
 	{
-		handler.PlatformView.SetCanBeDismissedByTappingOutsideOfPopup(view);
+		handler.PlatformView.SetCloseWhenBackgroundIsClicked(view);
 	}
 
 

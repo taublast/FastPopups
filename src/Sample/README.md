@@ -62,7 +62,7 @@ await this.ShowPopupAsync(popup);
 <popup:Popup x:Class="MyApp.MyPopup"
              Size="300,200"
              OverlayColor="Black"
-             CanBeDismissedByTappingOutsideOfPopup="True">
+             CloseWhenBackgroundIsClicked="True">
     <!-- Your content here -->
 </popup:Popup>
 ```

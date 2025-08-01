@@ -9,7 +9,7 @@
               HorizontalOptions="Center"
               VerticalOptions="Fill"
               IgnoreSafeArea="False"
-              CanBeDismissedByTappingOutsideOfPopup="True">
+              CloseWhenBackgroundIsClicked="False">
 
     <Border BackgroundColor="GhostWhite"
             StrokeThickness="2"
