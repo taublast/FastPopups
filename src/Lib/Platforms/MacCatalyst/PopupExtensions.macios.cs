@@ -91,6 +91,31 @@ public static partial class PopupExtensions
 		return frame;
 	}
 
+	/// <summary>
+	/// Gets the bounds of an anchor view in screen coordinates.
+	/// </summary>
+	/// <param name="anchor">The anchor view.</param>
+	/// <param name="mauiContext">The MAUI context.</param>
+	/// <returns>The anchor bounds in screen coordinates.</returns>
+	static Rect GetAnchorBounds(IView anchor, IMauiContext mauiContext)
+	{
+		var anchorView = anchor.ToPlatform(mauiContext);
+		
+		if (anchorView.Superview == null)
+		{
+			return Rect.Zero;
+		}
+		
+		// Convert anchor frame to window coordinates (screen coordinates)
+		var windowCoordinates = anchorView.Superview.ConvertRectToView(anchorView.Frame, null);
+		
+		return new Rect(
+			windowCoordinates.X,
+			windowCoordinates.Y,
+			windowCoordinates.Width,
+			windowCoordinates.Height);
+	}
+
 
 	/// <summary>
 	/// Method to update the <see cref="IPopup.Size"/> of the Popup.
@@ -242,16 +267,28 @@ public static partial class PopupExtensions
 		}
 		else
 		{
-			// If an anchor is provided, position the popup relative to the anchor.
-			var anchorView = popup.Anchor.ToPlatform(popup.Handler?.MauiContext
-															?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} cannot be null"));
-			if (anchorView.Superview != null)
+			// Use unified anchor positioning system
+			var anchorBounds = GetAnchorBounds(popup.Anchor, popup.Handler?.MauiContext
+											   ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} cannot be null"));
+			
+			// Get screen bounds and safe area info for PopupLayoutCalculator
+			var screenBounds = new Rect(originalFrame.X, originalFrame.Y, originalFrame.Width, originalFrame.Height);
+			var adjustedBounds = new Rect(adjustedFrame.X, adjustedFrame.Y, adjustedFrame.Width, adjustedFrame.Height);
+			
+			// Use PopupLayoutCalculator for consistent cross-platform positioning
+			var calculatedPosition = PopupLayoutCalculator.CalculateAnchoredPosition(
+				popup,
+				new Size(mauiPopup.PreferredContentSize.Width, mauiPopup.PreferredContentSize.Height),
+				anchorBounds,
+				screenBounds);
+			
+			if (mauiPopup.Control?.ViewController?.View is UIView contentView)
 			{
-				var anchorFrame = anchorView.Superview.ConvertRectToView(anchorView.Frame, mauiPopup.View);
-				if (mauiPopup.Control?.ViewController?.View is UIView contentView)
-				{
-					contentView.Center = new CoreGraphics.CGPoint(anchorFrame.GetMidX(), anchorFrame.GetMidY());
-				}
+				contentView.Frame = new CGRect(
+					calculatedPosition.X,
+					calculatedPosition.Y + additionalVerticalOffset,
+					mauiPopup.PreferredContentSize.Width,
+					mauiPopup.PreferredContentSize.Height);
 			}
 		}
 	}
