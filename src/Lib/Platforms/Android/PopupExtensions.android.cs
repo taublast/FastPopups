@@ -20,67 +20,20 @@ namespace AppoMobi.Maui.Popups;
 public static partial class PopupExtensions
 {
 	/// <summary>
-	/// Method to update the <see cref="IPopup.Anchor"/> view.
+	/// Method to update the <see cref="IPopup.Anchor"/> view. With the new architecture,
+	/// anchored positioning is handled by the content positioning within the fullscreen container.
 	/// </summary>
 	/// <param name="dialog">An instance of <see cref="Dialog"/>.</param>
 	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>
-	/// <param name="popupWidth">Width of Popup</param>
-	/// <param name="popupHeight">Height of Popup</param>
 	/// <exception cref="InvalidOperationException">if the <see cref="Window"/> is null an exception will be thrown.</exception>
-	public static void SetAnchor(this Dialog dialog, in IPopup popup, int? popupWidth = null, int? popupHeight = null)
+	public static void SetAnchor(this Dialog dialog, in IPopup popup)
 	{
-		var window = GetWindow(dialog);
-
-		var windowManager = window.WindowManager;
+		// With the new architecture, we don't position the dialog window itself.
+		// Instead, the content positioning is handled in the CreateCompositePopupContent method
+		// of MauiPopup, where the actual content is positioned within the fullscreen container.
 		
-		var statusBarHeight = GetStatusBarHeight(dialog.Context); 
-		var navigationBarHeight = GetNavigationBarHeight(windowManager); 
-		var windowSize = GetWindowSize(dialog.Context, windowManager, popup.IgnoreSafeArea);
-		var rotation = windowManager.DefaultDisplay?.Rotation ?? throw new InvalidOperationException("DefaultDisplay cannot be null");
-		navigationBarHeight = windowSize.Height < windowSize.Width ? (rotation == SurfaceOrientation.Rotation270 ? navigationBarHeight : 0) : 0;
-
-		if (popup.Handler?.MauiContext is null)
-		{
-			return;
-		}
-
-		if (popup.Anchor is not null)
-		{
-			var anchorView = popup.Anchor.ToPlatform();
-
-			var locationOnScreen = new int[2];
-			anchorView.GetLocationOnScreen(locationOnScreen);
-			if (popupWidth is null && popupHeight is null)
-			{
-				window.DecorView.Measure((int)MeasureSpecMode.Unspecified, (int)MeasureSpecMode.Unspecified);
-			}
-
-			// This logic is tricky, please read these notes if you need to modify
-			// Android window coordinate starts (0,0) at the top left and (max,max) at the bottom right. All of the positions
-			// that are being handled in this operation assume the point is at the top left of the rectangle. This means the
-			// calculation operates in this order:
-			// 1. Calculate top-left position of Anchor
-			// 2. Calculate the Actual Center of the Anchor by adding the width /2 and height / 2
-			// 3. Calculate the top-left point of where the dialog should be positioned by subtracting the Width / 2 and height / 2
-			//    of the dialog that is about to be drawn.
-			var attribute = window.Attributes ?? throw new InvalidOperationException($"{nameof(window.Attributes)} cannot be null");
-
-			var newX = locationOnScreen[0] - navigationBarHeight + (anchorView.Width / 2) - (popupWidth == null ? (window.DecorView.Width / 2) : (int)(popupWidth / 2));
-			var newY = locationOnScreen[1] - statusBarHeight + (anchorView.Height / 2) - (popupHeight == null ? (window.DecorView.Height / 2) : (int)(popupHeight / 2));
-
-			if (!(newX == attribute.X &&
-				  newY == attribute.Y))
-			{
-				window.SetGravity(GravityFlags.Top | GravityFlags.Left);
-				attribute.X = newX;
-				attribute.Y = newY;
-				window.Attributes = attribute;
-			}
-		}
-		else
-		{
-			SetDialogPosition(popup, window);
-		}
+		// This method is kept for compatibility but no longer needs to manipulate window positioning.
+		// Anchor-specific positioning logic will be implemented in the MauiPopup content positioning system.
 	}
 
 
@@ -125,29 +78,10 @@ public static partial class PopupExtensions
 		ArgumentNullException.ThrowIfNull(handler);
 
 		var window = GetWindow(dialog);
-		var context = dialog.Context;
-		var windowManager = window.WindowManager;
-
 		var decorView = (ViewGroup)window.DecorView;
-
-		//window.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.Blue));
-
-		var windowSize = GetWindowSize(context, windowManager, popup.IgnoreSafeArea);
-		int width = LayoutParams.WrapContent;
-		int height = LayoutParams.WrapContent;
-
-	
 
 		if (dialog.Window != null)
 		{
-
-			//if (_insetsListener == null)
-			//{
-			//    _insetsListener = new DialogInsetsListener();
-			//    dialog.Window.DecorView.SetOnApplyWindowInsetsListener(_insetsListener);
-			//}
-
-
 			// Remove any padding from the decorView
 			decorView.SetPadding(0, 0, 0, 0);
 
@@ -162,155 +96,14 @@ public static partial class PopupExtensions
 					child.LayoutParameters = marginParams;
 				}
 			}
-
 		}
 
-		if (popup.Size.IsZero)
-		{
-			if (double.IsNaN(popup.Content.Width) || double.IsNaN(popup.Content.Height))
-			{
-				if ((handler.LastPopupWidth == decorView.MeasuredWidth
-					&& handler.LastPopupHeight == decorView.MeasuredHeight)
-					&& Math.Abs(handler.LastWindowWidth - windowSize.Width) < 0.01 // Allow for floating point variation 
-					&& Math.Abs(handler.LastWindowHeight - windowSize.Height) < 0.01) // Allow for floating point variation
-				{
-					SetAnchor(dialog, popup, handler.LastPopupWidth, handler.LastPopupHeight);
-					return;
-				}
+		// Dialog window should always be fullscreen so overlay fills entire screen
+		window.SetLayout(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
 
-				decorView.Measure(
-					MeasureSpecMode.AtMost.MakeMeasureSpec((int)windowSize.Width),
-					MeasureSpecMode.AtMost.MakeMeasureSpec((int)windowSize.Height)
-				);
-
-				if (double.IsNaN(popup.Content.Width))
-				{
-					if (popup.HorizontalOptions == LayoutAlignment.Fill)
-					{
-						width = (int)windowSize.Width;
-					}
-					else
-					{
-						if (decorView.MeasuredWidth >= windowSize.Width)
-						{
-							width = (int)windowSize.Width;
-						}
-					}
-				}
-				else
-				{
-					if (context.ToPixels(popup.Content.Width) >= windowSize.Width)
-					{
-						width = (int)windowSize.Width;
-					}
-					else
-					{
-						width = (int)context.ToPixels(popup.Content.Width);
-					}
-				}
-
-				if (double.IsNaN(popup.Content.Height))
-				{
-					if (popup.VerticalOptions == LayoutAlignment.Fill)
-					{
-						height = (int)windowSize.Height;
-					}
-					else
-					{
-						if (decorView.MeasuredHeight >= windowSize.Height)
-						{
-							height = (int)windowSize.Height;
-						}
-					}
-				}
-				else
-				{
-					if (context.ToPixels(popup.Content.Height) >= windowSize.Height)
-					{
-						height = (int)windowSize.Height;
-					}
-					else
-					{
-						height = (int)context.ToPixels(popup.Content.Height);
-					}
-				}
-
-				width = width == LayoutParams.WrapContent ? decorView.MeasuredWidth : width;
-				height = height == LayoutParams.WrapContent ? decorView.MeasuredHeight : height;
-
-				window.SetLayout(width, height);
-				//window.SetLayout(-1, -1);
-			}
-			else
-			{
-				width = (int)context.ToPixels(popup.Content.Width);
-				height = (int)context.ToPixels(popup.Content.Height);
-				width = width > windowSize.Width ? (int)windowSize.Width : width;
-				height = height > windowSize.Height ? (int)windowSize.Height : height;
-
-				if (handler.LastPopupWidth == width
-					&& handler.LastPopupHeight == height
-					&& Math.Abs(handler.LastWindowWidth - windowSize.Width) < 0.01  // Allow for floating point variation 
-					&& Math.Abs(handler.LastWindowHeight - windowSize.Height) < 0.01)// Allow for floating point variation
-				{
-					SetAnchor(dialog, popup, handler.LastPopupWidth, handler.LastPopupHeight);
-					return;
-				}
-
-				window.SetLayout(width, height);
-
-			}
-		}
-		else
-		{
-			width = (int)context.ToPixels(popup.Size.Width);
-			height = (int)context.ToPixels(popup.Size.Height);
-			width = width > windowSize.Width ? (int)windowSize.Width : width;
-			height = height > windowSize.Height ? (int)windowSize.Height : height;
-
-			if (handler.LastPopupWidth == width
-				&& handler.LastPopupHeight == height
-				&& Math.Abs(handler.LastWindowWidth - windowSize.Width) < 0.01  // Allow for floating point variation
-				&& Math.Abs(handler.LastWindowHeight - windowSize.Height) < 0.01)  // Allow for floating point variation
-			{
-				SetAnchor(dialog, popup, handler.LastPopupWidth, handler.LastPopupHeight);
-				return;
-			}
-
-			window.SetLayout(width, height);
-
-		}
-
-		handler.LastPopupWidth = decorView.Width;
-		handler.LastPopupHeight = decorView.Height;
-		handler.LastWindowWidth = windowSize.Width;
-		handler.LastWindowHeight = windowSize.Height;
-
-		SetAnchor(dialog, popup, width, height);
+		SetAnchor(dialog, popup);
 	}
 
-	static void SetDialogPosition(in IPopup popup, Android.Views.Window window)
-	{
-		var isFlowDirectionRightToLeft = popup.Content?.FlowDirection == FlowDirection.RightToLeft;
-
-		var gravityFlags = popup.VerticalOptions switch
-		{
-			LayoutAlignment.Start => GravityFlags.Top,
-			LayoutAlignment.End => GravityFlags.Bottom,
-			LayoutAlignment.Center or LayoutAlignment.Fill => GravityFlags.CenterVertical,
-			_ => throw new NotSupportedException($"{nameof(IPopup.VerticalOptions)}: {popup.VerticalOptions} is not yet supported")
-		};
-
-		gravityFlags |= popup.HorizontalOptions switch
-		{
-			LayoutAlignment.Start => isFlowDirectionRightToLeft ? GravityFlags.Right : GravityFlags.Left,
-			LayoutAlignment.End => isFlowDirectionRightToLeft ? GravityFlags.Left : GravityFlags.Right,
-			LayoutAlignment.Center or LayoutAlignment.Fill => GravityFlags.CenterHorizontal,
-			_ => throw new NotSupportedException($"{nameof(IPopup.HorizontalOptions)}: {popup.HorizontalOptions} is not yet supported")
-		};
-
-		window.SetGravity(gravityFlags);
-	}
 
 	static Android.Views.Window GetWindow(in Dialog dialog) =>
 		dialog.Window ?? throw new InvalidOperationException($"{nameof(Dialog)}.{nameof(Dialog.Window)} cannot be null");

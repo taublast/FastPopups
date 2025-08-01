@@ -181,13 +181,45 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		// Add overlay first (behind content)
 		container.Children.Add(overlay);
 
-		// Add actual content on top of overlay
-		container.Children.Add(actualContent);
+		// Position the actual content within the fullscreen container
+		PositionContentInContainer(container, actualContent);
 
 		return container;
 	}
 
+	/// <summary>
+	/// Positions the actual popup content within the fullscreen container using layout options.
+	/// </summary>
+	/// <param name="container">The fullscreen container Grid.</param>
+	/// <param name="actualContent">The popup content to position.</param>
+	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+	{
+		if (VirtualView == null) return;
 
+		// Get window bounds for layout calculation
+		var window = mauiContext.GetPlatformWindow();
+		var windowBounds = window.Bounds;
+		var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
+
+		// Get content size
+		var contentSize = new Size(actualContent.Width, actualContent.Height);
+		if (double.IsNaN(contentSize.Width) || double.IsNaN(contentSize.Height))
+		{
+			actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+			contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+		}
+
+		// Use unified layout calculator for positioning
+		var (x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+
+		// Set positioning using margins
+		actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+		actualContent.VerticalAlignment = VerticalAlignment.Top;
+		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+
+		// Add content to container
+		container.Children.Add(actualContent);
+	}
 
 	/// <summary>
 	/// Opens the popup and shows the dimmer.

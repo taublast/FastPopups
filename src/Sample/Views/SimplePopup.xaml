@@ -4,7 +4,7 @@
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
               xmlns:popups="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
               x:Class="SampleApp.Views.SimplePopup"
-              BackgroundColor="#22000000"
+              BackgroundColor="#66000000"
               Background="Transparent"
               HorizontalOptions="Center"
               VerticalOptions="Fill"
@@ -19,6 +19,7 @@
             HorizontalOptions="Center"
             VerticalOptions="Center"
             StrokeShape="RoundRectangle 10">
+
         <StackLayout Padding="20" Spacing="15">
             <Label Text="Simple Popup"
                    FontSize="18"
@@ -36,6 +37,7 @@
                     TextColor="White"
                     Clicked="OnCloseClicked" />
         </StackLayout>
+
     </Border>
 
 </popups:Popup>

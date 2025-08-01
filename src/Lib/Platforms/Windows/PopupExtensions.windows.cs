@@ -146,16 +146,20 @@ public static partial class PopupExtensions
         currentSize.Width = Math.Min(currentSize.Width, popupParentFrame.Width);
         currentSize.Height = Math.Min(currentSize.Height, popupParentFrame.Height);
 
-        mauiPopup.PopupView.Width = currentSize.Width;
-        mauiPopup.PopupView.Height = currentSize.Height;
-        mauiPopup.PopupView.MinWidth = mauiPopup.PopupView.MaxWidth = currentSize.Width + (defaultBorderThickness * 2);
-        mauiPopup.PopupView.MinHeight =
-            mauiPopup.PopupView.MaxHeight = currentSize.Height + (defaultBorderThickness * 2);
+        // IMPORTANT: Make WinUI Popup fullscreen so overlay can fill entire screen
+        // Content positioning will be handled within the fullscreen popup
+        var window = mauiContext.GetPlatformWindow();
+        var windowBounds = window.Bounds;
+        
+        mauiPopup.PopupView.Width = windowBounds.Width;
+        mauiPopup.PopupView.Height = windowBounds.Height;
+        mauiPopup.PopupView.MinWidth = mauiPopup.PopupView.MaxWidth = windowBounds.Width;
+        mauiPopup.PopupView.MinHeight = mauiPopup.PopupView.MaxHeight = windowBounds.Height;
 
         if (mauiPopup.PopupView.Child is FrameworkElement control)
         {
-            control.Width = mauiPopup.PopupView.Width;
-            control.Height = mauiPopup.PopupView.Height;
+            control.Width = windowBounds.Width;
+            control.Height = windowBounds.Height;
         }
     }
 
@@ -214,13 +218,11 @@ public static partial class PopupExtensions
             return;
         }
 
-        // Use unified layout calculator
-        var (x, y) = PopupLayoutCalculator.CalculatePosition(popup, mauiContentSize, parentBounds, safeAreaInsets);
-
-        // Set WinUI popup properties
+        // WinUI Popup is now fullscreen, so no need to position it
+        // Content positioning is handled within the fullscreen popup by the composite content
         mauiPopup.PopupView.DesiredPlacement = PopupPlacementMode.Auto;
-        mauiPopup.PopupView.HorizontalOffset = x;
-        mauiPopup.PopupView.VerticalOffset = y;
+        mauiPopup.PopupView.HorizontalOffset = 0;
+        mauiPopup.PopupView.VerticalOffset = 0;
 
     }
 
