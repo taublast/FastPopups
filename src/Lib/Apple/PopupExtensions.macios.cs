@@ -1,3 +1,4 @@
+#if MACCATALYST || IOS
 
 using Microsoft.Maui.Platform;
 using ObjCRuntime;
@@ -320,3 +321,5 @@ public static partial class PopupExtensions
 	}
 
 }
+
+#endif

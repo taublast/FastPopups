@@ -1,5 +1,7 @@
 ﻿namespace AppoMobi.Maui.Popups.Extensions;
 
+#if MACCATALYST || IOS
+
 /// <summary>
 /// Extensions for <see cref="UIView"/>
 /// </summary>
@@ -85,3 +87,5 @@ public static class UIViewExtensions
 			? view.SafeAreaLayoutGuide.WidthAnchor
 			: view.WidthAnchor;
 }
+
+#endif

@@ -1,9 +1,11 @@
-﻿using UIKit;
+﻿#if IOS || MACCATALYST
+
+using UIKit;
 using Microsoft.Maui.Platform;
 
 namespace AppoMobi.Maui.Popups;
 
-#if IOS || MACCATALYST
+
 /// <summary>
 /// A UIView wrapper that manages a MauiPopup UIViewController.
 /// This allows us to use ViewHandler while still using UIViewController for popup functionality.

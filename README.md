@@ -2,6 +2,11 @@
 
 ---
 
+## TODO
+
+* Android anchor is lower by the amount for either bottom navbar or shell navbar can't 
+* Test/fix Tizen
+
 ## Features
 
 * Implement any popup design without restrictions

@@ -1,3 +1,5 @@
+#if MACCATALYST || IOS
+
 using System.Diagnostics.CodeAnalysis;
 using AppoMobi.Maui.Popups.Extensions;
 using Microsoft.Maui.ApplicationModel;
@@ -7,7 +9,7 @@ using UIKit;
 
 namespace AppoMobi.Maui.Popups;
 
-#if MACCATALYST || IOS
+
 
 /// <summary>
 /// The native implementation of Popup control.

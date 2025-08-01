@@ -29,6 +29,8 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Platforms\iOS\" />
+    <Folder Include="Platforms\MacCatalyst\" />
   </ItemGroup>
 
   <ItemGroup>
