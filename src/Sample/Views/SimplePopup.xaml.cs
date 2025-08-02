@@ -12,4 +12,7 @@ public partial class SimplePopup : Popup
     {
         Close();
     }
+
+ 
+
 }

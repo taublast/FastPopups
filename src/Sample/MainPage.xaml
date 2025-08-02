@@ -22,14 +22,14 @@
                 SemanticProperties.Description="Popup library demonstration" />
 
             <Label
-                Text="This sample demonstrates the enhanced popup functionality extracted from CommunityToolkit.Maui with improved platform handlers."
+                Text="This sample demonstrates the popup functionality"
                 HorizontalOptions="Center"
                 HorizontalTextAlignment="Center"
                 Margin="0,10,0,20"
                 TextColor="Gray" />
 
             <Button
-                Text="Show Simple Popup" 
+                Text="Centered Popup XAML" 
                 BackgroundColor="DarkBlue"
                 TextColor="White"
                 Clicked="OnSimplePopupClicked"
@@ -46,15 +46,7 @@
                 Margin="0,5" />
 
             <Button
-                Text="Show Centered Popup" 
-                BackgroundColor="Green"
-                TextColor="White"
-                Clicked="OnCenteredPopupClicked"
-                HorizontalOptions="Fill" 
-                Margin="0,5" />
-
-            <Button
-                Text="Show Custom Size Popup" 
+                Text="Custom Popup Code" 
                 BackgroundColor="Purple"
                 TextColor="White"
                 Clicked="OnCustomSizePopupClicked"

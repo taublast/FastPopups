@@ -7,15 +7,14 @@
               BackgroundColor="#66000000"
               Background="Transparent"
               HorizontalOptions="Center"
-              VerticalOptions="Start"
-              IgnoreSafeArea="False"
+              VerticalOptions="Center"
               CloseWhenBackgroundIsClicked="False">
 
     <Border BackgroundColor="GhostWhite"
             StrokeThickness="2"
             Stroke="DarkBlue"
             WidthRequest="300"
-            HeightRequest="300"
+            HeightRequest="-1"
             HorizontalOptions="Center"
             VerticalOptions="Start"
             StrokeShape="RoundRectangle 10">

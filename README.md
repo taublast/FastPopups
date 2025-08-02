@@ -2,38 +2,37 @@
 
 ---
 
+## About
+
+This small library was built on top of CommunityToolkit popups v1 code, no longer used by the toolkit itself.  
+It was found to be the fastest comparing different popup libraries, so HotReload support, IgnoreSafeArea and a separate dimmer layer were added to be used for custom cases.
+
+---
+
 ## TODO
 
 ### Required
 
-* Test orientation changes when open
-* Android anchor is lower by the amount for either bottom navbar or shell navbar..
-* Test (and then fix) Tizen
+* Test orientation changes when already open
+* Android anchor is acting lower by the amount for either bottom navbar or shell navbar, investigate
+* Test (and then possibly fix) Tizen
 
-### Optional
+### Roadmap
 
-* Add Blur effect below on every platform
+* Add Blur effect below for every platform
 * Add animations like we had in RG popups, working separately separate for overlay and content
 
-## Features
-
-* Implement any popup design without restrictions
-* Customize separate background layer
-* Optional anchors for positioning
-* Small popup opening time
-* Consistent across platforms
-* Supports HotReload
+---
 
 ## Popup Layers
-When rendered your popup is bringing up 2 layers:
+When rendered your popup is using 2 layers:
 
 * Background dimmer layer, can be totally transparent or dim your background under popup
 * Popup content
 
-
 ### Background Layer
 
-At al times you have a background layer filling the entire screen, layout properties will not affect it. You can change it's color by setting BackgroundColor of the popup, for example:
+At all times you have a background layer filling the entire screen, layout properties will not affect it. You can change it's color by setting BackgroundColor of the popup, for example:
 
 ```xml
 BackgroundColor="#66000000"
@@ -45,7 +44,13 @@ You can hide the layer by setting popup `BackgroundColor` property to a totally 
 
 ### Popup Content
 
-Layout properties like `HorizontalOptions`, `VerticalOptions` will affect your popup content.
+This is your logical popup, layout properties like `HorizontalOptions`, `VerticalOptions` will affect its positioning.
+
+`IgnoreSafeArea` controls if you want to consider full screen or not to go over safe insets, like status bar etc.
+
+## Gestures
+
+When `CloseWhenBackgroundIsClicked` is set to `true` then tapping somewhere where gestures are not user-handled will close your popup.
 
 ## Anchor Positioning
 
@@ -159,11 +164,6 @@ Here's a complete example of an anchored popup:
 - Anchor positioning works with all popup sizes and background configurations
 - The fullscreen overlay ensures proper visual layering even with anchored popups
 
-## The Code
-
-This library was built on top of CommunityToolkit Popups v1, no longer used in the toolkit, 
-found to be the fastest when comparing popup opening time between different libraries.
-Consistency across platforms, HotReload support, a separate background layer were added and this library went on a separate jurney.
 
 ---
 
