@@ -1,13 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Core.View;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Primitives;
+using System.Diagnostics.CodeAnalysis;
 using AView = Android.Views.View;
 
 namespace AppoMobi.Maui.Popups;
@@ -38,12 +39,19 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     /// <param name="context">An instance of <see cref="Context"/>.</param>
     /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
     /// <exception cref="ArgumentNullException">If <paramref name="mauiContext"/> is null an exception will be thrown. </exception>
-    public MauiPopup(Context context, IMauiContext mauiContext)
-		: base(context, Android.Resource.Style.ThemeTranslucentNoTitleBarFullScreen)
-	{
+    public MauiPopup(Context context, IMauiContext mauiContext, bool ignoreSafeArea)
+		: base(context, GetDialogTheme(ignoreSafeArea))
+    {
 		RequestWindowFeature((int)WindowFeatures.NoTitle);
 		this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
 	}
+
+    static int GetDialogTheme(bool ignoreSafeArea)
+    {
+        return ignoreSafeArea
+            ? Android.Resource.Style.ThemeTranslucentNoTitleBarFullScreen
+            : Android.Resource.Style.ThemeTranslucentNoTitleBar; // or another appropriate theme
+    }
 
     /// <summary>
     /// Switch fullscreen mode on/off for native Dialog with enhanced compatibility
@@ -99,6 +107,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     Window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
                     Window.ClearFlags(WindowManagerFlags.Fullscreen);
                     Window.ClearFlags(WindowManagerFlags.LayoutInScreen);
+                    Window.ClearFlags(WindowManagerFlags.TranslucentNavigation);
                     Window.AddFlags(WindowManagerFlags.ForceNotFullscreen);
 
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)

@@ -45,10 +45,10 @@ public class MauiPopupView : AView
 	/// </summary>
 	/// <param name="context">Android Context.</param>
 	/// <param name="mauiContext">MAUI Context.</param>
-	public void CreateDialog(Context context, Microsoft.Maui.IMauiContext mauiContext)
+	public void CreateDialog(Context context, Microsoft.Maui.IMauiContext mauiContext, bool ignoreSafeArea)
 	{
 		dialog?.Dispose();
-		dialog = new MauiPopup(context, mauiContext);
+		dialog = new MauiPopup(context, mauiContext, ignoreSafeArea);
 	}
 
 	/// <summary>

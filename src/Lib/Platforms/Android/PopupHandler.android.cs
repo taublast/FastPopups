@@ -124,7 +124,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 		_ = MauiContext.Context ?? throw new InvalidOperationException("Android Context is null, please check your MauiApplication.");
 
 		var popupView = new MauiPopupView(MauiContext.Context);
-		popupView.CreateDialog(MauiContext.Context, MauiContext);
+		popupView.CreateDialog(MauiContext.Context, MauiContext, VirtualView.IgnoreSafeArea);
 		return popupView;
 	}
 
