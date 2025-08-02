@@ -1,4 +1,4 @@
-# AppoMobi Popups for .NET MAUI
+# Popups for .NET MAUI
 
 ---
 
