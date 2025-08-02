@@ -117,6 +117,88 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 		}
 	}
 
+	/// <summary>
+	/// Action that's triggered when the Popup <see cref="IPopup.IgnoreSafeArea"/> property changes.
+	/// Recreates the dialog with the new safe area setting.
+	/// </summary>
+	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
+	public static void MapIgnoreSafeArea(PopupHandler handler, IPopup view)
+	{
+		var wasShowing = handler.PlatformView.Dialog?.IsShowing ?? false;
+
+		// Clean up and recreate dialog
+		RecreateDialog(handler, view);
+
+		// Show dialog again if it was previously showing
+		if (wasShowing)
+		{
+			handler.PlatformView.ShowDialog();
+		}
+	}
+
+	/// <summary>
+	/// Creates or recreates the dialog with proper setup.
+	/// </summary>
+	/// <param name="handler">The popup handler.</param>
+	/// <param name="view">The popup view.</param>
+	static void RecreateDialog(PopupHandler handler, IPopup view)
+	{
+		var popupView = handler.PlatformView;
+
+		// Clean up existing content and dialog
+		CleanupExistingDialog(handler);
+
+		// Create new dialog
+		popupView.CreateDialog(handler.MauiContext.Context, handler.MauiContext, view.IgnoreSafeArea);
+
+		// Set up content and handlers
+		SetupDialogContent(handler, view);
+	}
+
+	/// <summary>
+	/// Cleans up existing dialog and content.
+	/// </summary>
+	/// <param name="handler">The popup handler.</param>
+	static void CleanupExistingDialog(PopupHandler handler)
+	{
+		// Detach layout change handler from old content
+		if (handler.Content is not null)
+		{
+			handler.Content.LayoutChange -= handler.OnLayoutChange;
+		}
+
+		// Remove content from its current parent to avoid "child already has a parent" error
+		if (handler.Content?.Parent is Android.Views.ViewGroup parent)
+		{
+			parent.RemoveView(handler.Content);
+		}
+
+		// Dispose the old dialog to clean up resources
+		handler.PlatformView.Dialog?.Dispose();
+	}
+
+	/// <summary>
+	/// Sets up dialog content and applies all necessary configurations.
+	/// </summary>
+	/// <param name="handler">The popup handler.</param>
+	/// <param name="view">The popup view.</param>
+	static void SetupDialogContent(PopupHandler handler, IPopup view)
+	{
+		// Set the element to create content
+		handler.Content = handler.PlatformView.SetElement(view);
+
+		// Apply fullscreen and sizing
+		if (handler.Content is not null && handler.PlatformView.Dialog is not null)
+		{
+			handler.PlatformView.SetFullScreen(view.IgnoreSafeArea);
+			handler.PlatformView.Dialog.SetSize(view, handler.Content, handler);
+
+			// Attach layout change handler
+			handler.Content.LayoutChange += handler.OnLayoutChange;
+		}
+	}
+
 	/// <inheritdoc/>
 	protected override MauiPopupView CreatePlatformView()
 	{
@@ -124,19 +206,14 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 		_ = MauiContext.Context ?? throw new InvalidOperationException("Android Context is null, please check your MauiApplication.");
 
 		var popupView = new MauiPopupView(MauiContext.Context);
-		popupView.CreateDialog(MauiContext.Context, MauiContext, VirtualView.IgnoreSafeArea);
 		return popupView;
 	}
 
 	/// <inheritdoc/>
 	protected override void ConnectHandler(MauiPopupView platformView)
 	{
-		Content = platformView.SetElement(VirtualView);
-
-		if (Content is not null)
-		{
-			Content.LayoutChange += OnLayoutChange;
-		}
+		// Use the same logic as recreation to ensure consistency
+		RecreateDialog(this, VirtualView);
 	}
 
 	/// <inheritdoc/>
