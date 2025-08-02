@@ -1,25 +1,26 @@
-# MAUI Popups
+# AppoMobi Popups
 
 ---
 
 ## About
 
-This small library was built on top of CommunityToolkit popups v1 code, no longer used by the toolkit itself.  
-It was found to be the fastest comparing different popup libraries, so HotReload support, IgnoreSafeArea and a separate dimmer layer were added to be used for custom cases.
+This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  It was the fastest for opening popups among different libraries, was definitely worth adding HotReload support, IgnoreSafeArea and a separate dimmer layer for all platforms.
 
 ---
 
-## TODO
+## To Do
 
 ### Required
 
 * Test orientation changes when already open
-* Android anchor is acting lower by the amount for either bottom navbar or shell navbar, investigate
-* Test (and then possibly fix) Tizen
+* Android anchor is acting lower by the amount for either bottom navbar or shell navbar, need to investigate
+* Test and possibly fix Tizen
 
 ### Roadmap
 
-* Add Blur effect below for every platform
+* Add navigation stack
+* Add Blur effect below 
+* Add background layer custom content
 * Add animations like we had in RG popups, working separately separate for overlay and content
 
 ---

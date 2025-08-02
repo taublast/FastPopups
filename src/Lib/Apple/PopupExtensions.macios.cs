@@ -147,14 +147,18 @@ public static partial class PopupExtensions
 					popup.Handler?.MauiContext ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} Cannot Be Null"));
 				}
 
-				var contentSize = popup.Content.Measure(
-					double.IsNaN(popup.Content.Width) ? adjustedFrame.Width : popup.Content.Width, 
-					double.IsNaN(popup.Content.Height) ? adjustedFrame.Height : popup.Content.Height);
+				// For auto-sizing, measure with infinite height to get natural content size
+				// Only constrain by available space if explicitly requested via Fill layout options
+				var measureWidth = double.IsNaN(popup.Content.Width)
+					? (IsLayoutFill(popup.HorizontalOptions) ? adjustedFrame.Width : double.PositiveInfinity)
+					: popup.Content.Width;
 
-				//var check = content.SizeThatFits(new CGSize(
-				//	double.IsNaN(popup.Content.Width) ? adjustedFrame.Width : popup.Content.Width,
-				//	double.IsNaN(popup.Content.Height) ? adjustedFrame.Height : popup.Content.Height));
-				
+				var measureHeight = double.IsNaN(popup.Content.Height)
+					? (IsLayoutFill(popup.VerticalOptions) ? adjustedFrame.Height : double.PositiveInfinity)
+					: popup.Content.Height;
+
+				var contentSize = popup.Content.Measure(measureWidth, measureHeight);
+
 				var width = contentSize.Width;
 				var height = contentSize.Height;
 
@@ -164,8 +168,14 @@ public static partial class PopupExtensions
 				}
 				if (double.IsNaN(popup.Content.Height))
 				{
+					// For auto-sizing, only use full height if explicitly requested via Fill
+					// Otherwise use the measured content height for proper auto-sizing
 					height = IsLayoutFill(popup.VerticalOptions) ? adjustedFrame.Height : height;
 				}
+
+				// Constrain to available space to prevent popup from being larger than screen
+				width = Math.Min(width, adjustedFrame.Width);
+				height = Math.Min(height, adjustedFrame.Height);
 
 				currentSize = new CGSize(width, height);
 			}
@@ -181,10 +191,37 @@ public static partial class PopupExtensions
 		else
 		{
 			// Mixed case: some explicit, some calculated
-			var width = hasExplicitWidth == true && visualElement != null ? visualElement.WidthRequest : 
+			var width = hasExplicitWidth == true && visualElement != null ? visualElement.WidthRequest :
 				double.IsNaN(popup.Content.Width) ? adjustedFrame.Width : popup.Content.Width;
-			var height = hasExplicitHeight == true && visualElement != null ? visualElement.HeightRequest : 
-				double.IsNaN(popup.Content.Height) ? adjustedFrame.Height : popup.Content.Height;
+
+			double height;
+			if (hasExplicitHeight == true && visualElement != null)
+			{
+				height = visualElement.HeightRequest;
+			}
+			else if (!double.IsNaN(popup.Content.Height))
+			{
+				height = popup.Content.Height;
+			}
+			else
+			{
+				// Need to measure content for auto-sizing
+				if (popup.Content.Handler == null)
+				{
+					_ = popup.Content.ToPlatform(
+					popup.Handler?.MauiContext ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} Cannot Be Null"));
+				}
+
+				// Measure with the determined width and infinite height for auto-sizing
+				var measureWidth = width;
+				var measureHeight = double.PositiveInfinity; // Always use infinite for auto-sizing
+
+				var contentSize = popup.Content.Measure(measureWidth, measureHeight);
+
+				// Use measured height, but constrain to available space if needed
+				height = Math.Min(contentSize.Height, adjustedFrame.Height);
+			}
+
 			currentSize = new CGSize(width, height);
 		}
 
