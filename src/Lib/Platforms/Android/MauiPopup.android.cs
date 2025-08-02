@@ -45,62 +45,77 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
 	}
 
-	/// <summary>
-	/// Switch fullscreen mode on/off for native Dialog
-	/// </summary>
-	/// <param name="value"></param>
-	public void SetFullScreen(bool value)
-	{
-		if (Window != null)
-		{
-			if (value)
-			{
-				if (Build.VERSION.SdkInt >= BuildVersionCodes.R) // Android 11+
-				{
-					Window.SetDecorFitsSystemWindows(false);
+    /// <summary>
+    /// Switch fullscreen mode on/off for native Dialog with enhanced compatibility
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetFullScreen(bool value)
+    {
+        if (Window != null)
+        {
+            if (value)
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                {
+                    Window.SetDecorFitsSystemWindows(false);
+                    var insetsController = Window.InsetsController;
+                    if (insetsController != null)
+                    {
+                        insetsController.Hide(WindowInsets.Type.StatusBars() | WindowInsets.Type.NavigationBars());
+                        insetsController.SystemBarsBehavior = (int)WindowInsetsControllerBehavior.ShowTransientBarsBySwipe;
+                    }
+                    Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
+                }
+                else
+                {
+                    Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
+                    Window.AddFlags(WindowManagerFlags.Fullscreen);
+                    Window.AddFlags(WindowManagerFlags.LayoutInScreen);
+                    Window.ClearFlags(WindowManagerFlags.ForceNotFullscreen);
 
-					var insetsController = Window.InsetsController;
-					if (insetsController != null)
-					{
-						insetsController.Hide(WindowInsets.Type.StatusBars());
-						insetsController.SystemBarsBehavior = (int)WindowInsetsControllerBehavior.ShowTransientBarsBySwipe;
-					}
-				}
-				else
-				{
-					Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
-					Window.AddFlags(WindowManagerFlags.Fullscreen);
-					Window.AddFlags(WindowManagerFlags.LayoutInScreen);
-					Window.ClearFlags(WindowManagerFlags.ForceNotFullscreen);
-				}
-			}
-			else
-			{
-				if (Build.VERSION.SdkInt >= BuildVersionCodes.R)  
-				{
-					Window.SetDecorFitsSystemWindows(true);
+                    // Handle display cutout for devices with notches (API 28+)
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        var layoutParams = Window.Attributes;
+                        layoutParams.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+                        Window.Attributes = layoutParams;
+                    }
+                }
+            }
+            else
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                {
+                    Window.SetDecorFitsSystemWindows(true);
+                    var insetsController = Window.InsetsController;
+                    if (insetsController != null)
+                    {
+                        insetsController.Show(WindowInsets.Type.StatusBars() | WindowInsets.Type.NavigationBars());
+                    }
+                    Window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
+                }
+                else
+                {
+                    Window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
+                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
+                    Window.ClearFlags(WindowManagerFlags.LayoutInScreen);
+                    Window.AddFlags(WindowManagerFlags.ForceNotFullscreen);
 
-					var insetsController = Window.InsetsController;
-					if (insetsController != null)
-					{
-						insetsController.Show(WindowInsets.Type.StatusBars());
-					}
-				}
-				else
-				{
-					Window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
-					Window.ClearFlags(WindowManagerFlags.Fullscreen);
-					Window.ClearFlags(WindowManagerFlags.LayoutInScreen);
-					Window.AddFlags(WindowManagerFlags.ForceNotFullscreen);
-				}
-			}
-		}
-	}
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        var layoutParams = Window.Attributes;
+                        layoutParams.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
+                        Window.Attributes = layoutParams;
+                    }
+                }
+            }
+        }
+    }
 
-	/// <summary>
-	/// An instance of the <see cref="IPopup"/>.
-	/// </summary>
-	public IPopup? VirtualView { get; private set; }
+    /// <summary>
+    /// An instance of the <see cref="IPopup"/>.
+    /// </summary>
+    public IPopup? VirtualView { get; private set; }
 
 	/// <summary>
 	/// Method to initialize the native implementation.
