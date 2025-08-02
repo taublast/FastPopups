@@ -233,7 +233,7 @@ public static partial class PopupExtensions
     /// </summary>
     /// <param name="mauiContext"></param>
     /// <returns></returns>
-    static Windows.Foundation.Rect GetSafeArea(IMauiContext mauiContext)
+    public static Windows.Foundation.Rect GetSafeArea(IMauiContext mauiContext)
     {
         var platformWindow = mauiContext.GetPlatformWindow();
         var topOffset = 0;

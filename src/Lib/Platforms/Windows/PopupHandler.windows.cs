@@ -105,7 +105,8 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
 	public static void MapSize(PopupHandler handler, IPopup view)
 	{
-		handler.PlatformView.Layout();
+        handler.PlatformView.IgnoreSafeArea = view.IgnoreSafeArea;
+        handler.PlatformView.Layout();
 	}
 
 	/// <inheritdoc/>

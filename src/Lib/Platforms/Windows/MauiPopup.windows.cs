@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Platform;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Maui.Platform;
-using HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment;
-using VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment;
 using Grid = Microsoft.UI.Xaml.Controls.Grid;
-using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
+using HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment;
 using Popup = Microsoft.UI.Xaml.Controls.Primitives.Popup;
+using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
+using VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment;
 
 namespace AppoMobi.Maui.Popups;
 
@@ -41,8 +42,9 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	/// </summary>
 	public bool CanBeDismissedByTappingOutside { get; set; }
 
+    public bool IgnoreSafeArea { get; set; }
 
-	partial class BackgroundDimmer : Microsoft.UI.Xaml.Controls.Grid
+    partial class BackgroundDimmer : Microsoft.UI.Xaml.Controls.Grid
 	{
 		public BackgroundDimmer(Action actionTapped)
 		{
@@ -294,7 +296,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		if (VirtualView is not null)
 		{
 			PopupExtensions.SetSize(this, VirtualView, mauiContext);
-			PopupExtensions.SetLayout(this, VirtualView, mauiContext);
+            PopupExtensions.SetLayout(this, VirtualView, mauiContext);
 		}
 	}		
 
@@ -379,10 +381,15 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 					// Recalculate position using the same logic as initial positioning
 					var window = mauiContext.GetPlatformWindow();
 					var windowBounds = window.Bounds;
-					var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
+					var popupParentFrame = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
+                    if (!IgnoreSafeArea)
+                    {
+                        var adjusted = PopupExtensions.GetSafeArea(mauiContext);
+                        popupParentFrame = new(adjusted.Left, adjusted.Y, adjusted.Width, adjusted.Height);
+                    }
 
-					// Get content size
-					var contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
+                    // Get content size
+                    var contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
 					if (contentSize.Width == 0 || contentSize.Height == 0)
 					{
 						contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
@@ -394,12 +401,12 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 					{
 						// Handle anchored positioning
 						var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
-						(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
+						(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, popupParentFrame);
 					}
 					else
 					{
 						// Handle regular alignment-based positioning
-						(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+						(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, popupParentFrame);
 					}
 
 					// Update the content's margin to reposition it

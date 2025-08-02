@@ -32,13 +32,13 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		}
 	}
 
-	/// <summary>
-	/// Constructor of <see cref="MauiPopup"/>.
-	/// </summary>
-	/// <param name="context">An instance of <see cref="Context"/>.</param>
-	/// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
-	/// <exception cref="ArgumentNullException">If <paramref name="mauiContext"/> is null an exception will be thrown. </exception>
-	public MauiPopup(Context context, IMauiContext mauiContext)
+    /// <summary>
+    /// Constructor of <see cref="MauiPopup"/>.
+    /// </summary>
+    /// <param name="context">An instance of <see cref="Context"/>.</param>
+    /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
+    /// <exception cref="ArgumentNullException">If <paramref name="mauiContext"/> is null an exception will be thrown. </exception>
+    public MauiPopup(Context context, IMauiContext mauiContext)
 		: base(context, Android.Resource.Style.ThemeTranslucentNoTitleBarFullScreen)
 	{
 		RequestWindowFeature((int)WindowFeatures.NoTitle);

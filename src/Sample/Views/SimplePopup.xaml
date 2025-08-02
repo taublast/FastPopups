@@ -7,8 +7,8 @@
               BackgroundColor="#66000000"
               Background="Transparent"
               HorizontalOptions="Center"
-              VerticalOptions="Fill"
-              IgnoreSafeArea="True"
+              VerticalOptions="Start"
+              IgnoreSafeArea="False"
               CloseWhenBackgroundIsClicked="False">
 
     <Border BackgroundColor="GhostWhite"
@@ -17,7 +17,7 @@
             WidthRequest="300"
             HeightRequest="300"
             HorizontalOptions="Center"
-            VerticalOptions="Center"
+            VerticalOptions="Start"
             StrokeShape="RoundRectangle 10">
 
         <StackLayout Padding="20" Spacing="15">

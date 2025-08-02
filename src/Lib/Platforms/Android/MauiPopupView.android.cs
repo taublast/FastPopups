@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Content.Res;
 using Android.Views;
 using AView = Android.Views.View;
 
@@ -13,7 +14,18 @@ public class MauiPopupView : AView
 {
 	MauiPopup? dialog;
 
-	/// <summary>
+    protected override void OnConfigurationChanged(Configuration? newConfig)
+    {
+        base.OnConfigurationChanged(newConfig);
+
+        if (VirtualView != null && Visibility == ViewStates.Visible)
+        {
+            // todo
+            //dialog?.RecalculatePosition();
+        }
+    }
+
+    /// <summary>
 	/// Constructor for MauiPopupView.
 	/// </summary>
 	/// <param name="context">Android Context.</param>

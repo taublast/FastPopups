@@ -6,6 +6,7 @@
 
 ### Required
 
+* Test orientation changes when open
 * Android anchor is lower by the amount for either bottom navbar or shell navbar..
 * Test (and then fix) Tizen
 
