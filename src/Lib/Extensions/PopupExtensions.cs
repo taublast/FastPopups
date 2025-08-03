@@ -209,6 +209,9 @@ internal static IWindow GetWindow(this IElement element) =>
         var parent = page.GetCurrentPage();
         parent?.AddLogicalChild(popup);
 
+        // Add to navigation stack
+        PopupNavigationStack.Instance.Push(popup);
+
         try
         {
             var platformPopup = popup.ToHandler(mauiContext);
@@ -239,4 +242,5 @@ internal static IWindow GetWindow(this IElement element) =>
 
         return popup.Result.WaitAsync(token);
     }
+
 }

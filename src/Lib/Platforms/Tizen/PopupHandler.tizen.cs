@@ -21,6 +21,13 @@ public partial class PopupHandler : Microsoft.Maui.Handlers.ViewHandler<IPopup, 
 		{
 			popup.Close();
 		}
+
+		// Remove from navigation stack if it's a Popup
+		if (view is Popup popupInstance)
+		{
+			PopupNavigationStack.Instance.Remove(popupInstance);
+		}
+
 		view.HandlerCompleteTCS.TrySetResult();
 
 		handler.DisconnectHandler(handler.PlatformView);

@@ -5,8 +5,18 @@ namespace AppoMobi.Maui.Popups;
 
 public class PopupNavigationStack
 {
+    private static readonly Lazy<PopupNavigationStack> _instance = new(() => new PopupNavigationStack());
+
+    /// <summary>
+    /// Gets the global singleton instance of the popup navigation stack.
+    /// </summary>
+    public static PopupNavigationStack Instance => _instance.Value;
+
     private readonly Stack<Popup> _popupStack = new();
     private readonly object _lock = new();
+
+    // Private constructor to enforce singleton pattern
+    private PopupNavigationStack() { }
 
     public int Count 
     { 
@@ -50,6 +60,30 @@ public class PopupNavigationStack
             while (_popupStack.TryPop(out var popup))
             {
                 popup?.Close();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes a specific popup from the stack (used when popup closes naturally)
+    /// </summary>
+    /// <param name="popup">The popup to remove</param>
+    public void Remove(Popup popup)
+    {
+        lock (_lock)
+        {
+            // Convert stack to list, remove the popup, and rebuild the stack
+            var popups = _popupStack.ToArray();
+            _popupStack.Clear();
+
+            // Add back all popups except the one we want to remove
+            // Reverse the array to maintain the original stack order
+            foreach (var p in popups.Reverse())
+            {
+                if (p != popup)
+                {
+                    _popupStack.Push(p);
+                }
             }
         }
     }

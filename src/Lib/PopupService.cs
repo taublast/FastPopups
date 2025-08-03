@@ -9,8 +9,6 @@ namespace AppoMobi.Maui.Popups;
 /// <inheritdoc cref="IPopupService"/>
 public class PopupService : IPopupService
 {
-	// Add navigation stack
-	public PopupNavigationStack NavigationStack { get; } = new();
 
 	static readonly Dictionary<Type, Type> viewModelToViewMappings = [];
 
@@ -76,16 +74,15 @@ public class PopupService : IPopupService
 	/// <inheritdoc cref="IPopupService.ClosePopup(object?)" />
 	public void ClosePopup(object? result = null)
 	{
-		EnsureMainThreadIsUsed();
-
-		PopupLifecycleController.GetCurrentPopup()?.Close(result);
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            PopupLifecycleController.GetCurrentPopup()?.Close(result);
+        });
 	}
 
 	/// <inheritdoc cref="IPopupService.ClosePopupAsync(object?)" />
 	public Task ClosePopupAsync(object? result = null)
 	{
-		EnsureMainThreadIsUsed();
-
 		var popup = PopupLifecycleController.GetCurrentPopup();
 
 		return popup?.CloseAsync(result) ?? Task.CompletedTask;
@@ -94,23 +91,23 @@ public class PopupService : IPopupService
 	/// <inheritdoc cref="IPopupService.ShowPopup{TViewModel}()"/>
 	public void ShowPopup<TViewModel>() where TViewModel : INotifyPropertyChanged
 	{
-		EnsureMainThreadIsUsed();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var popup = GetPopup(typeof(TViewModel));
+            ValidateBindingContext<TViewModel>(popup, out _);
 
-		var popup = GetPopup(typeof(TViewModel));
-		ValidateBindingContext<TViewModel>(popup, out _);
-		
-		// Add to navigation stack
-		NavigationStack.Push(popup);
-		
-		InitializePopup(popup);
-		ShowPopup(popup);
+            // Add to navigation stack and hook close event
+            PopupNavigationStack.Instance.Push(popup);
+            HookPopupCloseEvent(popup);
+
+            InitializePopup(popup);
+            ShowPopup(popup);
+        });
 	}
 
 	/// <inheritdoc cref="IPopupService.ShowPopup{TViewModel}(Action{TViewModel})"/>
 	public void ShowPopup<TViewModel>(Action<TViewModel> onPresenting) where TViewModel : INotifyPropertyChanged
 	{
-		EnsureMainThreadIsUsed();
-
 		ArgumentNullException.ThrowIfNull(onPresenting);
 
 		var popup = GetPopup(typeof(TViewModel));
@@ -118,6 +115,10 @@ public class PopupService : IPopupService
 		ValidateBindingContext(popup, out TViewModel viewModel);
 
 		onPresenting.Invoke(viewModel);
+
+		// Add to navigation stack and hook close event
+		PopupNavigationStack.Instance.Push(popup);
+		HookPopupCloseEvent(popup);
 
 		InitializePopup(popup);
 
@@ -127,11 +128,13 @@ public class PopupService : IPopupService
 	/// <inheritdoc cref="IPopupService.ShowPopupAsync{TViewModel}(CancellationToken)"/>
 	public Task<object?> ShowPopupAsync<TViewModel>(CancellationToken token = default) where TViewModel : INotifyPropertyChanged
 	{
-		EnsureMainThreadIsUsed();
-
 		var popup = GetPopup(typeof(TViewModel));
 
 		ValidateBindingContext<TViewModel>(popup, out _);
+
+		// Add to navigation stack and hook close event
+		PopupNavigationStack.Instance.Push(popup);
+		HookPopupCloseEvent(popup);
 
 		InitializePopup(popup);
 
@@ -141,8 +144,6 @@ public class PopupService : IPopupService
 	/// <inheritdoc cref="IPopupService.ShowPopupAsync{TViewModel}(Action{TViewModel}, CancellationToken)"/>
 	public Task<object?> ShowPopupAsync<TViewModel>(Action<TViewModel> onPresenting, CancellationToken token = default) where TViewModel : INotifyPropertyChanged
 	{
-		EnsureMainThreadIsUsed();
-
 		ArgumentNullException.ThrowIfNull(onPresenting);
 
 		var popup = GetPopup(typeof(TViewModel));
@@ -150,6 +151,10 @@ public class PopupService : IPopupService
 		ValidateBindingContext(popup, out TViewModel viewModel);
 
 		onPresenting.Invoke(viewModel);
+
+		// Add to navigation stack and hook close event
+		PopupNavigationStack.Instance.Push(popup);
+		HookPopupCloseEvent(popup);
 
 		InitializePopup(popup);
 
@@ -215,13 +220,6 @@ public class PopupService : IPopupService
 #endif
 	}
 
-	void EnsureMainThreadIsUsed([CallerMemberName] string? callerName = default)
-	{
-		if (dispatcher.IsDispatchRequired)
-		{
-			throw new InvalidOperationException($"{callerName} must be called from the main thread.");
-		}
-	}
 
 	Popup GetPopup(Type viewModelType)
 	{
@@ -238,15 +236,42 @@ public class PopupService : IPopupService
 	// Add stack-based methods
 	public void CloseTopPopup(object? result = null)
 	{
-		EnsureMainThreadIsUsed();
-		
-		var popup = NavigationStack.Pop();
-		popup?.Close(result);
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var popup = PopupNavigationStack.Instance.Pop();
+            popup?.Close(result);
+        });
 	}
 
 	public void CloseAllPopups(object? result = null)
 	{
-		EnsureMainThreadIsUsed();
-		NavigationStack.Clear();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            PopupNavigationStack.Instance.Clear();
+        });
+	}
+
+	/// <summary>
+	/// Hooks into the popup's Closed event to automatically remove it from the navigation stack
+	/// </summary>
+	/// <param name="popup">The popup to hook</param>
+	private static void HookPopupCloseEvent(Popup popup)
+	{
+		popup.Closed += OnPopupClosed;
+	}
+
+	/// <summary>
+	/// Event handler for when a popup closes - removes it from the navigation stack
+	/// </summary>
+	private static void OnPopupClosed(object? sender, PopupClosedEventArgs e)
+	{
+		if (sender is Popup popup)
+		{
+			// Remove the event handler to prevent memory leaks
+			popup.Closed -= OnPopupClosed;
+
+			// Remove the popup from the navigation stack
+			PopupNavigationStack.Instance.Remove(popup);
+		}
 	}
 }

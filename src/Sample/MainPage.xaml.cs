@@ -10,7 +10,7 @@ public partial class MainPage : ContentPage
         InitializeComponent();
     }
 
-    private async void OnSimplePopupClicked(object? sender, EventArgs e)
+    private void OnSimplePopupClicked(object? sender, EventArgs e)
     {
         var popup = new SimplePopup();
         this.ShowPopup(popup);
@@ -88,4 +88,12 @@ public partial class MainPage : ContentPage
 
         await this.ShowPopupAsync(popup);
     }
+
+    // Navigation Stack Examples
+    private async void OnNavigationStackDemoClicked(object? sender, EventArgs e)
+    {
+        var popup = new Views.NavigationStackPopup(1);
+        await this.ShowPopupAsync(popup);
+    }
+
 }

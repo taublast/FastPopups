@@ -27,14 +27,33 @@ This sample application demonstrates the usage of the **AppoMobi.Maui.Popups** l
 - Larger size (400x300)
 - Shows flexibility in popup positioning
 
+### 5. Navigation Stack Demo
+- Interactive multi-level popup demonstration
+- Shows popup stacking with up to 5 levels
+- Real-time stack count display
+- Demonstrates stack management operations
+
+### 6. Stack Info Popup
+- Displays current navigation stack status
+- Shows count of popups in stack
+- Identifies the top popup type
+- Refreshable stack information
+
+### 7. Stack Management Controls
+- Close top popup from main page
+- Close all popups at once
+- Demonstrates global stack operations
+
 ## Key Features of AppoMobi.Maui.Popups
 
 - **Enhanced Platform Handlers**: Custom platform-specific implementations for Android, iOS, and Windows
+- **Navigation Stack Management**: Thread-safe popup stack with global access via `PopupNavigationStack.Instance`
 - **Flexible Positioning**: Support for anchored, centered, and custom positioning
 - **Overlay Customization**: Configurable overlay colors and transparency
 - **Dismissal Options**: Tap-outside-to-dismiss functionality
 - **Size Control**: Fixed sizes or content-based sizing
 - **Theme Support**: Full styling and theming capabilities
+- **Stack Operations**: Close top popup, close all popups, peek at stack
 
 ## Usage
 

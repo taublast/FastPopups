@@ -39,6 +39,12 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 			}
 		}
 
+		// Remove from navigation stack if it's a Popup
+		if (view is Popup popupInstance)
+		{
+			PopupNavigationStack.Instance.Remove(popupInstance);
+		}
+
 		view.HandlerCompleteTCS.TrySetResult();
 
 		if (popupView != null)
