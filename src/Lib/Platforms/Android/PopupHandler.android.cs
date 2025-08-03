@@ -180,8 +180,15 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 			parent.RemoveView(handler.Content);
 		}
 
-		// Dispose the old dialog to clean up resources
-		handler.PlatformView.Dialog?.Dispose();
+		// Properly dismiss and dispose the old dialog
+		if (handler.PlatformView.Dialog != null)
+		{
+			if (handler.PlatformView.Dialog.IsShowing)
+			{
+				handler.PlatformView.Dialog.Dismiss(); // Remove from WindowManager first
+			}
+			handler.PlatformView.Dialog.Dispose(); // Then dispose managed resources
+		}
 	}
 
 	/// <summary>
