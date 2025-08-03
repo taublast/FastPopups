@@ -13,6 +13,9 @@ public partial class FillPopup : Popup
         Close();
     }
 
- 
 
+    private void OnInsetsClicked(object? sender, EventArgs e)
+    {
+        IgnoreSafeArea = !IgnoreSafeArea;
+    }
 }

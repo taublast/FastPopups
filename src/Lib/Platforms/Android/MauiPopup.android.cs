@@ -227,20 +227,36 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			safeAreaInsets = new Microsoft.Maui.Thickness(0, statusBarHeight, 0, navigationBarHeight);
 		}
 
-		// Always measure the actual content to get its natural size (Android measure uses pixels)
-		actualContent.Measure(
-			Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Width), MeasureSpecMode.AtMost),
-			Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Height), MeasureSpecMode.AtMost));
-		
-		// Convert measured size from pixels to DIPs for use with shared layout logic
-		var contentSize = new Size(
-			PixelsToDips(actualContent.MeasuredWidth), 
-			PixelsToDips(actualContent.MeasuredHeight));
-		
-		// If content has no natural size, fall back to layout calculator
-		if (contentSize.Width == 0 || contentSize.Height == 0)
+		// For Fill layouts, we need to calculate size based on layout options, not measured content
+		// Check if we have Fill layout options first
+		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+		Size contentSize;
+		if (isFillWidth || isFillHeight)
 		{
+			// For Fill layouts, use the layout calculator to get proper Fill sizing
 			contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+		}
+		else
+		{
+			// For non-Fill layouts, measure the actual content to get its natural size (Android measure uses pixels)
+			actualContent.Measure(
+				Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Width), MeasureSpecMode.AtMost),
+				Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(screenSize.Height), MeasureSpecMode.AtMost));
+
+			// Convert measured size from pixels to DIPs for use with shared layout logic
+			contentSize = new Size(
+				PixelsToDips(actualContent.MeasuredWidth),
+				PixelsToDips(actualContent.MeasuredHeight));
+
+			// If content has no natural size, fall back to layout calculator
+			if (contentSize.Width == 0 || contentSize.Height == 0)
+			{
+				contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+			}
 		}
 
 		// Calculate position based on popup alignment or anchor (all in DIPs)

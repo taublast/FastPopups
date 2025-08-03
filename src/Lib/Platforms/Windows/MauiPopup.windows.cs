@@ -190,25 +190,65 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	}
 
 	/// <summary>
-	/// Positions the actual popup content within the fullscreen container using layout options.
+	/// Calculates the layout (size and position) for popup content.
 	/// </summary>
-	/// <param name="container">The fullscreen container Grid.</param>
-	/// <param name="actualContent">The popup content to position.</param>
-	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+	/// <param name="actualContent">The actual popup content to calculate layout for.</param>
+	/// <returns>The calculated size and position.</returns>
+	(Size ContentSize, double X, double Y) CalculateContentLayout(FrameworkElement actualContent)
 	{
-		if (VirtualView == null) return;
+		if (VirtualView is null || mauiContext is null)
+			return (new Size(300, 200), 0, 0);
 
 		// Get window bounds for layout calculation
 		var window = mauiContext.GetPlatformWindow();
 		var windowBounds = window.Bounds;
 		var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
 
-		// Get content size
-		var contentSize = new Size(actualContent.Width, actualContent.Height);
-		if (double.IsNaN(contentSize.Width) || double.IsNaN(contentSize.Height))
+		// Apply safe area adjustments if needed
+		var popupParentFrame = parentBounds;
+		Microsoft.Maui.Thickness safeAreaInsets = default;
+		if (!IgnoreSafeArea)
 		{
-			actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-			contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+			var safeArea = PopupExtensions.GetSafeArea(mauiContext);
+			popupParentFrame = new Rect(safeArea.Left, safeArea.Y, safeArea.Width, safeArea.Height);
+			safeAreaInsets = new Microsoft.Maui.Thickness(
+				safeArea.X - parentBounds.X,
+				safeArea.Y - parentBounds.Y,
+				parentBounds.Right - safeArea.Right,
+				parentBounds.Bottom - safeArea.Bottom);
+		}
+
+		// For Fill layouts, we need to calculate size based on layout options, not measured content
+		// Check if we have Fill layout options first
+		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+		Size contentSize;
+		if (isFillWidth || isFillHeight)
+		{
+			// For Fill layouts, use the layout calculator to get proper Fill sizing
+			contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+		}
+		else
+		{
+			// For non-Fill layouts, try to get actual/measured content size first
+			contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
+			if (contentSize.Width == 0 || contentSize.Height == 0)
+			{
+				if (actualContent.DesiredSize.Width == 0 || actualContent.DesiredSize.Height == 0)
+				{
+					actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+				}
+				contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+			}
+
+			// If still no size, use layout calculator as fallback
+			if (contentSize.Width == 0 || contentSize.Height == 0)
+			{
+				contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+			}
 		}
 
 		// Calculate position based on popup alignment or anchor
@@ -217,12 +257,42 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		{
 			// Handle anchored positioning
 			var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
-			(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
+			(x, y) = CrossPlatformAnchorCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds, safeAreaInsets);
 		}
 		else
 		{
 			// Handle regular alignment-based positioning
-			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds);
+			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, safeAreaInsets);
+		}
+
+		return (contentSize, x, y);
+	}
+
+	/// <summary>
+	/// Positions the actual popup content within the fullscreen container using layout options.
+	/// </summary>
+	/// <param name="container">The fullscreen container Grid.</param>
+	/// <param name="actualContent">The popup content to position.</param>
+	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+	{
+		if (VirtualView == null) return;
+
+		var (contentSize, x, y) = CalculateContentLayout(actualContent);
+
+		// Apply the calculated size to the content for Fill layouts
+		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+		if (isFillWidth)
+		{
+			actualContent.Width = contentSize.Width;
+		}
+
+		if (isFillHeight)
+		{
+			actualContent.Height = contentSize.Height;
 		}
 
 		// Set positioning using margins
@@ -378,35 +448,23 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 				var actualContent = container.Children.LastOrDefault() as FrameworkElement;
 				if (actualContent != null)
 				{
-					// Recalculate position using the same logic as initial positioning
-					var window = mauiContext.GetPlatformWindow();
-					var windowBounds = window.Bounds;
-					var popupParentFrame = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
-                    if (!IgnoreSafeArea)
-                    {
-                        var adjusted = PopupExtensions.GetSafeArea(mauiContext);
-                        popupParentFrame = new(adjusted.Left, adjusted.Y, adjusted.Width, adjusted.Height);
-                    }
+					// Recalculate layout using the unified method
+					var (contentSize, x, y) = CalculateContentLayout(actualContent);
 
-                    // Get content size
-                    var contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
-					if (contentSize.Width == 0 || contentSize.Height == 0)
+					// Apply the calculated size to the content for Fill layouts
+					var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+					var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+					var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+					var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+					if (isFillWidth)
 					{
-						contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+						actualContent.Width = contentSize.Width;
 					}
 
-					// Calculate position based on popup alignment or anchor
-					double x, y;
-					if (VirtualView.Anchor != null)
+					if (isFillHeight)
 					{
-						// Handle anchored positioning
-						var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
-						(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, popupParentFrame);
-					}
-					else
-					{
-						// Handle regular alignment-based positioning
-						(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, popupParentFrame);
+						actualContent.Height = contentSize.Height;
 					}
 
 					// Update the content's margin to reposition it

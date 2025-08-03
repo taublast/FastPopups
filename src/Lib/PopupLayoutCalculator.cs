@@ -36,10 +36,11 @@ public static class PopupLayoutCalculator
 		var horizontalAlignment = GetLayoutAlignment(popup.HorizontalOptions);
 		var x = horizontalAlignment switch
 		{
-			// Start alignment should position at true edge, not safe area adjusted
-			LayoutAlignment.Start => parentBounds.X,
+			// When IgnoreSafeArea=false, Start should respect safe area insets
+			// When IgnoreSafeArea=true, Start should position at true edge
+			LayoutAlignment.Start => popup.IgnoreSafeArea ? parentBounds.X : adjustedBounds.X,
 			LayoutAlignment.End => adjustedBounds.Right - contentSize.Width,
-			LayoutAlignment.Center or LayoutAlignment.Fill => 
+			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.X + (adjustedBounds.Width - contentSize.Width) / 2,
 			_ => adjustedBounds.X
 		};
@@ -48,10 +49,11 @@ public static class PopupLayoutCalculator
 		var verticalAlignment = GetLayoutAlignment(popup.VerticalOptions);
 		var y = verticalAlignment switch
 		{
-			// Start alignment should position at true edge, not safe area adjusted
-			LayoutAlignment.Start => parentBounds.Y,
+			// When IgnoreSafeArea=false, Start should respect safe area insets
+			// When IgnoreSafeArea=true, Start should position at true edge
+			LayoutAlignment.Start => popup.IgnoreSafeArea ? parentBounds.Y : adjustedBounds.Y,
 			LayoutAlignment.End => adjustedBounds.Bottom - contentSize.Height,
-			LayoutAlignment.Center or LayoutAlignment.Fill => 
+			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.Y + (adjustedBounds.Height - contentSize.Height) / 2,
 			_ => adjustedBounds.Y
 		};
@@ -110,18 +112,18 @@ public static class PopupLayoutCalculator
 		// Calculate size based on layout options and any explicit requests
 		var horizontalAlignment = GetLayoutAlignment(popup.HorizontalOptions);
 		var verticalAlignment = GetLayoutAlignment(popup.VerticalOptions);
-		
+
 		var width = hasExplicitWidth == true && visualElement != null
 			? Math.Min(visualElement.WidthRequest, adjustedBounds.Width)
-			: horizontalAlignment == LayoutAlignment.Fill 
-				? adjustedBounds.Width 
-				: Math.Min(600, adjustedBounds.Width); // Default width, constrained by parent
+			: horizontalAlignment == LayoutAlignment.Fill
+				? adjustedBounds.Width
+				: 600; // Default width for autosize - don't constrain by parent to allow natural sizing
 
 		var height = hasExplicitHeight == true && visualElement != null
 			? Math.Min(visualElement.HeightRequest, adjustedBounds.Height)
-			: verticalAlignment == LayoutAlignment.Fill 
-				? adjustedBounds.Height 
-				: Math.Min(400, adjustedBounds.Height); // Default height, constrained by parent
+			: verticalAlignment == LayoutAlignment.Fill
+				? adjustedBounds.Height
+				: 400; // Default height for autosize - don't constrain by parent to allow natural sizing
 
 		return new Size(width, height);
 	}
@@ -185,7 +187,7 @@ public static class PopupLayoutCalculator
 	/// </summary>
 	/// <param name="layoutOptions">The LayoutOptions from VisualElement.</param>
 	/// <returns>Corresponding LayoutAlignment.</returns>
-	static LayoutAlignment GetLayoutAlignment(LayoutOptions layoutOptions)
+	public static LayoutAlignment GetLayoutAlignment(LayoutOptions layoutOptions)
 	{
 		// Convert between different LayoutAlignment enums
 		return (int)layoutOptions.Alignment switch

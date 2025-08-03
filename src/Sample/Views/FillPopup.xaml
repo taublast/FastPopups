@@ -20,21 +20,27 @@
             StrokeShape="RoundRectangle 10">
 
         <StackLayout Padding="20" Spacing="15">
-            <Label Text="Simple Popup"
+            <Label Text="Fill Popup"
                    FontSize="18"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="DarkBlue" />
+                   TextColor="DarkGreen" />
 
             <Label Text="This is a basic popup, will close only when button is clicked."
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
 
+            <Button Text="Toggle IgnoreSafeArea"
+                    BackgroundColor="Orange"
+                    TextColor="White"
+                    Clicked="OnInsetsClicked" />
+
             <Button Text="Close"
                     BackgroundColor="DarkBlue"
                     TextColor="White"
                     Clicked="OnCloseClicked" />
+
         </StackLayout>
 
     </Border>
