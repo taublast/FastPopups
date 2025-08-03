@@ -75,4 +75,11 @@ public interface IPopupService
 	/// <param name="token"><see cref="CancellationToken"/> </param>
 	/// <exception cref="InvalidOperationException">Thrown if this method is not called on the UI thread.</exception>
 	Task<object?> ShowPopupAsync<TViewModel>(Action<TViewModel> onPresenting, CancellationToken token = default) where TViewModel : INotifyPropertyChanged;
+
+	// Add navigation stack property
+	PopupNavigationStack NavigationStack { get; }
+
+	// Add stack-based methods
+	void CloseTopPopup(object? result = null);
+	void CloseAllPopups(object? result = null);
 }

@@ -33,11 +33,16 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </summary>
 	bool CloseWhenBackgroundIsClicked { get; }
 
+    /// <summary>
+    /// Override this to allow latter processing of CloseWhenBackgroundIsClicked, return false to block.
+    /// </summary>
+    /// <returns></returns>
+    bool OnBackgroundClicked();
 
-	/// <summary>
-	/// Gets the vertical aspect of this element's arrangement in a container.
-	/// </summary>
-	LayoutOptions VerticalOptions { get; }
+    /// <summary>
+    /// Gets the vertical aspect of this element's arrangement in a container.
+    /// </summary>
+    LayoutOptions VerticalOptions { get; }
 
 	/// <summary>
 	/// Occurs when the Popup is closed.
@@ -55,3 +60,4 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </summary>
 	void OnDismissedByTappingOutsideOfPopup();
 }
+

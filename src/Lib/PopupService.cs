@@ -9,6 +9,9 @@ namespace AppoMobi.Maui.Popups;
 /// <inheritdoc cref="IPopupService"/>
 public class PopupService : IPopupService
 {
+	// Add navigation stack
+	public PopupNavigationStack NavigationStack { get; } = new();
+
 	static readonly Dictionary<Type, Type> viewModelToViewMappings = [];
 
 	readonly IServiceProvider serviceProvider;
@@ -94,11 +97,12 @@ public class PopupService : IPopupService
 		EnsureMainThreadIsUsed();
 
 		var popup = GetPopup(typeof(TViewModel));
-
 		ValidateBindingContext<TViewModel>(popup, out _);
-
+		
+		// Add to navigation stack
+		NavigationStack.Push(popup);
+		
 		InitializePopup(popup);
-
 		ShowPopup(popup);
 	}
 
@@ -229,5 +233,20 @@ public class PopupService : IPopupService
 	void InitializePopup(Popup popup)
 	{
 		PopupLifecycleController.OnShowPopup(popup);
+	}
+
+	// Add stack-based methods
+	public void CloseTopPopup(object? result = null)
+	{
+		EnsureMainThreadIsUsed();
+		
+		var popup = NavigationStack.Pop();
+		popup?.Close(result);
+	}
+
+	public void CloseAllPopups(object? result = null)
+	{
+		EnsureMainThreadIsUsed();
+		NavigationStack.Clear();
 	}
 }

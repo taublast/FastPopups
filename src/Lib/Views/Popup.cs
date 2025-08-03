@@ -177,10 +177,19 @@ public partial class Popup : View, IPopup
 		resultTaskCompletionSource.TrySetResult(result);
 	}
 
-	/// <summary>
-	/// Invokes the <see cref="Opened"/> event.
-	/// </summary>
-	internal virtual void OnOpened() =>
+    /// <summary>
+    /// Override this to allow latter processing of CloseWhenBackgroundIsClicked, return false to block.
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool OnBackgroundClicked()
+    {
+        return true;
+    }
+
+    /// <summary>
+    /// Invokes the <see cref="Opened"/> event.
+    /// </summary>
+    internal virtual void OnOpened() =>
 		openedWeakEventManager.HandleEvent(this, PopupOpenedEventArgs.Empty, nameof(Opened));
 
 	/// <summary>
