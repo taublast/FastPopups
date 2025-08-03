@@ -25,42 +25,6 @@ public static partial class PopupExtensions
         // Register the popup handler
         builder.ConfigureMauiHandlers(handlers => { handlers.AddHandler<IPopup, PopupHandler>(); });
 
-        // Register the popup service
-        builder.Services.TryAddSingleton<IPopupService, PopupService>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers a transient popup with its associated view model for dependency injection.
-    /// </summary>
-    /// <typeparam name="TPopupView">The popup view type.</typeparam>
-    /// <typeparam name="TPopupViewModel">The popup view model type.</typeparam>
-    /// <param name="builder">The <see cref="MauiAppBuilder"/> to configure.</param>
-    /// <returns>The configured <see cref="MauiAppBuilder"/>.</returns>
-    public static MauiAppBuilder AddTransientPopup<TPopupView, TPopupViewModel>(this MauiAppBuilder builder)
-        where TPopupView : class, IPopup
-        where TPopupViewModel : class, System.ComponentModel.INotifyPropertyChanged
-    {
-        PopupService.AddTransientPopup<TPopupView, TPopupViewModel>(builder.Services);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers a transient popup with its associated view model instance for dependency injection.
-    /// </summary>
-    /// <typeparam name="TPopupView">The popup view type.</typeparam>
-    /// <typeparam name="TPopupViewModel">The popup view model type.</typeparam>
-    /// <param name="builder">The <see cref="MauiAppBuilder"/> to configure.</param>
-    /// <param name="popup">The popup instance.</param>
-    /// <param name="popupViewModel">The popup view model instance.</param>
-    /// <returns>The configured <see cref="MauiAppBuilder"/>.</returns>
-    public static MauiAppBuilder AddTransientPopup<TPopupView, TPopupViewModel>(this MauiAppBuilder builder,
-        TPopupView popup, TPopupViewModel popupViewModel)
-        where TPopupView : class, IPopup
-        where TPopupViewModel : class, System.ComponentModel.INotifyPropertyChanged
-    {
-        PopupService.AddTransientPopup(popup, popupViewModel, builder.Services);
         return builder;
     }
 

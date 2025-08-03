@@ -64,6 +64,19 @@ public class PopupNavigationStack
         }
     }
 
+    public void CloseTop(object result=null)
+    {
+        lock (_lock)
+        {
+            var topPopup = Peek();
+            if (topPopup != null)
+            {
+                topPopup.Close(result);
+            }
+        }
+    }
+
+
     /// <summary>
     /// Removes a specific popup from the stack (used when popup closes naturally)
     /// </summary>

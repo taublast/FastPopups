@@ -1,10 +1,67 @@
 # Popups for .NET MAUI
 
----
+**Simple and fast popup library for .NET MAUI**
+
 
 ## About
 
-This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  It was the fastest for opening popups among different libraries, was definitely worth adding a navigation stack, HotReload support, IgnoreSafeArea and a separate dimmer layer for all platforms.
+This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  It was the fastest for opening popups among different libraries, was definitely worth adding new features.
+
+---
+
+## ✨ Key Features
+
+- **↕️ Full Screen Support**: Diplaye over safe area or full screen
+- **🎨 Overlay Customization**: Configurable colors and transparency
+- **🔄 HotReload Support**: Preview changes in realtime
+- **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
+- **📍 Flexible Positioning**: Anchored ot aligned positioning
+- **👆 Dismissal Options**: Tap-outside-to-dismiss with custom validation
+---
+
+## 🚀 Quick Start
+
+### 1. Setup (One Line!)
+```csharp
+public static class MauiProgram
+{
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .AddPopups(); // That's it! 🎉
+
+        return builder.Build();
+    }
+}
+```
+
+### 2. Create and Show Popups
+```csharp
+// Simple popup
+var popup = new Popup
+{
+    Content = new Label { Text = "Hello World!" },
+    HeightRequest = 200,
+    WidthRequest = 300
+};
+
+await this.ShowPopupAsync(popup);
+
+// MVVM popup
+var popup = new UserProfilePopup
+{
+    BindingContext = new UserProfileViewModel(user)
+};
+
+await this.ShowPopupAsync(popup);
+
+// Global operations
+PopupNavigationStack.Instance.CloseTop(); // Close top popup
+PopupNavigationStack.Instance.Clear(); // Close all popups
+var count = PopupNavigationStack.Instance.Count; // How many open?
+```
 
 ---
 
@@ -81,12 +138,12 @@ private async void OnAnchoredPopupClicked(object sender, EventArgs e)
 
 ## API Reference
 
-### Three Ways to Work with Popups
+### Two Simple Ways to Work with Popups
 
-AppoMobi.Maui.Popups provides three complementary approaches for different scenarios:
+AppoMobi.Maui.Popups provides a clean, simple approach with two complementary parts:
 
-#### 1. 🎯 Manual Popup Creation (Direct Approach)
-Perfect for simple popups and full control:
+#### 1. 🎯 Create and Show Popups (Direct Approach)
+Simple, powerful, and gives you full control:
 
 ```csharp
 // Create popup manually
@@ -104,42 +161,13 @@ var result = await this.ShowPopupAsync(popup);
 this.ShowPopup(popup);
 ```
 
-**When to use:** Simple popups, prototyping, full control over properties
+**Perfect for:** All scenarios - simple messages, complex forms, MVVM patterns, everything!
 
-#### 2. 🏗️ PopupService (Dependency Injection Approach)
-Best for MVVM architecture and complex applications:
-
-```csharp
-// Register in MauiProgram.cs
-builder.Services.AddTransientPopup<MyPopup, MyPopupViewModel>();
-
-// Inject and use
-public class MyPageViewModel
-{
-    private readonly IPopupService popupService;
-
-    public async Task ShowMyPopup()
-    {
-        // Service creates popup + viewmodel automatically
-        var result = await popupService.ShowPopupAsync<MyPopupViewModel>();
-
-        // OR with initialization
-        var result2 = await popupService.ShowPopupAsync<MyPopupViewModel>(vm =>
-        {
-            vm.Title = "Custom Title";
-            vm.LoadData();
-        });
-    }
-}
-```
-
-**When to use:** MVVM pattern, dependency injection, automatic ViewModel creation
-
-#### 3. 🗂️ PopupNavigationStack (Global Stack Management)
+#### 2. 🗂️ PopupNavigationStack (Global Stack Management)
 Automatic tracking and global operations for all popups:
 
 ```csharp
-// Access the global navigation stack (works with ANY popup approach)
+// Access the global navigation stack (automatically tracks ALL popups)
 var stackCount = PopupNavigationStack.Instance.Count;
 var topPopup = PopupNavigationStack.Instance.Peek();
 
@@ -148,30 +176,29 @@ PopupNavigationStack.Instance.Clear(); // Close all popups
 var popup = PopupNavigationStack.Instance.Pop(); // Get and remove top popup
 ```
 
-**When to use:** Managing multiple popups, global operations, navigation-like experiences
+**Perfect for:** Managing multiple popups, global operations, navigation-like experiences
 
 ---
 
 ### How They Work Together
 
-All three approaches work seamlessly together:
+Both parts work seamlessly together:
 
 ```mermaid
 graph TD
-    A[Manual Creation] --> D[Extension Methods]
-    B[PopupService] --> E[Service Methods]
-    D --> F[Platform Display]
-    E --> F
-    F --> G[PopupNavigationStack]
-    G --> H[Automatic Tracking]
-    H --> I[Global Operations]
+    A[Create Popup] --> B[Extension Methods]
+    B --> C[Platform Display]
+    C --> D[PopupNavigationStack]
+    D --> E[Automatic Tracking]
+    E --> F[Global Operations]
 ```
 
 **Key Points:**
-- ✅ **All popups are automatically tracked** in NavigationStack regardless of creation method
-- ✅ **Mix and match approaches** - use what fits each scenario
+- ✅ **All popups are automatically tracked** in NavigationStack
+- ✅ **Simple and powerful** - no complex setup or registration needed
 - ✅ **Global operations work on all popups** - close all, peek, count, etc.
 - ✅ **Automatic cleanup** - popups are removed from stack when closed
+- ✅ **Full control** - customize every aspect of your popups
 
 ---
 
@@ -205,11 +232,10 @@ var popup = new Popup
 
 ---
 
-## Detailed Usage Guide
+## Setup and Usage Guide
 
-### Setup and Configuration
+### Simple Setup (One Line!)
 
-#### Basic Setup (Required for all approaches)
 ```csharp
 public static class MauiProgram
 {
@@ -218,37 +244,14 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .AddPopups(); // Configure popup handlers - REQUIRED
+            .AddPopups(); // That's it! 🎉
 
         return builder.Build();
     }
 }
 ```
 
-#### PopupService Setup (Optional - only if using dependency injection)
-```csharp
-public static class MauiProgram
-{
-    public static MauiApp CreateMauiApp()
-    {
-        var builder = MauiApp.CreateBuilder();
-        builder
-            .UseMauiApp<App>()
-            .AddPopups(); // Configure popup handlers
-
-        // Register popup service (optional)
-        builder.Services.AddSingleton<IPopupService, PopupService>();
-
-        // Register popup/viewmodel pairs (optional)
-        builder.Services.AddTransientPopup<MyPopup, MyPopupViewModel>();
-        builder.Services.AddTransientPopup<ConfirmDialog, ConfirmDialogViewModel>();
-
-        return builder.Build();
-    }
-}
-```
-
-### Manual Popup Creation Examples
+### Popup Creation Examples
 
 #### Simple Message Popup
 ```csharp
@@ -303,23 +306,25 @@ private async void OnButtonClicked(object sender, EventArgs e)
 }
 ```
 
-### PopupService Examples
-
-#### Basic Service Usage
+#### MVVM Pattern Example
 ```csharp
 public class MyPageViewModel
 {
-    private readonly IPopupService popupService;
-
-    public MyPageViewModel(IPopupService popupService)
-    {
-        this.popupService = popupService;
-    }
-
     public async Task ShowConfirmation()
     {
-        // Service creates popup + viewmodel automatically
-        var result = await popupService.ShowPopupAsync<ConfirmationViewModel>();
+        // Create popup with ViewModel
+        var popup = new ConfirmationPopup
+        {
+            BindingContext = new ConfirmationViewModel
+            {
+                Title = "Confirm Action",
+                Message = "Are you sure you want to delete this item?"
+            },
+            HeightRequest = 200,
+            WidthRequest = 400
+        };
+
+        var result = await Application.Current.MainPage.ShowPopupAsync(popup);
 
         if (result?.ToString() == "confirmed")
         {
@@ -327,15 +332,21 @@ public class MyPageViewModel
         }
     }
 
-    public async Task ShowCustomDialog()
+    public async Task ShowComplexDialog()
     {
-        // Initialize viewmodel before showing
-        var result = await popupService.ShowPopupAsync<DialogViewModel>(vm =>
+        // For complex ViewModels, create separately
+        var viewModel = new DialogViewModel();
+        viewModel.LoadData();
+        viewModel.Title = "Custom Title";
+
+        var popup = new DialogPopup
         {
-            vm.Title = "Custom Title";
-            vm.Message = "Are you sure you want to delete this item?";
-            vm.LoadData();
-        });
+            BindingContext = viewModel,
+            HeightRequest = 400,
+            WidthRequest = 500
+        };
+
+        var result = await Application.Current.MainPage.ShowPopupAsync(popup);
     }
 }
 ```
@@ -400,29 +411,34 @@ public class PopupManager
 }
 ```
 
-#### Using with PopupService
+#### Multiple Popups Example
 ```csharp
-public class ServiceBasedManager
+public class PopupManager
 {
-    private readonly IPopupService popupService;
-
-    public ServiceBasedManager(IPopupService popupService)
-    {
-        this.popupService = popupService;
-    }
-
     public async Task ShowMultipleDialogs()
     {
-        // Use service to show popups
-        await popupService.ShowPopupAsync<ConfirmationViewModel>();
-        await popupService.ShowPopupAsync<InputViewModel>();
+        // Show multiple popups - all automatically tracked
+        var confirmation = new ConfirmationPopup();
+        await Application.Current.MainPage.ShowPopupAsync(confirmation);
+
+        var input = new InputPopup();
+        await Application.Current.MainPage.ShowPopupAsync(input);
 
         // NavigationStack tracks them automatically
         var count = PopupNavigationStack.Instance.Count;
 
-        // Use service methods for stack operations
-        popupService.CloseTopPopup();
-        popupService.CloseAllPopups();
+        // Global stack operations
+        PopupNavigationStack.Instance.Clear(); // Close all
+    }
+
+    public void HandleBackButton()
+    {
+        // Close top popup on back button
+        if (PopupNavigationStack.Instance.Count > 0)
+        {
+            var topPopup = PopupNavigationStack.Instance.Pop();
+            topPopup?.Close();
+        }
     }
 }
 ```
@@ -431,41 +447,57 @@ public class ServiceBasedManager
 
 ## Key Features Summary
 
-### NavigationStack Features
+### 🎯 **Simple & Powerful**
+- ✅ **One-line setup** - Just `.AddPopups()` and you're ready
+- ✅ **Direct creation** - `new MyPopup()` - no magic, no complexity
+- ✅ **Full control** - Customize every aspect of your popups
+- ✅ **MVVM friendly** - Works perfectly with ViewModels and data binding
+- ✅ **No dependencies** - No services to inject or register
+
+### 🗂️ **NavigationStack Features**
 - ✅ **Thread-Safe**: All operations are thread-safe with internal locking
 - ✅ **Automatic Management**: Popups are automatically added/removed from stack
-- ✅ **Universal Tracking**: Works with manual creation, PopupService, and extension methods
+- ✅ **Universal Tracking**: Works with all popup creation methods
 - ✅ **LIFO Behavior**: Last-In-First-Out like a standard navigation stack
 - ✅ **Bulk Operations**: Close multiple popups efficiently
 - ✅ **Stack Inspection**: Peek at the top popup without removing it
 - ✅ **Global Access**: Static singleton accessible from anywhere
 
-### When to Use Each Approach
+### Why This Approach is Better
 
-| Approach | Best For | Example Use Cases |
-|----------|----------|-------------------|
-| **Manual Creation** | Simple popups, prototyping, full control | Alert messages, simple confirmations, quick demos |
-| **PopupService** | MVVM apps, dependency injection, complex logic | User forms, data entry, business workflows |
-| **NavigationStack** | Multi-popup scenarios, global management | Wizard flows, modal stacks, emergency exits |
+| ✅ **Simplified** | ❌ **Complex Alternatives** |
+|------------------|----------------------------|
+| **One line setup** - Just `.AddPopups()` | Multiple service registrations |
+| **Direct creation** - `new MyPopup()` | Magic string mappings |
+| **Full control** - Customize everything | Limited by service patterns |
+| **Easy debugging** - See exactly what happens | Hidden service magic |
+| **No dependencies** - Just create and show | Inject services everywhere |
 
-### Mixing Approaches
+### Real-World Usage
 ```csharp
-public class MixedUsageExample
+public class RealWorldExample
 {
-    private readonly IPopupService popupService;
-
-    public async Task DemonstrateAllApproaches()
+    public async Task ShowUserProfile(User user)
     {
-        // 1. Manual creation
-        var simplePopup = new Popup { Content = new Label { Text = "Simple" } };
-        await this.ShowPopupAsync(simplePopup);
+        // Simple, direct, powerful
+        var popup = new UserProfilePopup
+        {
+            BindingContext = new UserProfileViewModel(user),
+            HeightRequest = 500,
+            WidthRequest = 400,
+            CloseWhenBackgroundIsClicked = true
+        };
 
-        // 2. Service-based
-        await popupService.ShowPopupAsync<ComplexViewModel>();
+        var result = await Application.Current.MainPage.ShowPopupAsync(popup);
 
-        // 3. Global stack operations work on ALL popups
-        var totalPopups = PopupNavigationStack.Instance.Count; // Shows 2
-        PopupNavigationStack.Instance.Clear(); // Closes both
+        // NavigationStack automatically tracked everything
+        Console.WriteLine($"Popups in stack: {PopupNavigationStack.Instance.Count}");
+    }
+
+    public void CloseAllPopups()
+    {
+        // Global operations work seamlessly
+        PopupNavigationStack.Instance.Clear();
     }
 }
 ```
