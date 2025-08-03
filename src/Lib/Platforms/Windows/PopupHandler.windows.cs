@@ -84,7 +84,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
 	public static void MapCloseWhenBackgroundIsClicked(PopupHandler handler, IPopup view)
 	{
-		handler.PlatformView.CanBeDismissedByTappingOutside = view.CloseWhenBackgroundIsClicked;
+		handler.PlatformView.CloseWhenBackgroundIsClicked = view.CloseWhenBackgroundIsClicked;
 	}
 
 

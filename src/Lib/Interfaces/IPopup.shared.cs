@@ -24,13 +24,17 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	LayoutOptions HorizontalOptions { get; }
 
 	/// <summary>
-	/// Controls whether the popup should respect safe insets like status bar etc. 
+	/// Controls whether the popup should respect safe insets like status bar etc.
 	/// </summary>
 	bool IgnoreSafeArea { get; }
 
 	/// <summary>
-	/// Gets the CloseWhenBackgroundIsClicked property.
+	/// Gets or sets a value indicating whether the popup can be dismissed by tapping anywhere where gestures are not processed.
 	/// </summary>
+	/// <remarks>
+	/// When true and the user taps outside the popup, it will dismiss.
+	/// On Android - when false the hardware back button is disabled.
+	/// </remarks>
 	bool CloseWhenBackgroundIsClicked { get; }
 
     /// <summary>

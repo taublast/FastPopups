@@ -6,7 +6,7 @@
              WidthRequest="250"
              HeightRequest="150"
              BackgroundColor="#80000000"
-             CloseWhenBackgroundIsClicked="False">
+             CloseWhenBackgroundIsClicked="True">
     
     <Border BackgroundColor="LightYellow" 
             StrokeThickness="1" 

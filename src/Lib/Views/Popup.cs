@@ -187,6 +187,16 @@ public partial class Popup : View, IPopup
     }
 
     /// <summary>
+    /// Unified method to handle outside click/tap events across all platforms.
+    /// This ensures consistent behavior and validation logic.
+    /// </summary>
+    /// <returns>True if the popup should be dismissed, false otherwise.</returns>
+    internal bool ShouldDismissOnOutsideClick()
+    {
+        return CloseWhenBackgroundIsClicked && OnBackgroundClicked();
+    }
+
+    /// <summary>
     /// Invokes the <see cref="Opened"/> event.
     /// </summary>
     internal virtual void OnOpened() =>

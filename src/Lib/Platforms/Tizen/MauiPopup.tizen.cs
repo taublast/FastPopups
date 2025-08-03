@@ -130,7 +130,7 @@ public partial class MauiPopup : Popup
 			return;
 		}
 
-		if (VirtualView.CloseWhenBackgroundIsClicked)
+		if (VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 		{
 			Close();
 			VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));

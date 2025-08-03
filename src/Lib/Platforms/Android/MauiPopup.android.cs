@@ -186,7 +186,10 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 		{
 			overlay.Click += (sender, e) =>
 			{
-				VirtualView?.OnDismissedByTappingOutsideOfPopup();
+				if (VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
+				{
+					VirtualView?.OnDismissedByTappingOutsideOfPopup();
+				}
 			};
 		}
 
@@ -486,27 +489,8 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 	/// <inheritdoc/>
 	public override bool OnTouchEvent(MotionEvent e)
 	{
-		if (VirtualView is not null)
-		{
-			if (VirtualView.CloseWhenBackgroundIsClicked &&
-				e.Action == MotionEventActions.Up)
-			{
-				if (Window?.DecorView is AView decorView)
-				{
-					float x = e.GetX();
-					float y = e.GetY();
-
-					if (!(x >= 0 && x <= decorView.Width && y >= 0 && y <= decorView.Height))
-					{
-						if (IsShowing)
-						{
-							OnDismissedByTappingOutsideOfPopup(this);
-						}
-					}
-				}
-			}
-		}
-
+		// Let the overlay handle outside clicks to avoid conflicts
+		// The overlay.Click event will handle dismissing the popup
 		return !this.IsDisposed() && base.OnTouchEvent(e);
 	}
 

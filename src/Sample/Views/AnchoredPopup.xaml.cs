@@ -1,4 +1,6 @@
 
+using System.Diagnostics;
+
 namespace SampleApp.Views;
 
 public partial class AnchoredPopup : Popup
@@ -11,5 +13,13 @@ public partial class AnchoredPopup : Popup
     private void OnGotItClicked(object sender, EventArgs e)
     {
         Close();
+    }
+
+    public override bool OnBackgroundClicked()
+    {
+
+        Trace.WriteLine("OnBackgroundClicked !");
+
+        return base.OnBackgroundClicked();
     }
 }

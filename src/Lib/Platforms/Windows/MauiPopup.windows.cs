@@ -38,9 +38,9 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	}
 
 	/// <summary>
-	/// 
+	/// Gets or sets a value indicating whether the popup can be dismissed by tapping outside the popup.
 	/// </summary>
-	public bool CanBeDismissedByTappingOutside { get; set; }
+	public bool CloseWhenBackgroundIsClicked { get; set; }
 
     public bool IgnoreSafeArea { get; set; }
 
@@ -159,7 +159,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		var overlayColor = ((Popup)VirtualView).BackgroundColor;
 		overlay = new BackgroundDimmer(() =>
 		{
-			if (CanBeDismissedByTappingOutside)
+			if (VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 			{
 				VirtualView?.OnDismissedByTappingOutsideOfPopup();
 			}
@@ -274,7 +274,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 
 	void OnClosed(object? sender, object e)
 	{
-		if (!PopupView.IsOpen && this.CanBeDismissedByTappingOutside && VirtualView is not null)
+		if (!PopupView.IsOpen && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 		{
 			VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
 		}

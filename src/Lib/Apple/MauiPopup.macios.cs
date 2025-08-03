@@ -191,7 +191,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 			{
 				var tapGesture = new UITapGestureRecognizer(tapEvent =>
 				{
-					if (CanBeDismissedByTappingInternal)
+					if (CanBeDismissedByTappingInternal && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 					{
 						DismissViewController(true, null);
 						_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null.");
