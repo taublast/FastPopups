@@ -266,10 +266,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			// Get anchor bounds and calculate position using shared logic (all in DIPs)
 			var anchorBounds = GetAnchorBounds(VirtualView.Anchor);
 			(x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds);
-			
-			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Anchor bounds (DIPs): {anchorBounds}");
-			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Calculated position (DIPs): X={x}, Y={y}");
-			System.Diagnostics.Debug.WriteLine($"[ANCHOR DEBUG] Content size (DIPs): {contentSize}");
 		}
 		else
 		{
@@ -277,17 +273,26 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, safeAreaInsets);
 		}
 
+		// Adjust coordinates for IgnoreSafeArea=false: move TOP up and extend BOTTOM down by status bar height
+		var adjustedY = y;
+		var adjustedHeight = contentSize.Height;
+		if (!VirtualView.IgnoreSafeArea)
+		{
+			var statusBarHeight = GetStatusBarHeight(Context);
+			adjustedY = y - statusBarHeight;
+            adjustedHeight += statusBarHeight;
+
+        }
+
 		// Convert final position and size from DIPs to pixels for Android layout parameters
 		var layoutParams = new FrameLayout.LayoutParams(
-			DipsToPixels(contentSize.Width), 
-			DipsToPixels(contentSize.Height))
+			DipsToPixels(contentSize.Width),
+			DipsToPixels(adjustedHeight))
 		{
 			LeftMargin = DipsToPixels(x),
-			TopMargin = DipsToPixels(y)
+			TopMargin = DipsToPixels(adjustedY)
 		};
 		
-		System.Diagnostics.Debug.WriteLine($"[LAYOUT DEBUG] Final layout (pixels): X={DipsToPixels(x)}, Y={DipsToPixels(y)}, W={DipsToPixels(contentSize.Width)}, H={DipsToPixels(contentSize.Height)}");
-		System.Diagnostics.Debug.WriteLine($"[LAYOUT DEBUG] Density factor: {GetDensity()}");
 
 		actualContent.LayoutParameters = layoutParams;
 		container.AddView(actualContent);
