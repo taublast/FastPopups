@@ -16,6 +16,12 @@ public partial class MainPage : ContentPage
         this.ShowPopup(popup);
     }
 
+    private void OnFillPopupClicked(object? sender, EventArgs e)
+    {
+        var popup = new FillPopup();
+        this.ShowPopup(popup);
+    }
+
     private async void OnAnchoredPopupClicked(object? sender, EventArgs e)
     {
         var popup = new AnchoredPopup

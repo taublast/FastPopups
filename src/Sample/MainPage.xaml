@@ -37,6 +37,14 @@
                 Margin="0,5" />
 
             <Button
+                Text="Fill Popup XAML" 
+                BackgroundColor="SeaGreen"
+                TextColor="White"
+                Clicked="OnFillPopupClicked"
+                HorizontalOptions="Fill" 
+                Margin="0,5" />
+
+            <Button
                 x:Name="AnchoredButton"
                 Text="Show Anchored Popup" 
                 BackgroundColor="Orange"
