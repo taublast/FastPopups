@@ -108,6 +108,7 @@ This is your logical popup, layout properties like `HorizontalOptions`, `Vertica
 ## Gestures
 
 When `CloseWhenBackgroundIsClicked` is set to `true` then tapping somewhere where gestures are not user-handled will close your popup.
+You can override `OnBackgroundClicked` to return false to block closing.
 
 ## Anchor Positioning
 
