@@ -17,9 +17,9 @@ public partial class PopupHandler
 		[nameof(IPopup.VerticalOptions)] = MapSize,
 		[nameof(IPopup.HorizontalOptions)] = MapSize,
 #if ANDROID
-		[nameof(IPopup.IgnoreSafeArea)] = MapIgnoreSafeArea,
+		[nameof(IPopup.IsFullScreen)] = MapIsFullScreen,
 #else
-		[nameof(IPopup.IgnoreSafeArea)] = MapSize,
+		[nameof(IPopup.IsFullScreen)] = MapSize,
 #endif
 		[nameof(IPopup.CloseWhenBackgroundIsClicked)] = MapCloseWhenBackgroundIsClicked
 	};

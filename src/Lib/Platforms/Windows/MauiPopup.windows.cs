@@ -42,7 +42,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	/// </summary>
 	public bool CloseWhenBackgroundIsClicked { get; set; }
 
-    public bool IgnoreSafeArea { get; set; }
+    public bool IsFullScreen { get; set; }
 
     partial class BackgroundDimmer : Microsoft.UI.Xaml.Controls.Grid
 	{
@@ -207,7 +207,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		// Apply safe area adjustments if needed
 		var popupParentFrame = parentBounds;
 		Microsoft.Maui.Thickness safeAreaInsets = default;
-		if (!IgnoreSafeArea)
+		if (!IsFullScreen)
 		{
 			var safeArea = PopupExtensions.GetSafeArea(mauiContext);
 			popupParentFrame = new Rect(safeArea.Left, safeArea.Y, safeArea.Width, safeArea.Height);

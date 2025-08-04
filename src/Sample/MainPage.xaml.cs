@@ -36,7 +36,7 @@ public partial class MainPage : ContentPage
         Popup popup = null!;
         popup = new Popup
         {
-            IgnoreSafeArea = false,
+            IsFullScreen = false,
             WidthRequest = 400,
             BackgroundColor = Colors.Red.WithAlpha(0.85f),
             CloseWhenBackgroundIsClicked = true,
@@ -72,12 +72,12 @@ public partial class MainPage : ContentPage
                         },
                         new Button
                         {
-                            Text = "Toggle IgnoreSafeArea",
+                            Text = "Toggle IsFullScreen",
                             BackgroundColor = Colors.Orange,
                             TextColor = Colors.White,
                             Command = new Command(() =>
                             {
-                                popup.IgnoreSafeArea = !popup.IgnoreSafeArea;
+                                popup.IsFullScreen = !popup.IsFullScreen;
                             })
                         },
                         new Button

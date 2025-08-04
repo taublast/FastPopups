@@ -31,7 +31,7 @@
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
 
-            <Button Text="Toggle IgnoreSafeArea"
+            <Button Text="Toggle IsFullScreen"
                     BackgroundColor="Orange"
                     TextColor="White"
                     Clicked="OnInsetsClicked" />

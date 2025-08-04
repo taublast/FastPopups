@@ -25,9 +25,15 @@
                    HorizontalTextAlignment="Center"
                    FontSize="12"
                    TextColor="Gray" />
-            
+
+            <Button Text="Toggle IsFullScreen"
+                    BackgroundColor="Orange"
+                    TextColor="White"
+                    Clicked="OnInsetsClicked" />
+
+
             <Button Text="Got it!" 
-                    BackgroundColor="Orange" 
+                    BackgroundColor="DarkGreen" 
                     TextColor="White"
                     FontSize="12"
                     Clicked="OnGotItClicked" />

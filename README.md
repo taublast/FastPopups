@@ -103,7 +103,7 @@ You can hide the layer by setting popup `BackgroundColor` property to a totally 
 
 This is your logical popup, layout properties like `HorizontalOptions`, `VerticalOptions` will affect its positioning.
 
-`IgnoreSafeArea` controls if you want to consider full screen or not to go over safe insets, like status bar etc.
+`IsFullScreen` controls if you want to consider full screen or not to go over safe insets, like status bar etc.
 
 ## Gestures
 
@@ -221,7 +221,7 @@ var popup = new Popup
 
     // Behavior
     CloseWhenBackgroundIsClicked = true,
-    IgnoreSafeArea = false,
+    IsFullScreen = false,
 
     // Positioning
     Anchor = someButton, // Position relative to this element

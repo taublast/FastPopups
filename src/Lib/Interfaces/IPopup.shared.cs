@@ -26,7 +26,7 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// <summary>
 	/// Controls whether the popup should respect safe insets like status bar etc.
 	/// </summary>
-	bool IgnoreSafeArea { get; }
+	bool IsFullScreen { get; }
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the popup can be dismissed by tapping anywhere where gestures are not processed.
