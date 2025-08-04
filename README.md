@@ -11,7 +11,7 @@ This small private library is built on top of CommunityToolkit popups version 1,
 
 ## ✨ Key Features
 
-- **↕️ Full Screen Support**: Diplaye over safe area or full screen
+- **↕️ Full Screen Support**: Display content inside safe area or full screen
 - **🎨 Overlay Customization**: Configurable colors and transparency
 - **🔄 HotReload Support**: Preview changes in realtime
 - **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
