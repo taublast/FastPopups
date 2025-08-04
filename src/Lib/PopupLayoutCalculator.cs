@@ -24,7 +24,7 @@ public static class PopupLayoutCalculator
 		MauiThickness safeAreaInsets = default)
 	{
 		// Apply safe area adjustments if not ignored
-		var adjustedBounds = popup.IgnoreSafeArea 
+		var adjustedBounds = popup.IsFullScreen 
 			? parentBounds
 			: new Rect(
 				parentBounds.X + safeAreaInsets.Left,
@@ -36,9 +36,9 @@ public static class PopupLayoutCalculator
 		var horizontalAlignment = GetLayoutAlignment(popup.HorizontalOptions);
 		var x = horizontalAlignment switch
 		{
-			// When IgnoreSafeArea=false, Start should respect safe area insets
-			// When IgnoreSafeArea=true, Start should position at true edge
-			LayoutAlignment.Start => popup.IgnoreSafeArea ? parentBounds.X : adjustedBounds.X,
+			// When IsFullScreen=false, Start should respect safe area insets
+			// When IsFullScreen=true, Start should position at true edge
+			LayoutAlignment.Start => popup.IsFullScreen ? parentBounds.X : adjustedBounds.X,
 			LayoutAlignment.End => adjustedBounds.Right - contentSize.Width,
 			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.X + (adjustedBounds.Width - contentSize.Width) / 2,
@@ -49,9 +49,9 @@ public static class PopupLayoutCalculator
 		var verticalAlignment = GetLayoutAlignment(popup.VerticalOptions);
 		var y = verticalAlignment switch
 		{
-			// When IgnoreSafeArea=false, Start should respect safe area insets
-			// When IgnoreSafeArea=true, Start should position at true edge
-			LayoutAlignment.Start => popup.IgnoreSafeArea ? parentBounds.Y : adjustedBounds.Y,
+			// When IsFullScreen=false, Start should respect safe area insets
+			// When IsFullScreen=true, Start should position at true edge
+			LayoutAlignment.Start => popup.IsFullScreen ? parentBounds.Y : adjustedBounds.Y,
 			LayoutAlignment.End => adjustedBounds.Bottom - contentSize.Height,
 			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.Y + (adjustedBounds.Height - contentSize.Height) / 2,
@@ -74,7 +74,7 @@ public static class PopupLayoutCalculator
 		MauiThickness safeAreaInsets = default)
 	{
 		// Apply safe area adjustments if not ignored
-		var adjustedBounds = popup.IgnoreSafeArea 
+		var adjustedBounds = popup.IsFullScreen 
 			? parentBounds
 			: new Rect(
 				parentBounds.X + safeAreaInsets.Left,

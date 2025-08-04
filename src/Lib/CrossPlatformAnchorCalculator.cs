@@ -25,7 +25,7 @@ public static class CrossPlatformAnchorCalculator
         Microsoft.Maui.Thickness safeAreaInsets = default)
     {
         // Apply safe area adjustments if not ignored
-        var adjustedBounds = popup.IgnoreSafeArea 
+        var adjustedBounds = popup.IsFullScreen 
             ? containerBounds
             : new Rect(
                 containerBounds.X + safeAreaInsets.Left,

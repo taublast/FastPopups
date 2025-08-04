@@ -16,6 +16,6 @@ public partial class FillPopup : Popup
 
     private void OnInsetsClicked(object? sender, EventArgs e)
     {
-        IgnoreSafeArea = !IgnoreSafeArea;
+        IsFullScreen = !IsFullScreen;
     }
 }

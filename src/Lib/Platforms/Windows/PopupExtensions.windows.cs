@@ -112,7 +112,7 @@ public static partial class PopupExtensions
         var fullBounds = popupParent.Bounds;
 
         var popupParentFrame = fullBounds;
-        if (!popup.IgnoreSafeArea)
+        if (!popup.IsFullScreen)
         {
             popupParentFrame = GetSafeArea(mauiContext);
         }
@@ -188,7 +188,7 @@ public static partial class PopupExtensions
         
         // Get safe area if needed
         Microsoft.Maui.Thickness safeAreaInsets = default;
-        if (!popup.IgnoreSafeArea)
+        if (!popup.IsFullScreen)
         {
             var safeArea = GetSafeArea(mauiContext);
             safeAreaInsets = new Microsoft.Maui.Thickness(

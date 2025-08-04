@@ -22,4 +22,9 @@ public partial class AnchoredPopup : Popup
 
         return base.OnBackgroundClicked();
     }
+
+    private void OnInsetsClicked(object? sender, EventArgs e)
+    {
+        IsFullScreen = !IsFullScreen;
+    }
 }

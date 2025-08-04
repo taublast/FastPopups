@@ -127,7 +127,7 @@ public static partial class PopupExtensions
 	{
 		ArgumentNullException.ThrowIfNull(popup.Content);
 
-		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IgnoreSafeArea);
+		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IsFullScreen);
 
 		CGSize currentSize;
 
@@ -247,7 +247,7 @@ public static partial class PopupExtensions
 		CGRect originalFrame = UIScreen.MainScreen.Bounds;
 
 		// Get the adjusted frame based on safe areas (and MacCatalyst margins).
-		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IgnoreSafeArea);
+		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IsFullScreen);
 
 		popup.Content.Arrange(new Rect(0,0, adjustedFrame.Width, adjustedFrame.Height));
 		

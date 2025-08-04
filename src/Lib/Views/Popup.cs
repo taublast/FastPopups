@@ -23,10 +23,10 @@ public partial class Popup : View, IPopup
 
 
 	/// <summary>
-	/// Backing BindableProperty for the <see cref="IgnoreSafeArea"/> property.
+	/// Backing BindableProperty for the <see cref="IsFullScreen"/> property.
 	/// </summary>
-	public static readonly BindableProperty IgnoreSafeAreaProperty =
-		BindableProperty.Create(nameof(IgnoreSafeArea), typeof(bool), typeof(Popup), false);
+	public static readonly BindableProperty IsFullScreenProperty =
+		BindableProperty.Create(nameof(IsFullScreen), typeof(bool), typeof(Popup), false);
 
 
 	/// <summary>
@@ -100,10 +100,10 @@ public partial class Popup : View, IPopup
 	/// <summary>
 	/// Controls whether the popup should respect safe insets like status bar etc. 
 	/// </summary>
-	public bool IgnoreSafeArea
+	public bool IsFullScreen
 	{
-		get => (bool)GetValue(IgnoreSafeAreaProperty);
-		set => SetValue(IgnoreSafeAreaProperty, value);
+		get => (bool)GetValue(IsFullScreenProperty);
+		set => SetValue(IsFullScreenProperty, value);
 	}
 
 	/// <summary>
@@ -215,7 +215,7 @@ public partial class Popup : View, IPopup
 
 		((IPopup)this).OnClosed(result);
 
-		RemoveBinding(Popup.IgnoreSafeAreaProperty);
+		RemoveBinding(Popup.IsFullScreenProperty);
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
 		RemoveBinding(Popup.StyleProperty);
