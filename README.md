@@ -19,11 +19,14 @@ This small private library is built on top of CommunityToolkit popups version 1,
 - **👆 Dismissal Options**: Tap-outside-to-dismiss with custom validation
 ---
 
+<img src="https://github.com/user-attachments/assets/7ec782eb-1c3c-4361-91b1-9b48086f6c20" alt="sample" width="300">
+
 ## 🚀 Quick Start
 
 ### 1. Setup (One Line!)
 ```csharp
 public static class MauiProgram
+
 {
     public static MauiApp CreateMauiApp()
     {
