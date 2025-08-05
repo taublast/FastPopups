@@ -22,6 +22,8 @@
     <PackageTags>maui popup modal dialog appomobi</PackageTags>
     <Version>1.0.0.1-pre</Version>
     <Authors>Nick Kovalsky aka AppoMobi and contributors</Authors>
+    <RepositoryUrl>https://github.com/taublast/popups</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     
   </PropertyGroup>
