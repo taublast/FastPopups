@@ -8,6 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
@@ -15,11 +16,14 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 
-    <Title>AppoMobi Maui Popups</Title>
+    <Title>MAUI Popups</Title>
     <PackageId>AppoMobi.Maui.Popups</PackageId>
-    <Description>Popup controls for .NET MAUI derived from CommunityToolkit implementation</Description>
+    <Description>Popup controls for .NET MAUI derived from CommunityToolkit Popups</Description>
     <PackageTags>maui popup modal dialog appomobi</PackageTags>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Version>1.0.0.1-pre</Version>
+    <Authors>Nick Kovalsky aka AppoMobi and contributors</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    
   </PropertyGroup>
 
   <ItemGroup>
