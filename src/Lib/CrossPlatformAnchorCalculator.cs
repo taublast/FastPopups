@@ -1,6 +1,6 @@
 using Microsoft.Maui.Primitives;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Cross-platform anchor positioning calculator that provides consistent anchor positioning logic across all platforms.

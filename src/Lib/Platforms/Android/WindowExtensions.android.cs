@@ -1,7 +1,7 @@
 ﻿using Android.Views;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 static class JavaObjectExtensions
 {

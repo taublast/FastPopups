@@ -4,7 +4,7 @@ using Microsoft.Maui.Platform;
 using ObjCRuntime;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 /// <summary>
 /// Extension class where Helper methods for Popup lives.
 /// </summary>

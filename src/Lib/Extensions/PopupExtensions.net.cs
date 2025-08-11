@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups;
+﻿namespace FastPopups;
 
 #if !WINDOWS && !IOS && !MACCATALYST && !ANDROID && !TIZEN
 

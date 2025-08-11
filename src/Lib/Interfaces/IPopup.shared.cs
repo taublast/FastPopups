@@ -1,7 +1,7 @@
 ﻿using IElement = Microsoft.Maui.IElement;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Represents a small View that pops up at front the Page.

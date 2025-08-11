@@ -3,7 +3,7 @@
 using UIKit;
 using Microsoft.Maui.Platform;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 
 /// <summary>

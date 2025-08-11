@@ -1,4 +1,4 @@
-﻿global using AppoMobi.Maui.Popups;
+﻿global using FastPopups;
 using Microsoft.Extensions.Logging;
 
 namespace SampleApp;

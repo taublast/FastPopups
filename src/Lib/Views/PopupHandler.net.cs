@@ -1,6 +1,6 @@
 ﻿using Microsoft.Maui.Platform;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if !WINDOWS && !IOS && !MACCATALYST && !ANDROID && !TIZEN
 

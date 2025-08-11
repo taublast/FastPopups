@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Graphics.Drawables;
 using Android.OS;
 
-//using AppoMobi.Maui.Popups;
+//using FastPopups;
 using Microsoft.Maui.Platform;
 using static Android.Views.ViewGroup;
 using AColorRes = Android.Resource.Color;
@@ -12,7 +12,7 @@ using AView = Android.Views.View;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Extension class where Helper methods for Popup lives.
@@ -70,7 +70,7 @@ public static partial class PopupExtensions
     /// <param name="container">The native representation of <see cref="IPopup.Content"/>.</param>
     /// <param name="handler">An instance of <see cref="AppoMobi.Maui.Popups.PopupHandler"/>.</param>
     /// <exception cref="InvalidOperationException">if the <see cref="Window"/> is null an exception will be thrown. If the <paramref name="container"/> is null an exception will be thrown.</exception>
-    public static void SetSize(this Dialog dialog, in IPopup popup, in AView container, AppoMobi.Maui.Popups.PopupHandler handler)
+    public static void SetSize(this Dialog dialog, in IPopup popup, in AView container, FastPopups.PopupHandler handler)
 	{
 		ArgumentNullException.ThrowIfNull(dialog);
 		ArgumentNullException.ThrowIfNull(container);

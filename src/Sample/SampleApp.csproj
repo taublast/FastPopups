@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>Popups Sample</ApplicationTitle>
+		<ApplicationTitle>FastPopups Sample</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.sampleapp</ApplicationId>

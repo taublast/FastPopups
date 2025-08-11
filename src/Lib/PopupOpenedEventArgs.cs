@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups;
+﻿namespace FastPopups;
 
 /// <summary>
 /// Popup opened event arguments used when a popup is opened.

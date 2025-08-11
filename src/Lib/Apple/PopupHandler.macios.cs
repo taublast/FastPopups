@@ -1,7 +1,7 @@
-﻿using AppoMobi.Maui.Popups;
+﻿using FastPopups;
 using Microsoft.Maui.Handlers;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if IOS || MACCATALYST
 

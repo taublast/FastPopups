@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups;
+﻿namespace FastPopups;
 
 /// <summary>
 /// Interface that allows asynchronous completion of .NET MAUI Handlers

@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using AppoMobi.Maui.Popups;
+using FastPopups;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if WINDOWS
 
@@ -114,7 +114,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
         handler.PlatformView.IsFullScreen = view.IsFullScreen;
         handler.PlatformView.Layout();
 
-        // Update content positioning when IsFullScreen changes
+
         handler.PlatformView.UpdateContentPositioning();
 	}
 

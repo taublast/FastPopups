@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups;
+﻿namespace FastPopups;
 
 /// <summary>
 /// Handler Popup control

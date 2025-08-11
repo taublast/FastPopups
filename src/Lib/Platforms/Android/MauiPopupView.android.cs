@@ -3,7 +3,7 @@ using Android.Content.Res;
 using Android.Views;
 using AView = Android.Views.View;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if ANDROID
 /// <summary>

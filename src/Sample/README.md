@@ -1,6 +1,6 @@
-# AppoMobi.Maui.Popups Sample Application
+# FastPopups Sample Application
 
-This sample application demonstrates the usage of the **AppoMobi.Maui.Popups** library, which provides enhanced popup functionality for .NET MAUI applications.
+This sample application demonstrates the usage of the **FastPopups** library, which provides enhanced popup functionality for .NET MAUI applications.
 
 ## Features Demonstrated
 
@@ -44,7 +44,7 @@ This sample application demonstrates the usage of the **AppoMobi.Maui.Popups** l
 - Close all popups at once
 - Demonstrates global stack operations
 
-## Key Features of AppoMobi.Maui.Popups
+## Key Features of FastPopups
 
 - **Enhanced Platform Handlers**: Custom platform-specific implementations for Android, iOS, and Windows
 - **Navigation Stack Management**: Thread-safe popup stack with global access via `PopupNavigationStack.Instance`
@@ -57,7 +57,7 @@ This sample application demonstrates the usage of the **AppoMobi.Maui.Popups** l
 
 ## Usage
 
-1. **Install the library**: Add project reference to `AppoMobi.Maui.Popups`
+1. **Install the library**: Add project reference to `FastPopups`
 2. **Configure handlers**: Call `ConfigurePopups()` in `MauiProgram.cs`
 3. **Show popups**: Use `ShowPopup()` or `ShowPopupAsync()` extension methods
 4. **Create custom popups**: Inherit from `Popup` class or use XAML
@@ -102,4 +102,4 @@ await this.ShowPopupAsync(popup);
 3. Build and run the `SampleApp` project
 4. Test the different popup types using the buttons in the main interface
 
-The sample demonstrates the power and flexibility of the AppoMobi.Maui.Popups library with its enhanced platform handlers that provide superior performance and reliability compared to the original Community Toolkit implementation.
+The sample demonstrates the power and flexibility of the FastPopups library with its enhanced platform handlers that provide superior performance and reliability compared to the original Community Toolkit implementation.

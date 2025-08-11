@@ -5,7 +5,7 @@ using Tizen.UIExtensions.NUI;
 using NHorizontalAlignment = Tizen.NUI.HorizontalAlignment;
 using NVerticalAlignment = Tizen.NUI.VerticalAlignment;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if TIZEN
 /// <summary>

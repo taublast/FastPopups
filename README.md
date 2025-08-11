@@ -1,22 +1,24 @@
-# Popups for .NET MAUI
+# Fast Popups for .NET MAUI
 
 **Simple and fast popup library for .NET MAUI**
 
 
 ## About
 
-This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  It was the fastest for opening popups among different libraries, was definitely worth adding new features.
+This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  
+It was the fastest for opening popups among different libraries, was definitely worth adding new features.
 
 ---
 
 ## ✨ Key Features
 
 - **↕️ Full Screen Support**: Display content inside safe area or full screen
-- **🎨 Overlay Customization**: Configurable colors and transparency
-- **🔄 HotReload Support**: Preview changes in realtime
+- **🌖 Overlay Customization**: Configurable colors and transparency
 - **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
 - **📍 Flexible Positioning**: Anchored ot aligned positioning
 - **👆 Dismissal Options**: Tap-outside-to-dismiss with custom validation
+- **💪 Multiplatform consistency**: Same behavior on all platforms
+- **🔄 HotReload Support**: Preview changes in realtime
 ---
 
 <img src="https://github.com/user-attachments/assets/7ec782eb-1c3c-4361-91b1-9b48086f6c20" alt="sample" width="300">

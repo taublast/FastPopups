@@ -2,7 +2,7 @@
 using MauiThickness = Microsoft.Maui.Thickness;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Cross-platform popup layout calculator that provides consistent positioning logic across all platforms.

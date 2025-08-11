@@ -2,12 +2,12 @@ using Microsoft.Maui.Platform;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
 using Window = Microsoft.UI.Xaml.Window;
-using AppoMobi.Maui.Popups;
+using FastPopups;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Page = Microsoft.Maui.Controls.Page;
-using Popup = AppoMobi.Maui.Popups.Popup;
+using Popup = FastPopups.Popup;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Extension class where Helper methods for Popup lives.

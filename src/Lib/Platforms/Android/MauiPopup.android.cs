@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using static AndroidX.ViewPager.Widget.ViewPager;
 using AView = Android.Views.View;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if ANDROID
 
@@ -81,7 +81,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     Window.AddFlags(WindowManagerFlags.LayoutInScreen);
                     Window.ClearFlags(WindowManagerFlags.ForceNotFullscreen);
 
-                    // Handle display cutout for devices with notches (API 28+)
+    
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
                         var layoutParams = Window.Attributes;
@@ -142,7 +142,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 
         if (TryCreateContent(VirtualView, out var container))
         {
-            // Android fix: Create composite content with overlay, similar to Windows approach
+
             var compositeContainer = CreateCompositePopupContent(container);
             SetContentView(compositeContainer);
 
@@ -153,13 +153,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         return container;
     }
 
-    /// <summary>
-    /// Creates a composite popup content that includes both the full-screen overlay and the actual popup content.
-    /// This ensures the overlay is part of the dialog and can darken existing popups.
-    /// The actual content is positioned within the fullscreen container using PopupLayoutCalculator.
-    /// </summary>
-    /// <param name="actualContent">The actual popup content.</param>
-    /// <returns>A FrameLayout containing both overlay and positioned content.</returns>
     AView CreateCompositePopupContent(AView actualContent)
     {
         // Create a full-screen container
@@ -185,7 +178,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         var color = ((Popup)VirtualView).BackgroundColor ?? Colors.Transparent;
         overlay.SetBackgroundColor(color.ToPlatform());
 
-        // Add click handler for dismissing popup when tapping outside
+
         if (VirtualView.CloseWhenBackgroundIsClicked)
         {
             overlay.Click += (sender, e) =>
@@ -403,7 +396,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         }
         else
         {
-            // Handle regular alignment-based positioning (all in DIPs)
+
             (x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, Thickness.Zero);
         }
 
@@ -663,8 +656,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     /// <inheritdoc/>
     public override bool OnTouchEvent(MotionEvent e)
     {
-        // Let the overlay handle outside clicks to avoid conflicts
-        // The overlay.Click event will handle dismissing the popup
+
         return !this.IsDisposed() && base.OnTouchEvent(e);
     }
 

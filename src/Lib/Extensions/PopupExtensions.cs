@@ -1,12 +1,12 @@
 using System.Diagnostics;
-using AppoMobi.Maui.Popups;
+using FastPopups;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using System.Runtime.CompilerServices;
 using Page = Microsoft.Maui.Controls.Page;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Extension methods for <see cref="Popup"/>.

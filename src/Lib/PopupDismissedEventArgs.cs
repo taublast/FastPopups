@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups;
+﻿namespace FastPopups;
 
 /// <summary>
 /// Popup dismissed event arguments used when a popup is dismissed.

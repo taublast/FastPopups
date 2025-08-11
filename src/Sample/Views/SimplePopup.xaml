@@ -2,7 +2,7 @@
 
 <popups:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-              xmlns:popups="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
+              xmlns:popups="clr-namespace:FastPopups;assembly=FastPopups"
               x:Class="SampleApp.Views.SimplePopup"
               BackgroundColor="#66000000"
               Background="Transparent"

@@ -1,13 +1,13 @@
 #if MACCATALYST || IOS
 
 using System.Diagnostics.CodeAnalysis;
-using AppoMobi.Maui.Popups.Extensions;
+using FastPopups.Extensions;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using UIKit;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 
 
@@ -204,10 +204,6 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 				View.AddGestureRecognizer(tapGesture);
 			}
 
-			// iOS fix: Insert overlay at index 0 (behind content)
-			// Since each popup is a separate UIViewController presented modally,
-			// this overlay will be part of the current popup and will automatically
-			// appear above all previously presented popups
 			this.View.InsertSubview(overlay, 0);
 		}
 

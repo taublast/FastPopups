@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 public class PopupNavigationStack
 {

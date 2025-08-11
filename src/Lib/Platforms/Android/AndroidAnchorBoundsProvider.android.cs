@@ -4,7 +4,7 @@ using Microsoft.Maui.Platform;
 using Microsoft.Maui.Primitives;
 using AView = Android.Views.View;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if ANDROID
 /// <summary>

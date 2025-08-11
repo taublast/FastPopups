@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <popup:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:popup="clr-namespace:AppoMobi.Maui.Popups;assembly=AppoMobi.Maui.Popups"
+             xmlns:popup="clr-namespace:FastPopups;assembly=FastPopups"
              x:Class="SampleApp.Views.NavigationStackPopup"
              HeightRequest="400"
              WidthRequest="350"

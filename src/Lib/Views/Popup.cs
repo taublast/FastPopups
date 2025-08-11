@@ -1,11 +1,6 @@
-using AppoMobi.Maui.Popups;
-using Microsoft.Maui.Controls.Internals;
-using Microsoft.Maui.Controls.StyleSheets;
-using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
-using Style = Microsoft.Maui.Controls.Style;
 using View = Microsoft.Maui.Controls.View;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 /// <summary>
 /// Represents a small View that pops up at front the Page. Implements <see cref="IPopup"/>.
@@ -186,11 +181,6 @@ public partial class Popup : View, IPopup
         return true;
     }
 
-    /// <summary>
-    /// Unified method to handle outside click/tap events across all platforms.
-    /// This ensures consistent behavior and validation logic.
-    /// </summary>
-    /// <returns>True if the popup should be dismissed, false otherwise.</returns>
     internal bool ShouldDismissOnOutsideClick()
     {
         return CloseWhenBackgroundIsClicked && OnBackgroundClicked();

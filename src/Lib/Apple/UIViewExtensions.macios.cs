@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Maui.Popups.Extensions;
+﻿namespace FastPopups.Extensions;
 
 #if MACCATALYST || IOS
 

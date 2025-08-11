@@ -1,6 +1,6 @@
 ﻿using Tizen.NUI;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if TIZEN
 /// <summary>

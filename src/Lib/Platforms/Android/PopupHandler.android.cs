@@ -1,9 +1,9 @@
-﻿using AppoMobi.Maui.Popups;
+﻿using FastPopups;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using AView = Android.Views.View;
 
-namespace AppoMobi.Maui.Popups;
+namespace FastPopups;
 
 #if ANDROID
 
