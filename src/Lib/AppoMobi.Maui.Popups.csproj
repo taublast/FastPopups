@@ -20,7 +20,7 @@
     <PackageId>AppoMobi.Maui.Popups</PackageId>
     <Description>Popup controls for .NET MAUI derived from CommunityToolkit Popups</Description>
     <PackageTags>maui popup modal dialog appomobi</PackageTags>
-    <Version>1.0.0.1-pre</Version>
+    <Version>1.0.0.2-pre</Version>
     <Authors>Nick Kovalsky aka AppoMobi and contributors</Authors>
     <RepositoryUrl>https://github.com/taublast/popups</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

@@ -201,7 +201,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 				{
 					CancelsTouchesInView = false
 				};
-				overlay.AddGestureRecognizer(tapGesture);
+				View.AddGestureRecognizer(tapGesture);
 			}
 
 			// iOS fix: Insert overlay at index 0 (behind content)
