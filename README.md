@@ -5,8 +5,8 @@
 
 ## About
 
-This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself.  
-It was the fastest for opening popups among different libraries, was definitely worth adding new features.
+This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself. 
+It was the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
 
 ---
 
@@ -21,14 +21,13 @@ It was the fastest for opening popups among different libraries, was definitely 
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-<img src="https://github.com/user-attachments/assets/7ec782eb-1c3c-4361-91b1-9b48086f6c20" alt="sample" width="300">
-
 ## 🚀 Quick Start
 
-### 1. Setup (One Line!)
+### 1. Setup 
 ```csharp
-public static class MauiProgram
+using FastPopups;
 
+public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
@@ -67,22 +66,6 @@ PopupNavigationStack.Instance.CloseTop(); // Close top popup
 PopupNavigationStack.Instance.Clear(); // Close all popups
 var count = PopupNavigationStack.Instance.Count; // How many open?
 ```
-
----
-
-## To Do
-
-### Required
-
-* Test orientation changes when already open
-* Android anchor is acting lower by the amount for either bottom navbar or shell navbar, need to investigate
-* Test and possibly fix Tizen
-
-### Roadmap
-
-* Add Blur effect below
-* Add background layer custom content
-* Add animations like we had in RG popups, working separately separate for overlay and content
 
 ---
 
@@ -670,4 +653,21 @@ public class LoadingPopup : Popup
 ```
 
 ---
+
+## TODO
+
+### Required
+
+* Test orientation changes when already open
+* Test and possibly fix Tizen
+
+### Roadmap
+
+* Add Blur effect below
+* Add background layer custom content
+* Add animations like we had in RG popups, working separately separate for overlay and content
+
+---
+
+Please feel free to contribute!
 
