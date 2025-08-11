@@ -16,10 +16,10 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 
-    <Title>MAUI Popups</Title>
+    <Title>Fast Popups for .NET MAUI</Title>
     <PackageId>AppoMobi.Maui.Popups</PackageId>
     <Description>Popup controls for .NET MAUI derived from CommunityToolkit Popups</Description>
-    <PackageTags>maui popup modal dialog appomobi</PackageTags>
+    <PackageTags>fastpopups popups maui popup modal dialog appomobi</PackageTags>
     <Version>1.0.0.2</Version>
     <Authors>Nick Kovalsky aka AppoMobi and contributors</Authors>
     <RepositoryUrl>https://github.com/taublast/popups</RepositoryUrl>
