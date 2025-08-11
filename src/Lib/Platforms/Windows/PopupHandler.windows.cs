@@ -113,6 +113,9 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
 	{
         handler.PlatformView.IsFullScreen = view.IsFullScreen;
         handler.PlatformView.Layout();
+
+        // Update content positioning when IsFullScreen changes
+        handler.PlatformView.UpdateContentPositioning();
 	}
 
 	/// <inheritdoc/>

@@ -269,11 +269,11 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	}
 
 	/// <summary>
-	/// Positions the actual popup content within the fullscreen container using layout options.
+	/// Unified method to apply positioning and sizing to popup content.
+	/// Used for initial positioning, window resize, and property changes.
 	/// </summary>
-	/// <param name="container">The fullscreen container Grid.</param>
 	/// <param name="actualContent">The popup content to position.</param>
-	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+	void ApplyContentPositioning(FrameworkElement actualContent)
 	{
 		if (VirtualView == null) return;
 
@@ -299,6 +299,17 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		actualContent.HorizontalAlignment = HorizontalAlignment.Left;
 		actualContent.VerticalAlignment = VerticalAlignment.Top;
 		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+	}
+
+	/// <summary>
+	/// Positions the actual popup content within the fullscreen container using layout options.
+	/// </summary>
+	/// <param name="container">The fullscreen container Grid.</param>
+	/// <param name="actualContent">The popup content to position.</param>
+	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+	{
+		// Apply positioning using the unified method
+		ApplyContentPositioning(actualContent);
 
 		// Add content to container
 		container.Children.Add(actualContent);
@@ -368,7 +379,27 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 			PopupExtensions.SetSize(this, VirtualView, mauiContext);
             PopupExtensions.SetLayout(this, VirtualView, mauiContext);
 		}
-	}		
+	}
+
+	/// <summary>
+	/// Updates the content positioning within the popup (e.g., when IsFullScreen changes)
+	/// </summary>
+	public void UpdateContentPositioning()
+	{
+		if (VirtualView is not null && PopupView.IsOpen && Content is not null)
+		{
+			// Find the actual content element within the composite popup and update its positioning
+			if (PopupView.Child is Grid container && container.Children.Count > 1)
+			{
+				var actualContent = container.Children.LastOrDefault() as FrameworkElement;
+				if (actualContent != null)
+				{
+					// Use the unified positioning method
+					ApplyContentPositioning(actualContent);
+				}
+			}
+		}
+	}
 
 	/// <summary>
 	/// An instance of the <see cref="IPopup"/>.
@@ -440,38 +471,8 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	/// </summary>
 	void OnWindowSizeChanged(object? sender, Microsoft.UI.Xaml.WindowSizeChangedEventArgs e)
 	{
-		if (VirtualView is not null && PopupView.IsOpen && Content is not null)
-		{
-			// Find the actual content element within the composite popup and update its margin
-			if (PopupView.Child is Grid container && container.Children.Count > 1)
-			{
-				var actualContent = container.Children.LastOrDefault() as FrameworkElement;
-				if (actualContent != null)
-				{
-					// Recalculate layout using the unified method
-					var (contentSize, x, y) = CalculateContentLayout(actualContent);
-
-					// Apply the calculated size to the content for Fill layouts
-					var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
-					var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
-					var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-					var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-
-					if (isFillWidth)
-					{
-						actualContent.Width = contentSize.Width;
-					}
-
-					if (isFillHeight)
-					{
-						actualContent.Height = contentSize.Height;
-					}
-
-					// Update the content's margin to reposition it
-					actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
-				}
-			}
-		}
+		// Use the unified content positioning method
+		UpdateContentPositioning();
 	}
 
 
