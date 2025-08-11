@@ -295,10 +295,35 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 			actualContent.Height = contentSize.Height;
 		}
 
-		// Set positioning using margins
-		actualContent.HorizontalAlignment = HorizontalAlignment.Left;
-		actualContent.VerticalAlignment = VerticalAlignment.Top;
-		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+		// Set positioning - for Fill popups, let content use its own alignment
+		if (isFillWidth && isFillHeight)
+		{
+			// Popup fills entire screen, let content position itself naturally
+			actualContent.HorizontalAlignment = HorizontalAlignment.Stretch;
+			actualContent.VerticalAlignment = VerticalAlignment.Stretch;
+			actualContent.Margin = new Microsoft.UI.Xaml.Thickness(0);
+		}
+		else if (isFillWidth)
+		{
+			// Popup fills width, position vertically using calculated position
+			actualContent.HorizontalAlignment = HorizontalAlignment.Stretch;
+			actualContent.VerticalAlignment = VerticalAlignment.Top;
+			actualContent.Margin = new Microsoft.UI.Xaml.Thickness(0, y, 0, 0);
+		}
+		else if (isFillHeight)
+		{
+			// Popup fills height, position horizontally using calculated position
+			actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+			actualContent.VerticalAlignment = VerticalAlignment.Stretch;
+			actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, 0, 0, 0);
+		}
+		else
+		{
+			// Non-fill popup, use calculated position
+			actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+			actualContent.VerticalAlignment = VerticalAlignment.Top;
+			actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+		}
 
 		// Add content to container
 		container.Children.Add(actualContent);
@@ -467,8 +492,35 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 						actualContent.Height = contentSize.Height;
 					}
 
-					// Update the content's margin to reposition it
-					actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+					// Update positioning - for Fill popups, let content use its own alignment
+					if (isFillWidth && isFillHeight)
+					{
+						// Popup fills entire screen, let content position itself naturally
+						actualContent.HorizontalAlignment = HorizontalAlignment.Stretch;
+						actualContent.VerticalAlignment = VerticalAlignment.Stretch;
+						actualContent.Margin = new Microsoft.UI.Xaml.Thickness(0);
+					}
+					else if (isFillWidth)
+					{
+						// Popup fills width, position vertically using calculated position
+						actualContent.HorizontalAlignment = HorizontalAlignment.Stretch;
+						actualContent.VerticalAlignment = VerticalAlignment.Top;
+						actualContent.Margin = new Microsoft.UI.Xaml.Thickness(0, y, 0, 0);
+					}
+					else if (isFillHeight)
+					{
+						// Popup fills height, position horizontally using calculated position
+						actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+						actualContent.VerticalAlignment = VerticalAlignment.Stretch;
+						actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, 0, 0, 0);
+					}
+					else
+					{
+						// Non-fill popup, use calculated position
+						actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+						actualContent.VerticalAlignment = VerticalAlignment.Top;
+						actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+					}
 				}
 			}
 		}
