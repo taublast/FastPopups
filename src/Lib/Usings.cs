@@ -2,6 +2,7 @@
 global using Microsoft.Maui.Devices;
 global using Microsoft.Maui.Graphics;
 global using Microsoft.Maui.Hosting;
+global using FastPopups;
 
 #if ANDROID
 

@@ -24,6 +24,14 @@ It was the fastest for opening popups among different libraries, was definitely 
 ## 🚀 Quick Start
 
 ### 1. Setup 
+
+**Install from nuget:**
+```bash
+dotnet add package AppoMobi.Maui.FastPopups
+```
+
+Initilalize:
+
 ```csharp
 using FastPopups;
 
@@ -40,6 +48,8 @@ public static class MauiProgram
     }
 }
 ```
+
+When in any doubt check out the included `SampleApp` project!
 
 ### 2. Create and Show Popups
 ```csharp
@@ -129,7 +139,7 @@ private async void OnAnchoredPopupClicked(object sender, EventArgs e)
 
 ### Two Simple Ways to Work with Popups
 
-AppoMobi.Maui.Popups provides a clean, simple approach with two complementary parts:
+AppoMobi.Maui.FastPopups provides a clean, simple approach with two complementary parts:
 
 #### 1. 🎯 Create and Show Popups (Direct Approach)
 Simple, powerful, and gives you full control:

@@ -65,7 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Lib\AppoMobi.Maui.Popups.csproj" />
+	  <ProjectReference Include="..\Lib\FastPopups.csproj" />
 	</ItemGroup>
 
 

@@ -68,7 +68,7 @@ public static partial class PopupExtensions
     /// <param name="dialog">An instance of <see cref="Dialog"/>.</param>
     /// <param name="popup">An instance of <see cref="IPopup"/>.</param>
     /// <param name="container">The native representation of <see cref="IPopup.Content"/>.</param>
-    /// <param name="handler">An instance of <see cref="AppoMobi.Maui.Popups.PopupHandler"/>.</param>
+    /// <param name="handler">An instance of <see cref="FastPopups.PopupHandler"/>.</param>
     /// <exception cref="InvalidOperationException">if the <see cref="Window"/> is null an exception will be thrown. If the <paramref name="container"/> is null an exception will be thrown.</exception>
     public static void SetSize(this Dialog dialog, in IPopup popup, in AView container, FastPopups.PopupHandler handler)
 	{

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36203.30
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppoMobi.Maui.Popups", "Lib\AppoMobi.Maui.Popups.csproj", "{D1C7A25F-A0F4-5FCB-3C4A-925EB50C86CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastPopups", "Lib\FastPopups.csproj", "{D1C7A25F-A0F4-5FCB-3C4A-925EB50C86CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "Sample\SampleApp.csproj", "{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}"
 EndProject
@@ -19,8 +19,10 @@ Global
 		{D1C7A25F-A0F4-5FCB-3C4A-925EB50C86CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{424A2DEE-CECD-4F9A-C294-5F1C35E1D543}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
