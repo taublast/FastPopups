@@ -5,7 +5,7 @@
 
 ## About
 
-This small private library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself. 
+This library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself. 
 It was the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
 
 ---
