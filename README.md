@@ -30,7 +30,7 @@ It was the fastest for opening popups among different libraries, was definitely 
 dotnet add package AppoMobi.Maui.FastPopups
 ```
 
-Initilalize:
+**Initilalize:**
 
 ```csharp
 using FastPopups;
