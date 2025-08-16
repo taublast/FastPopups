@@ -24,21 +24,28 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	/// <param name="result">The result that should return from this Popup.</param>
 	public static async void MapOnClosed(PopupHandler handler, IPopup view, object? result)
 	{
-		var popup = handler.PlatformView.Popup;
-		if (popup?.PresentationController?.PresentedViewController is UIViewController presentationViewController)
-		{
-			await presentationViewController.DismissViewControllerAsync(true);
-		}
+        try
+        {
+            var popup = handler.PlatformView.Popup;
+            if (popup?.PresentationController?.PresentedViewController is UIViewController presentationViewController)
+            {
+                await presentationViewController.DismissViewControllerAsync(true);
+            }
 
-		// Remove from navigation stack if it's a Popup
-		if (view is Popup popupInstance)
-		{
-			PopupNavigationStack.Instance.Remove(popupInstance);
-		}
+            // Remove from navigation stack if it's a Popup
+            if (view is Popup popupInstance)
+            {
+                PopupNavigationStack.Instance.Remove(popupInstance);
+            }
 
-		view.HandlerCompleteTCS.TrySetResult();
+            view.HandlerCompleteTCS.TrySetResult();
 
-		handler.DisconnectHandler(handler.PlatformView);
+            handler.DisconnectHandler(handler.PlatformView);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e); //avoid MAUI crashing us with "PlatformView cannot be null here" in rare scenarios
+        }
 	}
 
 	/// <summary>
