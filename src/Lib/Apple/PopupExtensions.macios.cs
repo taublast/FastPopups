@@ -147,7 +147,7 @@ public static partial class PopupExtensions
 					popup.Handler?.MauiContext ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} Cannot Be Null"));
 				}
 
-				// For auto-sizing, measure with infinite height to get natural content size
+				// For auto-sizing, measure with infinite space first to get natural content size
 				// Only constrain by available space if explicitly requested via Fill layout options
 				var measureWidth = double.IsNaN(popup.Content.Width)
 					? (IsLayoutFill(popup.HorizontalOptions) ? adjustedFrame.Width : double.PositiveInfinity)
@@ -176,6 +176,14 @@ public static partial class PopupExtensions
 				// Constrain to available space to prevent popup from being larger than screen
 				width = Math.Min(width, adjustedFrame.Width);
 				height = Math.Min(height, adjustedFrame.Height);
+
+				// IMPORTANT: If width was constrained, re-measure content with the final width
+				// to ensure proper layout with the actual available space
+				if (!IsLayoutFill(popup.HorizontalOptions) && width < contentSize.Width)
+				{
+					contentSize = popup.Content.Measure(width, double.PositiveInfinity);
+					height = Math.Min(contentSize.Height, adjustedFrame.Height);
+				}
 
 				currentSize = new CGSize(width, height);
 			}

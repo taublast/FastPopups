@@ -211,6 +211,12 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 				parentBounds.Bottom - safeArea.Bottom);
 		}
 
+		// Check if popup has explicit size requests first (similar to Android/Apple implementations)
+		// Cast to VisualElement to access HeightRequest/WidthRequest properties
+		var visualElement = VirtualView as VisualElement;
+		var hasExplicitWidth = visualElement?.WidthRequest > 0;
+		var hasExplicitHeight = visualElement?.HeightRequest > 0;
+
 		// For Fill layouts, we need to calculate size based on layout options, not measured content
 		// Check if we have Fill layout options first
 		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
@@ -219,14 +225,70 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
 
 		Size contentSize;
-		if (isFillWidth || isFillHeight)
-		{
 
+		// If popup has explicit width and height requests, use them (similar to Apple implementation)
+		if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
+		{
+			contentSize = new Size(
+				Math.Min(visualElement.WidthRequest, parentBounds.Width),
+				Math.Min(visualElement.HeightRequest, parentBounds.Height));
+		}
+		else if (hasExplicitWidth == true || hasExplicitHeight == true)
+		{
+			// Mixed case: some explicit, some calculated (similar to Apple implementation)
+			double width, height;
+
+			if (hasExplicitWidth == true && visualElement != null)
+			{
+				width = Math.Min(visualElement.WidthRequest, parentBounds.Width);
+			}
+			else if (isFillWidth)
+			{
+				width = parentBounds.Width;
+			}
+			else
+			{
+				// Measure content for width
+				if (actualContent.DesiredSize.Width == 0)
+				{
+					actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+				}
+				width = actualContent.DesiredSize.Width;
+				if (width == 0)
+				{
+					width = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Width;
+				}
+			}
+
+			if (hasExplicitHeight == true && visualElement != null)
+			{
+				height = Math.Min(visualElement.HeightRequest, parentBounds.Height);
+			}
+			else if (isFillHeight)
+			{
+				height = parentBounds.Height;
+			}
+			else
+			{
+				// Measure content for height with the determined width
+				actualContent.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
+				height = actualContent.DesiredSize.Height;
+				if (height == 0)
+				{
+					height = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Height;
+				}
+			}
+
+			contentSize = new Size(width, height);
+		}
+		else if (isFillWidth || isFillHeight)
+		{
+			// For Fill layouts, use the layout calculator to get proper Fill sizing
 			contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
 		}
 		else
 		{
-			// For non-Fill layouts, try to get actual/measured content size first
+			// For non-Fill layouts with no explicit requests, try to get actual/measured content size first
 			contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
 			if (contentSize.Width == 0 || contentSize.Height == 0)
 			{
@@ -236,7 +298,6 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 				}
 				contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
 			}
-
 
 			if (contentSize.Width == 0 || contentSize.Height == 0)
 			{
@@ -273,12 +334,18 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
 		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
 
-		if (isFillWidth)
+		// Check if popup has explicit size requests
+		var visualElement = VirtualView as VisualElement;
+		var hasExplicitWidth = visualElement?.WidthRequest > 0;
+		var hasExplicitHeight = visualElement?.HeightRequest > 0;
+
+		// Set content size when we have Fill layout options OR explicit popup sizing
+		if (isFillWidth || hasExplicitWidth == true)
 		{
 			actualContent.Width = contentSize.Width;
 		}
 
-		if (isFillHeight)
+		if (isFillHeight || hasExplicitHeight == true)
 		{
 			actualContent.Height = contentSize.Height;
 		}
