@@ -8,18 +8,18 @@
               Background="Transparent"
               HorizontalOptions="Center"
               VerticalOptions="Center"
+              WidthRequest="300"
               CloseWhenBackgroundIsClicked="False">
 
     <Border BackgroundColor="GhostWhite"
             StrokeThickness="2"
             Stroke="DarkBlue"
-            WidthRequest="300"
             HeightRequest="-1"
-            HorizontalOptions="Center"
+            HorizontalOptions="Fill"
             VerticalOptions="Start"
             StrokeShape="RoundRectangle 10">
 
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20" Spacing="15" HorizontalOptions="Fill">
             <Label Text="Simple Popup"
                    FontSize="18"
                    FontAttributes="Bold"

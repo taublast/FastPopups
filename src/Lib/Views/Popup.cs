@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using View = Microsoft.Maui.Controls.View;
 
 namespace FastPopups;
@@ -7,7 +9,7 @@ namespace FastPopups;
 /// </summary>
 [ContentProperty(nameof(Content))]
 public partial class Popup : View, IPopup
-    //, IWindowController, IPropertyPropagationController, IResourcesProvider, IStyleSelectable, IStyleElement
+//, IWindowController, IPropertyPropagationController, IResourcesProvider, IStyleSelectable, IStyleElement
 {
 	/// <summary>
 	///  Backing BindableProperty for the <see cref="Content"/> property.
@@ -246,10 +248,10 @@ public partial class Popup : View, IPopup
 		}
 	}
 
-	static void OnContentChanged(BindableObject bindable, object oldValue, object newValue)
+    static void OnContentChanged(BindableObject bindable, object oldValue, object newValue)
 	{
-		var popup = (Popup)bindable;
-		popup.OnBindingContextChanged();
+        var popup = (Popup)bindable;
+        popup.OnBindingContextChanged();
 	}
 
 

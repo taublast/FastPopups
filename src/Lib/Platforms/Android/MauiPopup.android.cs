@@ -333,6 +333,12 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         }
 
 
+        // Check if popup has explicit size requests first
+        // Cast to VisualElement to access HeightRequest/WidthRequest properties
+        var visualElement = VirtualView as VisualElement;
+        var hasExplicitWidth = visualElement?.WidthRequest > 0;
+        var hasExplicitHeight = visualElement?.HeightRequest > 0;
+
         // For Fill layouts, we need to calculate size based on layout options, not measured content
         // Check if we have Fill layout options first
         var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
@@ -341,14 +347,77 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
 
         Size contentSize;
-        if (isFillWidth || isFillHeight)
+
+        // If popup has explicit width and height requests, use them (similar to Apple implementation)
+        if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
+        {
+            contentSize = new Size(
+                Math.Min(visualElement.WidthRequest, parentBounds.Width),
+                Math.Min(visualElement.HeightRequest, parentBounds.Height));
+        }
+        else if (hasExplicitWidth == true || hasExplicitHeight == true)
+        {
+            // Mixed case: some explicit, some calculated (similar to Apple implementation)
+            double width, height;
+
+            if (hasExplicitWidth == true && visualElement != null)
+            {
+                width = Math.Min(visualElement.WidthRequest, parentBounds.Width);
+            }
+            else if (isFillWidth)
+            {
+                width = parentBounds.Width;
+            }
+            else
+            {
+                // Measure content for width
+                actualContent.Measure(
+                    Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(parentBounds.Width),
+                        MeasureSpecMode.AtMost),
+                    Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(parentBounds.Height),
+                        MeasureSpecMode.AtMost));
+                width = PixelsToDips(actualContent.MeasuredWidth);
+                if (width == 0)
+                {
+                    width = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, Thickness.Zero).Width;
+                }
+            }
+
+            if (hasExplicitHeight == true && visualElement != null)
+            {
+                height = Math.Min(visualElement.HeightRequest, parentBounds.Height);
+            }
+            else if (isFillHeight)
+            {
+                height = parentBounds.Height;
+            }
+            else
+            {
+                // Measure content for height - we need to re-measure with the determined width
+                // to get the correct height, especially when we have an explicit width
+                actualContent.Measure(
+                    Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(width),
+                        MeasureSpecMode.Exactly),
+                    Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(parentBounds.Height),
+                        MeasureSpecMode.AtMost));
+
+                height = PixelsToDips(actualContent.MeasuredHeight);
+                if (height == 0)
+                {
+                    height = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, Thickness.Zero).Height;
+                }
+            }
+
+            contentSize = new Size(width, height);
+        }
+        else if (isFillWidth || isFillHeight)
         {
             // For Fill layouts, use the layout calculator to get proper Fill sizing
             contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, Thickness.Zero);
         }
         else
         {
-            // For non-Fill layouts, measure the actual content to get its natural size (Android measure uses pixels)
+            // For non-Fill layouts with no explicit requests, measure the actual content to get its natural size (Android measure uses pixels)
             actualContent.Measure(
                 Android.Views.View.MeasureSpec.MakeMeasureSpec(DipsToPixels(parentBounds.Width),
                     MeasureSpecMode.AtMost),
