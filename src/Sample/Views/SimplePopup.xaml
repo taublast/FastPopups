@@ -25,7 +25,7 @@
                    HorizontalOptions="Center"
                    TextColor="DarkBlue" />
 
-            <Label Text="This is a basic popup, will close only when button is clicked."
+            <Label Text="This is a basic popup, will close if background is clicked."
                    x:Name="LabelTest"
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"
