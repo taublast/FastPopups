@@ -13,6 +13,9 @@ public partial class SimplePopup : Popup
         Close();
     }
 
- 
 
-}
+    private void OnTestClicked(object? sender, EventArgs e)
+    {
+        LabelTest.Text = "Clicked Button!";
+    }
+}    

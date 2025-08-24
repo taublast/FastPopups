@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<popups:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<popup:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-              xmlns:popups="clr-namespace:FastPopups;assembly=AppoMobi.Maui.Popups"
+              xmlns:popup="clr-namespace:FastPopups;assembly=FastPopups"
               x:Class="SampleApp.Views.SimplePopup"
               BackgroundColor="#66000000"
               Background="Transparent"
               HorizontalOptions="Center"
               VerticalOptions="Center"
               WidthRequest="300"
-              CloseWhenBackgroundIsClicked="False">
+              CloseWhenBackgroundIsClicked="True">
 
     <Border BackgroundColor="GhostWhite"
             StrokeThickness="2"
@@ -27,16 +26,23 @@
                    TextColor="DarkBlue" />
 
             <Label Text="This is a basic popup, will close only when button is clicked."
+                   x:Name="LabelTest"
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
+
+            <Button Text="Should Not Close"
+                    BackgroundColor="DarkBlue"
+                    TextColor="White"
+                    Clicked="OnTestClicked" />
 
             <Button Text="Close"
                     BackgroundColor="DarkBlue"
                     TextColor="White"
                     Clicked="OnCloseClicked" />
+
         </StackLayout>
 
     </Border>
 
-</popups:Popup>
+</popup:Popup>

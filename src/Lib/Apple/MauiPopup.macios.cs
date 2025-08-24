@@ -193,6 +193,16 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 				{
 					if (CanBeDismissedByTappingInternal && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 					{
+						// Check if tap is actually outside content area (iOS gesture fix)
+						var tapLocation = tapEvent.LocationInView(this.View);
+						var contentView = Control?.ViewController?.View;
+						if (contentView != null)
+						{
+							var contentBounds = contentView.Frame;
+							if (contentBounds.Contains(tapLocation))
+								return; // Don't dismiss if tap is on content
+						}
+
 						DismissViewController(true, null);
 						_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null.");
 						VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
