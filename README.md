@@ -4,8 +4,8 @@
 
 ## About
 
-This library is built on top of CommunityToolkit popups version 1, code no longer used by the toolkit itself. 
-It was the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
+Initially built on top of CommunityToolkit popups version 1, the code that is no longer used by CommunityToolkit. 
+It was found to be the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
 
 ---
 
