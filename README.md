@@ -1,7 +1,6 @@
-# Fast Popups for .NET MAUI
+# FastPopups for .NET MAUI
 
-**Simple and fast popup library for .NET MAUI**
-
+**Simple and fast popups library for .NET MAUI**
 
 ## About
 
