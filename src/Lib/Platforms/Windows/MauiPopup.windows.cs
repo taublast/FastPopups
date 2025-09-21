@@ -51,6 +51,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 			PointerPressed += (s, e) =>
 			{
 				actionTapped?.Invoke();
+				e.Handled = true; // Consume the gesture to prevent it from passing through
 			};
 		}
 	}
