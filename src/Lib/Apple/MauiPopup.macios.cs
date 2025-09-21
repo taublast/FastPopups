@@ -209,7 +209,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 					}
 				})
 				{
-					CancelsTouchesInView = true // Consume the gesture to prevent it from passing through
+					CancelsTouchesInView = false
 				};
 				View.AddGestureRecognizer(tapGesture);
 			}
