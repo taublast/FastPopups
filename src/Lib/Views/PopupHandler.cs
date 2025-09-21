@@ -16,6 +16,7 @@ public partial class PopupHandler
 		[nameof(VisualElement.WidthRequest)] = MapSize,
 		[nameof(IPopup.VerticalOptions)] = MapSize,
 		[nameof(IPopup.HorizontalOptions)] = MapSize,
+		[nameof(IPopup.Padding)] = MapSize,
 #if ANDROID
 		[nameof(IPopup.IsFullScreen)] = MapIsFullScreen,
 #else

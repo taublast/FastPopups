@@ -32,6 +32,12 @@ public partial class Popup : View, IPopup
 	public static readonly BindableProperty CloseWhenBackgroundIsClickedProperty =
 		BindableProperty.Create(nameof(CloseWhenBackgroundIsClicked), typeof(bool), typeof(Popup), true);
 
+	/// <summary>
+	/// Backing BindableProperty for the <see cref="Padding"/> property.
+	/// </summary>
+	public static readonly BindableProperty PaddingProperty =
+		BindableProperty.Create(nameof(Padding), typeof(Microsoft.Maui.Thickness), typeof(Popup), new Microsoft.Maui.Thickness(0));
+
 
  
 	readonly WeakEventManager dismissWeakEventManager = new();
@@ -114,6 +120,19 @@ public partial class Popup : View, IPopup
 	{
 		get => (bool)GetValue(CloseWhenBackgroundIsClickedProperty);
 		set => SetValue(CloseWhenBackgroundIsClickedProperty, value);
+	}
+
+	/// <summary>
+	/// Gets or sets the padding around the popup content that reduces the available content area.
+	/// </summary>
+	/// <remarks>
+	/// Padding creates an inner boundary within the popup, reducing the space available for content.
+	/// This is different from margins, which would affect the popup's position relative to its parent.
+	/// </remarks>
+	public Microsoft.Maui.Thickness Padding
+	{
+		get => (Microsoft.Maui.Thickness)GetValue(PaddingProperty);
+		set => SetValue(PaddingProperty, value);
 	}
 
 	/// <summary>
@@ -210,6 +229,7 @@ public partial class Popup : View, IPopup
 		RemoveBinding(Popup.IsFullScreenProperty);
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
+		RemoveBinding(Popup.PaddingProperty);
 		RemoveBinding(Popup.StyleProperty);
 
 		await popupDismissedTaskCompletionSource.Task.WaitAsync(token);

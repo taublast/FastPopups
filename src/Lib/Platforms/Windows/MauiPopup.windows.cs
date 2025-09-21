@@ -48,10 +48,22 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 	{
 		public BackgroundDimmer(Action actionTapped)
 		{
+			// Only close on complete TAP gesture, not on press down
+			Tapped += (s, e) =>
+			{
+				e.Handled = true; // Consume the tap event
+				actionTapped?.Invoke();
+			};
+
+			// Also consume press/release events to prevent any leakage
 			PointerPressed += (s, e) =>
 			{
-				actionTapped?.Invoke();
-				e.Handled = true; // Consume the gesture to prevent it from passing through
+				e.Handled = true;
+			};
+
+			PointerReleased += (s, e) =>
+			{
+				e.Handled = true;
 			};
 		}
 	}
@@ -329,6 +341,8 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 
 		var (contentSize, x, y) = CalculateContentLayout(actualContent);
 
+		// Get padding offset to position content correctly within the popup
+		var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
 
 		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
 		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
@@ -340,21 +354,24 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		var hasExplicitWidth = visualElement?.WidthRequest > 0;
 		var hasExplicitHeight = visualElement?.HeightRequest > 0;
 
+		// Calculate the available content size (subtract padding from total popup size)
+		var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize);
+
 		// Set content size when we have Fill layout options OR explicit popup sizing
 		if (isFillWidth || hasExplicitWidth == true)
 		{
-			actualContent.Width = contentSize.Width;
+			actualContent.Width = availableContentSize.Width;
 		}
 
 		if (isFillHeight || hasExplicitHeight == true)
 		{
-			actualContent.Height = contentSize.Height;
+			actualContent.Height = availableContentSize.Height;
 		}
 
-		// Set positioning using margins
+		// Set positioning using margins, including padding offset
 		actualContent.HorizontalAlignment = HorizontalAlignment.Left;
 		actualContent.VerticalAlignment = VerticalAlignment.Top;
-		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x, y, 0, 0);
+		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x + paddingX, y + paddingY, 0, 0);
 	}
 
 	/// <summary>

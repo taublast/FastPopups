@@ -37,6 +37,15 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </remarks>
 	bool CloseWhenBackgroundIsClicked { get; }
 
+	/// <summary>
+	/// Gets the padding around the popup content that reduces the available content area.
+	/// </summary>
+	/// <remarks>
+	/// Padding creates an inner boundary within the popup, reducing the space available for content.
+	/// This is different from margins, which would affect the popup's position relative to its parent.
+	/// </remarks>
+	Microsoft.Maui.Thickness Padding { get; }
+
     /// <summary>
     /// Override this to allow latter processing of CloseWhenBackgroundIsClicked, return false to block.
     /// </summary>

@@ -13,7 +13,7 @@ public static class PopupLayoutCalculator
 	/// Calculates the position of a popup based on its alignment options.
 	/// </summary>
 	/// <param name="popup">The popup to position.</param>
-	/// <param name="contentSize">The size of the popup content.</param>
+	/// <param name="contentSize">The size of the popup content (before padding is applied).</param>
 	/// <param name="parentBounds">The bounds of the parent container.</param>
 	/// <param name="safeAreaInsets">Safe area insets to consider (optional).</param>
 	/// <returns>The calculated position (x, y) for the popup.</returns>
@@ -62,6 +62,45 @@ public static class PopupLayoutCalculator
 	}
 
 	/// <summary>
+	/// Calculates the available content size with padding applied.
+	/// </summary>
+	/// <param name="popup">The popup to calculate padding for.</param>
+	/// <param name="totalSize">The total size before padding is applied.</param>
+	/// <returns>The content size with padding subtracted.</returns>
+	public static Size ApplyPadding(IPopup popup, Size totalSize)
+	{
+		var padding = popup.Padding;
+		var paddedWidth = Math.Max(0, totalSize.Width - padding.Left - padding.Right);
+		var paddedHeight = Math.Max(0, totalSize.Height - padding.Top - padding.Bottom);
+		return new Size(paddedWidth, paddedHeight);
+	}
+
+	/// <summary>
+	/// Calculates the total size needed including padding.
+	/// </summary>
+	/// <param name="popup">The popup to calculate padding for.</param>
+	/// <param name="contentSize">The desired content size.</param>
+	/// <returns>The total size including padding.</returns>
+	public static Size AddPadding(IPopup popup, Size contentSize)
+	{
+		var padding = popup.Padding;
+		var totalWidth = contentSize.Width + padding.Left + padding.Right;
+		var totalHeight = contentSize.Height + padding.Top + padding.Bottom;
+		return new Size(totalWidth, totalHeight);
+	}
+
+	/// <summary>
+	/// Calculates the content position offset due to padding.
+	/// </summary>
+	/// <param name="popup">The popup to calculate padding offset for.</param>
+	/// <returns>The x, y offset for content positioning.</returns>
+	public static (double X, double Y) GetPaddingOffset(IPopup popup)
+	{
+		var padding = popup.Padding;
+		return (padding.Left, padding.Top);
+	}
+
+	/// <summary>
 	/// Calculates the size of a popup based on its size options and content.
 	/// </summary>
 	/// <param name="popup">The popup to size.</param>
@@ -74,7 +113,7 @@ public static class PopupLayoutCalculator
 		MauiThickness safeAreaInsets = default)
 	{
 		// Apply safe area adjustments if not ignored
-		var adjustedBounds = popup.IsFullScreen 
+		var adjustedBounds = popup.IsFullScreen
 			? parentBounds
 			: new Rect(
 				parentBounds.X + safeAreaInsets.Left,
@@ -82,17 +121,23 @@ public static class PopupLayoutCalculator
 				parentBounds.Width - safeAreaInsets.Left - safeAreaInsets.Right,
 				parentBounds.Height - safeAreaInsets.Top - safeAreaInsets.Bottom);
 
-		// If popup has explicit HeightRequest/WidthRequest, use them (but constrain to parent bounds)
+		// Reduce available space by padding
+		var paddedBounds = new Size(
+			Math.Max(0, adjustedBounds.Width - popup.Padding.Left - popup.Padding.Right),
+			Math.Max(0, adjustedBounds.Height - popup.Padding.Top - popup.Padding.Bottom));
+
+		// If popup has explicit HeightRequest/WidthRequest, use them (but constrain to available space including padding)
 		// Cast to VisualElement to access HeightRequest/WidthRequest properties
 		var visualElement = popup as VisualElement;
 		var hasExplicitWidth = visualElement?.WidthRequest > 0;
 		var hasExplicitHeight = visualElement?.HeightRequest > 0;
-		
+
 		if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
 		{
-			return new Size(
-				Math.Min(visualElement.WidthRequest, adjustedBounds.Width),
-				Math.Min(visualElement.HeightRequest, adjustedBounds.Height));
+			var requestedSize = new Size(
+				Math.Min(visualElement.WidthRequest, paddedBounds.Width),
+				Math.Min(visualElement.HeightRequest, paddedBounds.Height));
+			return AddPadding(popup, requestedSize);
 		}
 
 		// If content has explicit size, use it
@@ -103,9 +148,10 @@ public static class PopupLayoutCalculator
 
 			if (!double.IsNaN(explicitWidth) && !double.IsNaN(explicitHeight))
 			{
-				return new Size(
-					Math.Min(explicitWidth, adjustedBounds.Width),
-					Math.Min(explicitHeight, adjustedBounds.Height));
+				var contentSize = new Size(
+					Math.Min(explicitWidth, paddedBounds.Width),
+					Math.Min(explicitHeight, paddedBounds.Height));
+				return AddPadding(popup, contentSize);
 			}
 		}
 
@@ -113,19 +159,20 @@ public static class PopupLayoutCalculator
 		var horizontalAlignment = GetLayoutAlignment(popup.HorizontalOptions);
 		var verticalAlignment = GetLayoutAlignment(popup.VerticalOptions);
 
-		var width = hasExplicitWidth == true && visualElement != null
-			? Math.Min(visualElement.WidthRequest, adjustedBounds.Width)
+		var contentWidth = hasExplicitWidth == true && visualElement != null
+			? Math.Min(visualElement.WidthRequest, paddedBounds.Width)
 			: horizontalAlignment == LayoutAlignment.Fill
-				? adjustedBounds.Width
-				: 600; // Default width for autosize - don't constrain by parent to allow natural sizing
+				? paddedBounds.Width
+				: Math.Min(600, paddedBounds.Width); // Default width for autosize, constrained by available space
 
-		var height = hasExplicitHeight == true && visualElement != null
-			? Math.Min(visualElement.HeightRequest, adjustedBounds.Height)
+		var contentHeight = hasExplicitHeight == true && visualElement != null
+			? Math.Min(visualElement.HeightRequest, paddedBounds.Height)
 			: verticalAlignment == LayoutAlignment.Fill
-				? adjustedBounds.Height
-				: 400; // Default height for autosize - don't constrain by parent to allow natural sizing
+				? paddedBounds.Height
+				: Math.Min(400, paddedBounds.Height); // Default height for autosize, constrained by available space
 
-		return new Size(width, height);
+		var finalContentSize = new Size(contentWidth, contentHeight);
+		return AddPadding(popup, finalContentSize);
 	}
 
 	/// <summary>

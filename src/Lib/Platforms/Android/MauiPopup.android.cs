@@ -469,9 +469,15 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             (x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, Thickness.Zero);
         }
 
+        // Apply padding offset to position content correctly within the popup
+        var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
+
+        // Calculate the available content size (subtract padding from total popup size)
+        var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize);
+
         // Adjust coordinates for IsFullScreen=false: move TOP up and extend BOTTOM down by status bar height
-        var adjustedY = y;
-        var adjustedHeight = contentSize.Height;
+        var adjustedY = y + paddingY;
+        var adjustedHeight = availableContentSize.Height;
 
         //if (!VirtualView.IsFullScreen)
         //{
@@ -482,10 +488,10 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 
         // Convert final position and size from DIPs to pixels for Android layout parameters
         var layoutParams = new FrameLayout.LayoutParams(
-            DipsToPixels(contentSize.Width),
+            DipsToPixels(availableContentSize.Width),
             DipsToPixels(adjustedHeight))
         {
-            LeftMargin = DipsToPixels(x),
+            LeftMargin = DipsToPixels(x + paddingX),
             TopMargin = DipsToPixels(adjustedY)
         };
 

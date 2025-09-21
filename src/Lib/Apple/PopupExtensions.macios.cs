@@ -283,47 +283,54 @@ public static partial class PopupExtensions
 				contentSize.Height = (nfloat)popup.Content.Height;
 			}
 
+			// Apply padding offset to position content correctly within the popup
+			var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(popup);
+
+			// Calculate the available content size (subtract padding from total popup size)
+			var totalSize = new Size(contentSize.Width, contentSize.Height);
+			var availableContentSize = PopupLayoutCalculator.ApplyPadding(popup, totalSize);
+
 			// Compute the horizontal position based on the HorizontalOptions within the adjusted frame.
 			nfloat x;
 			if (IsLayoutStart(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X;
+				x = adjustedFrame.X + (nfloat)paddingX;
 			}
 			else if (IsLayoutEnd(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X + adjustedFrame.Width - contentSize.Width;
+				x = adjustedFrame.X + adjustedFrame.Width - (nfloat)availableContentSize.Width - (nfloat)paddingX;
 			}
 			else if (IsLayoutCenter(popup.HorizontalOptions) || IsLayoutFill(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2;
+				x = adjustedFrame.X + (adjustedFrame.Width - (nfloat)availableContentSize.Width) / 2 + (nfloat)paddingX;
 			}
 			else
 			{
-				x = adjustedFrame.X + (adjustedFrame.Width - contentSize.Width) / 2;
+				x = adjustedFrame.X + (adjustedFrame.Width - (nfloat)availableContentSize.Width) / 2 + (nfloat)paddingX;
 			}
 
 			// Compute the vertical position based on the VerticalOptions within the adjusted frame.
 			nfloat y;
 			if (IsLayoutStart(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + additionalVerticalOffset;
+				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)paddingY;
 			}
 			else if (IsLayoutEnd(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + adjustedFrame.Height - contentSize.Height - additionalVerticalOffset;
+				y = adjustedFrame.Y + adjustedFrame.Height - (nfloat)availableContentSize.Height - additionalVerticalOffset - (nfloat)paddingY;
 			}
 			else if (IsLayoutCenter(popup.VerticalOptions) || IsLayoutFill(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2 - additionalVerticalOffset;
+				y = adjustedFrame.Y + (adjustedFrame.Height - (nfloat)availableContentSize.Height) / 2 - additionalVerticalOffset + (nfloat)paddingY;
 			}
 			else
 			{
-				y = adjustedFrame.Y + (adjustedFrame.Height - contentSize.Height) / 2;
+				y = adjustedFrame.Y + (adjustedFrame.Height - (nfloat)availableContentSize.Height) / 2 + (nfloat)paddingY;
 			}
 
 			if (mauiPopup.Control?.ViewController?.View is UIView contentView)
 			{
-				contentView.Frame = new CGRect(x, y, contentSize.Width, contentSize.Height);
+				contentView.Frame = new CGRect(x, y, (nfloat)availableContentSize.Width, (nfloat)availableContentSize.Height);
 			}
 		}
 		else

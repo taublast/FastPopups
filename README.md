@@ -16,6 +16,7 @@ It was found to be the fastest for opening popups among different libraries, was
 - **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
 - **📍 Flexible Positioning**: Anchored ot aligned positioning
 - **👆 Dismissal Options**: Tap-outside-to-dismiss with custom validation
+- **📐 Padding Support**: Built-in content padding to limit filling content
 - **💪 Multiplatform consistency**: Same behavior on all platforms
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
@@ -101,6 +102,29 @@ You can hide the layer by setting popup `BackgroundColor` property to a totally 
 This is your logical popup, layout properties like `HorizontalOptions`, `VerticalOptions` will affect its positioning.
 
 `IsFullScreen` controls if you want to consider full screen or not to go over safe insets, like status bar etc.
+
+### Padding
+
+The `Padding` property creates internal spacing within your popup, reducing the available content area. This is useful for creating visual breathing room around your content.
+
+```csharp
+var popup = new Popup
+{
+    Content = new Label { Text = "Content with padding" },
+    Padding = new Thickness(50), // 50 pts padding on all sides
+    BackgroundColor = Colors.Red, // You'll see the red border around content
+    IsFullScreen = true
+};
+
+// Or specify different padding for each side
+popup.Padding = new Thickness(left: 10, top: 20, right: 10, bottom: 20);
+```
+
+**Key Points:**
+- ✅ **Content-only**: Padding affects content positioning/sizing, not the background overlay
+- ✅ **Cross-platform**: Works consistently on Windows, iOS, Android, and other platforms
+- ✅ **Visual spacing**: Creates clean borders between content and popup edges
+- ✅ **Layout aware**: Works with all layout options (Fill, Center, Start, End)
 
 ## Gestures
 
@@ -216,6 +240,10 @@ var popup = new Popup
     BackgroundColor = Colors.Black.WithAlpha(0.5f), // Semi-transparent dimmer
     Color = Colors.White, // Popup content background
 
+    // Spacing and padding
+    Padding = new Thickness(20), // 20px padding on all sides
+    // or Padding = new Thickness(10, 20, 10, 20), // left, top, right, bottom
+
     // Behavior
     CloseWhenBackgroundIsClicked = true,
     IsFullScreen = false,
@@ -271,10 +299,37 @@ public async Task ShowMessage(string message)
         },
         HeightRequest = 150,
         WidthRequest = 300,
+        Padding = new Thickness(20), // Add 20px padding around content
         CloseWhenBackgroundIsClicked = true
     };
 
     var result = await this.ShowPopupAsync(popup);
+}
+```
+
+#### Popup with Custom Padding
+```csharp
+public async Task ShowPaddedDialog()
+{
+    var popup = new Popup
+    {
+        Content = new Frame
+        {
+            BackgroundColor = Colors.White,
+            Content = new Label
+            {
+                Text = "This content has custom padding!",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            }
+        },
+        Padding = new Thickness(30, 50, 30, 20), // Different padding per side
+        BackgroundColor = Colors.Black.WithAlpha(0.7f),
+        IsFullScreen = true,
+        CloseWhenBackgroundIsClicked = true
+    };
+
+    await this.ShowPopupAsync(popup);
 }
 ```
 
