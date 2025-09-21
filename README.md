@@ -21,6 +21,12 @@ It was found to be the fastest for opening popups among different libraries, was
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
+## ⬆️ What's New
+
+- Added `Padding` property to limit content
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Setup 
