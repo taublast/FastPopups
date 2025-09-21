@@ -300,9 +300,14 @@ public static partial class PopupExtensions
 			{
 				x = adjustedFrame.X + adjustedFrame.Width - (nfloat)availableContentSize.Width - (nfloat)paddingX;
 			}
-			else if (IsLayoutCenter(popup.HorizontalOptions) || IsLayoutFill(popup.HorizontalOptions))
+			else if (IsLayoutCenter(popup.HorizontalOptions))
 			{
 				x = adjustedFrame.X + (adjustedFrame.Width - (nfloat)availableContentSize.Width) / 2 + (nfloat)paddingX;
+			}
+			else if (IsLayoutFill(popup.HorizontalOptions))
+			{
+				// For Fill, position at adjusted frame + padding (don't center)
+				x = adjustedFrame.X + (nfloat)paddingX;
 			}
 			else
 			{
@@ -319,9 +324,14 @@ public static partial class PopupExtensions
 			{
 				y = adjustedFrame.Y + adjustedFrame.Height - (nfloat)availableContentSize.Height - additionalVerticalOffset - (nfloat)paddingY;
 			}
-			else if (IsLayoutCenter(popup.VerticalOptions) || IsLayoutFill(popup.VerticalOptions))
+			else if (IsLayoutCenter(popup.VerticalOptions))
 			{
 				y = adjustedFrame.Y + (adjustedFrame.Height - (nfloat)availableContentSize.Height) / 2 - additionalVerticalOffset + (nfloat)paddingY;
+			}
+			else if (IsLayoutFill(popup.VerticalOptions))
+			{
+				// For Fill, position at adjusted frame + padding (don't center)
+				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)paddingY;
 			}
 			else
 			{
