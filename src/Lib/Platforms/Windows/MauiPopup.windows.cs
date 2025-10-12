@@ -341,6 +341,17 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 
 		var (contentSize, x, y) = CalculateContentLayout(actualContent);
 
+		// Get window bounds for available space calculation
+		var window = mauiContext?.GetPlatformWindow();
+		var windowBounds = window?.Bounds ?? new Windows.Foundation.Rect(0, 0, 1000, 1000);
+		var availableSize = new Size(windowBounds.Width, windowBounds.Height);
+
+		if (!IsFullScreen)
+		{
+			var safeArea = PopupExtensions.GetSafeArea(mauiContext!);
+			availableSize = new Size(safeArea.Width, safeArea.Height);
+		}
+
 		// Get padding offset to position content correctly within the popup
 		var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
 
@@ -355,7 +366,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 		var hasExplicitHeight = visualElement?.HeightRequest > 0;
 
 		// Calculate the available content size (subtract padding from total popup size)
-		var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize);
+		var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize, availableSize);
 
 		// Set content size when we have Fill layout options OR explicit popup sizing
 		if (isFillWidth || hasExplicitWidth == true)

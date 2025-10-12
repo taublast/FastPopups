@@ -473,7 +473,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
 
         // Calculate the available content size (subtract padding from total popup size)
-        var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize);
+        var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize, new Size(parentBounds.Width, parentBounds.Height));
 
         // Adjust coordinates for IsFullScreen=false: move TOP up and extend BOTTOM down by status bar height
         var adjustedY = y + paddingY;

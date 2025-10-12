@@ -288,7 +288,8 @@ public static partial class PopupExtensions
 
 			// Calculate the available content size (subtract padding from total popup size)
 			var totalSize = new Size(contentSize.Width, contentSize.Height);
-			var availableContentSize = PopupLayoutCalculator.ApplyPadding(popup, totalSize);
+			var availableSize = new Size(adjustedFrame.Width, adjustedFrame.Height);
+			var availableContentSize = PopupLayoutCalculator.ApplyPadding(popup, totalSize, availableSize);
 
 			// Compute the horizontal position based on the HorizontalOptions within the adjusted frame.
 			nfloat x;

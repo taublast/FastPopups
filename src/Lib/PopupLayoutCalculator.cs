@@ -66,6 +66,31 @@ public static class PopupLayoutCalculator
 	/// </summary>
 	/// <param name="popup">The popup to calculate padding for.</param>
 	/// <param name="totalSize">The total size before padding is applied.</param>
+	/// <param name="availableSize">The available space to constrain against.</param>
+	/// <returns>The content size with padding subtracted only when necessary.</returns>
+	public static Size ApplyPadding(IPopup popup, Size totalSize, Size availableSize)
+	{
+		var padding = popup.Padding;
+		var paddingWidth = padding.Left + padding.Right;
+		var paddingHeight = padding.Top + padding.Bottom;
+
+		// Only subtract padding if totalSize + padding would exceed available space
+		var paddedWidth = totalSize.Width + paddingWidth > availableSize.Width
+			? Math.Max(0, totalSize.Width - paddingWidth)
+			: totalSize.Width;
+
+		var paddedHeight = totalSize.Height + paddingHeight > availableSize.Height
+			? Math.Max(0, totalSize.Height - paddingHeight)
+			: totalSize.Height;
+
+		return new Size(paddedWidth, paddedHeight);
+	}
+
+	/// <summary>
+	/// Calculates the available content size with padding applied.
+	/// </summary>
+	/// <param name="popup">The popup to calculate padding for.</param>
+	/// <param name="totalSize">The total size before padding is applied.</param>
 	/// <returns>The content size with padding subtracted.</returns>
 	public static Size ApplyPadding(IPopup popup, Size totalSize)
 	{
