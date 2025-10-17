@@ -21,9 +21,9 @@ It was found to be the fastest for opening popups among different libraries, was
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New
+## ⬆️ What's New 1.0.0.8
 
-- Added `Padding` property to limit content
+- Fix `Padding` property for non-Fill
 
 ---
 
