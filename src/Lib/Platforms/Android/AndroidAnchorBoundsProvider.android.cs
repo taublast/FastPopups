@@ -29,6 +29,12 @@ public class AndroidAnchorBoundsProvider : CrossPlatformAnchorCalculator.IAnchor
             return new Rect(0, 0, 100, 50); // Default if anchor not found
         }
 
+        // Safety: Check if anchor view is attached to window
+        if (anchorView.WindowToken == null)
+        {
+            return new Rect(0, 0, 100, 50); // Return default if view is detached
+        }
+
         // Use MAUI's Frame property which is already in DIPs and properly positioned
         // This avoids all the coordinate conversion issues we've been having
         var frame = anchor.Frame;

@@ -512,6 +512,12 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             return new Rect(0, 0, 100, 50); // Default if anchor not found
         }
 
+        // Safety: Check if anchor view is attached to window before getting location
+        if (anchorView.WindowToken == null)
+        {
+            return new Rect(0, 0, 100, 50); // Return default if view is detached
+        }
+
         // Get density factor to convert pixels to DIPs
         var density = Context?.Resources?.DisplayMetrics?.Density ?? 1.0f;
 
