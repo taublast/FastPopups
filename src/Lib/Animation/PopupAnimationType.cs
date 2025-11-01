@@ -70,4 +70,39 @@ public enum PopupAnimationType
     /// Elastic slide from bottom with spring physics
     /// </summary>
     FromBottomElastic = 12,
+
+    /// <summary>
+    /// Elastic slide from top with spring physics
+    /// </summary>
+    FromTopElastic = 13,
+
+    /// <summary>
+    /// Elastic slide from left with spring physics
+    /// </summary>
+    FromLeftElastic = 14,
+
+    /// <summary>
+    /// Elastic slide from right with spring physics
+    /// </summary>
+    FromRightElastic = 15,
+
+    /// <summary>
+    /// Vertical bounce effect with scale overshoot (1.0→1.1→1.0)
+    /// </summary>
+    ShrinkVertical = 16,
+
+    /// <summary>
+    /// Combined bounce effect with scale overshoot on both axes (1.0→1.1→1.0)
+    /// </summary>
+    ShrinkBoth = 17,
+
+    /// <summary>
+    /// 3D flip animation rotating around Y axis (horizontal flip like card)
+    /// </summary>
+    FlipHorizontal = 18,
+
+    /// <summary>
+    /// 3D flip animation rotating around X axis (vertical flip like trapdoor)
+    /// </summary>
+    FlipVertical = 19,
 }

@@ -59,8 +59,15 @@
                             <x:String>ZoomOut</x:String>
                             <x:String>WhirlIn</x:String>
                             <x:String>WhirlIn3</x:String>
-                            <x:String>Bounce</x:String>
-                            <x:String>ElasticSlideUp</x:String>
+                            <x:String>ShrinkHorizontal</x:String>
+                            <x:String>ShrinkVertical</x:String>
+                            <x:String>ShrinkBoth</x:String>
+                            <x:String>ElasticFromBottom</x:String>
+                            <x:String>ElasticFromTop</x:String>
+                            <x:String>ElasticFromLeft</x:String>
+                            <x:String>ElasticFromRight</x:String>
+                            <x:String>FlipHorizontal</x:String>
+                            <x:String>FlipVertical</x:String>
                         </Picker.Items>
                     </Picker>
                 </VerticalStackLayout>

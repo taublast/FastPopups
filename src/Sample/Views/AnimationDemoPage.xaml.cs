@@ -56,7 +56,14 @@ public partial class AnimationDemoPage : ContentPage
             9 => PopupAnimationType.WhirlIn,
             10 => PopupAnimationType.WhirlIn3,
             11 => PopupAnimationType.ShrinkHorizontal,
-            12 => PopupAnimationType.FromBottomElastic,
+            12 => PopupAnimationType.ShrinkVertical,
+            13 => PopupAnimationType.ShrinkBoth,
+            14 => PopupAnimationType.FromBottomElastic,
+            15 => PopupAnimationType.FromTopElastic,
+            16 => PopupAnimationType.FromLeftElastic,
+            17 => PopupAnimationType.FromRightElastic,
+            18 => PopupAnimationType.FlipHorizontal,
+            19 => PopupAnimationType.FlipVertical,
             _ => PopupAnimationType.Fade
         };
     }
@@ -91,8 +98,15 @@ public partial class AnimationDemoPage : ContentPage
             PopupAnimationType.ZoomOut => "Zooms out to center (scale 1.5→1.0). Dramatic entrance effect.",
             PopupAnimationType.WhirlIn => "Rotates 180° while zooming in. Fun and attention-grabbing.",
             PopupAnimationType.WhirlIn3 => "Rotates 1080° (3 full rotations) while zooming in. Very dramatic effect with extended duration.",
-            PopupAnimationType.ShrinkHorizontal => "Bounces with scale overshoot (1.0→1.1→1.0). Playful and energetic.",
+            PopupAnimationType.ShrinkHorizontal => "Horizontal bounce with scale overshoot (0.5→1.1→1.0). Playful width squash effect.",
+            PopupAnimationType.ShrinkVertical => "Vertical bounce with scale overshoot (0.5→1.1→1.0). Playful height squash effect.",
+            PopupAnimationType.ShrinkBoth => "Combined bounce on both axes (0.5→1.1→1.0). Full squash and stretch effect.",
             PopupAnimationType.FromBottomElastic => "Slides from bottom with spring physics. Natural and satisfying motion.",
+            PopupAnimationType.FromTopElastic => "Slides from top with spring physics. Bouncy dropdown effect.",
+            PopupAnimationType.FromLeftElastic => "Slides from left with spring physics. Elastic side panel entrance.",
+            PopupAnimationType.FromRightElastic => "Slides from right with spring physics. Elastic side panel entrance.",
+            PopupAnimationType.FlipHorizontal => "3D horizontal flip like a card turning. Rotates 90° around Y-axis.",
+            PopupAnimationType.FlipVertical => "3D vertical flip like a trapdoor. Rotates 90° around X-axis.",
             _ => "No information available for this animation type."
         };
     }
@@ -114,15 +128,22 @@ public partial class AnimationDemoPage : ContentPage
         {
             PopupAnimationType.Fade,
             PopupAnimationType.FromBottom,
-            PopupAnimationType.FromTop,
             PopupAnimationType.FromBottomElastic,
+            PopupAnimationType.FromTop,
+            PopupAnimationType.FromTopElastic,
             PopupAnimationType.FromRight,
+            PopupAnimationType.FromRightElastic,
             PopupAnimationType.FromLeft,
+            PopupAnimationType.FromLeftElastic,
             PopupAnimationType.ZoomIn,
             PopupAnimationType.ZoomOut,
             PopupAnimationType.ShrinkHorizontal,
+            PopupAnimationType.ShrinkVertical,
+            PopupAnimationType.ShrinkBoth,
+            PopupAnimationType.FlipHorizontal,
+            PopupAnimationType.FlipVertical,
             PopupAnimationType.WhirlIn,
-            PopupAnimationType.WhirlIn3,  
+            PopupAnimationType.WhirlIn3,
         };
 
         foreach (var animationType in animations)
