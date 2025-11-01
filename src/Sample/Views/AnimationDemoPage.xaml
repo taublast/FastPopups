@@ -153,7 +153,6 @@
             <Border
                 Padding="15"
                 BackgroundColor="#FFF0F5"
-                IsVisible="{Binding SelectedAnimationInfo, Converter={StaticResource IsNotNullConverter}}"
                 Stroke="Pink"
                 StrokeThickness="1">
                 <Border.StrokeShape>

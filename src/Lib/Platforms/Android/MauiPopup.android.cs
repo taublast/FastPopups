@@ -6,11 +6,16 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.Core.View;
 using AndroidX.Window.Layout;
+using FastPopups.Platforms.Android;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Primitives;
 using System.Diagnostics.CodeAnalysis;
+using AppoMobi.Maui.FastPopups;
+using static Android.Views.View;
 using static AndroidX.ViewPager.Widget.ViewPager;
+using static FastPopups.MauiPopup;
 using AView = Android.Views.View;
 
 namespace FastPopups;
@@ -24,6 +29,11 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 {
     readonly IMauiContext mauiContext;
     AView? overlay;
+    AView? content;
+    readonly PopupAnimator animator = new PopupAnimator();
+    bool _appeared = false;
+    private AView _compositeContainer;
+    private LayoutListener _sizeChangeListener;
 
     /// <summary>
     /// The native fullscreen overlay
@@ -81,7 +91,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     Window.AddFlags(WindowManagerFlags.LayoutInScreen);
                     Window.ClearFlags(WindowManagerFlags.ForceNotFullscreen);
 
-    
+
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
                         var layoutParams = Window.Attributes;
@@ -146,7 +156,10 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             var compositeContainer = CreateCompositePopupContent(container);
             SetContentView(compositeContainer);
 
-            SubscribeEvents();
+            _compositeContainer = compositeContainer;
+
+            Subscribe(true);
+
             return container; // Return original container for reference
         }
 
@@ -167,6 +180,9 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         {
             return container;
         }
+
+        // Store content reference for animations
+        content = actualContent;
 
         // Create the full-screen overlay that will darken everything behind this dialog
         overlay = new AView(Context)
@@ -696,6 +712,17 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     {
         _ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null");
 
+        if (VirtualView is Popup popup)
+        {
+            // Prepare animation initial state BEFORE showing
+            if (content != null && overlay != null &&
+                popup.AnimationType != AppoMobi.Maui.FastPopups.PopupAnimationType.None)
+            {
+                content.Alpha = 0;
+                overlay.Alpha = 0;
+            }
+        }
+
         // Show the dialog popup - the overlay is now part of the dialog content
         // so it will automatically darken everything that was visible before this dialog opened
         base.Show();
@@ -726,12 +753,42 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     }
 
     /// <summary>
+    /// Method to close the popup with animation
+    /// </summary>
+    public async Task CloseWithAnimationAsync()
+    {
+        if (VirtualView is Popup popup && content != null && overlay != null)
+        {
+            // Disable overlay hit testing during close animation
+            overlay.Clickable = false;
+
+            await animator.AnimateHideAsync(
+                content,
+                overlay,
+                popup.AnimationType,
+                popup.AnimationDuration,
+                popup.AnimationEasing);
+
+            animator.Cleanup(content, overlay);
+        }
+
+        Subscribe(false);
+    }
+
+    /// <summary>
     /// Method to clean up the resources of the <see cref="MauiPopup"/>.
     /// </summary>
     public void CleanUp()
     {
+        if (content != null && overlay != null)
+        {
+            animator.Cleanup(content, overlay);
+        }
+
         VirtualView = null;
         overlay = null;
+        content = null;
+        _appeared = false;
     }
 
     /// <inheritdoc/>
@@ -766,9 +823,75 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         return true;
     }
 
-    void SubscribeEvents()
+
+    void Subscribe(bool subscribe)
     {
-        SetOnCancelListener(this);
+        if (subscribe)
+        {
+            SetOnCancelListener(this);
+            _sizeChangeListener = new LayoutListener(_compositeContainer, (view) =>
+            {
+                // Trigger animation AFTER dialog size is fully ready
+                if (VirtualView is Popup popup && content != null && overlay != null)
+                {
+                    if (!_appeared && content.Width > 0 && content.Height > 0)
+                    {
+                        _appeared = true;
+
+                        if (popup.AnimationType != PopupAnimationType.None)
+                        {
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                animator.SetInitialAnimationState(content, overlay, popup.AnimationType);
+
+                                await animator.AnimateShowAsync(
+                                    content,
+                                    overlay,
+                                    popup.AnimationType,
+                                    popup.AnimationDuration,
+                                    popup.AnimationEasing);
+                            });
+                        }
+                    }
+                }
+            });
+            _compositeContainer.AddOnLayoutChangeListener(_sizeChangeListener);
+        }
+        else
+        {
+            SetOnCancelListener(null);
+            _sizeChangeListener?.Release();
+            _sizeChangeListener = null;
+            _compositeContainer = null;
+        }
+    }
+
+    public class LayoutListener : Java.Lang.Object, Android.Views.View.IOnLayoutChangeListener
+    {
+        public Action<AView>? Callback;
+
+        public global::Android.Views.View View;
+
+        public LayoutListener(global::Android.Views.View view, Action<AView> callback)
+        {
+            View = view;
+            Callback = callback;
+            View?.AddOnLayoutChangeListener(this);
+        }
+
+        public void Release()
+        {
+            View?.RemoveOnLayoutChangeListener(this);
+            View = null;
+            Callback = null;
+        }
+
+
+        public void OnLayoutChange(AView? v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight,
+            int oldBottom)
+        {
+            Callback?.Invoke(v);
+        }
     }
 
     void IDialogInterfaceOnCancelListener.OnCancel(IDialogInterface? dialog) =>

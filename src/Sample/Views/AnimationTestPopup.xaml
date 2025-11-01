@@ -17,7 +17,7 @@
             Stroke="DodgerBlue"
             Padding="20">
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="15"/>
+            <RoundRectangle CornerRadius="14"/>
         </Border.StrokeShape>
 
         <ScrollView>

@@ -344,6 +344,15 @@ public partial class Popup : View, IPopup
         {
             return handler.PlatformView.CloseWithAnimationAsync();
         }
+#elif ANDROID
+        if (Handler is PopupHandler handler)
+        {
+            var dialog = handler.PlatformView.Dialog;
+            if (dialog != null)
+            {
+                return dialog.CloseWithAnimationAsync();
+            }
+        }
 #endif
 
         return Task.CompletedTask;
