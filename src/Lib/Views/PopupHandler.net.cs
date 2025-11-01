@@ -82,6 +82,16 @@ public partial class PopupHandler : Microsoft.Maui.Handlers.ElementHandler<IPopu
 	{
 		throw new NotSupportedException();
 	}
+
+	/// <summary>
+	/// Action that's triggered when animation properties change.
+	/// </summary>
+	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
+	public static void MapAnimation(PopupHandler handler, IPopup view)
+	{
+		throw new NotSupportedException();
+	}
 }
 
 #endif

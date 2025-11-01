@@ -98,6 +98,17 @@ public partial class PopupHandler : Microsoft.Maui.Handlers.ViewHandler<IPopup, 
 		handler.PlatformView.Popup?.UpdateContentSize();
 	}
 
+	/// <summary>
+	/// Action that's triggered when animation properties change.
+	/// </summary>
+	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
+	public static void MapAnimation(PopupHandler handler, IPopup view)
+	{
+		// Animation properties are read directly from VirtualView when needed
+		// TODO: Implement Tizen animations in future
+	}
+
 	/// <inheritdoc/>
 	protected override void ConnectHandler(MauiPopupView platformView)
 	{

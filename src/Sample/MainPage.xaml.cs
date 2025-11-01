@@ -102,4 +102,10 @@ public partial class MainPage : ContentPage
         await this.ShowPopupAsync(popup);
     }
 
+    // Animation Demo
+    private async void OnAnimationDemoClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new Views.AnimationDemoPage());
+    }
+
 }

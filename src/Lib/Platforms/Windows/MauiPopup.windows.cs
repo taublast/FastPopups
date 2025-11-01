@@ -1,7 +1,9 @@
-﻿using Microsoft.Maui.Platform;
+﻿using AppoMobi.Maui.FastPopups;
+using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Grid = Microsoft.UI.Xaml.Controls.Grid;
 using HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment;
 using Popup = Microsoft.UI.Xaml.Controls.Primitives.Popup;
@@ -16,537 +18,636 @@ namespace FastPopups;
 /// </summary>
 public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 {
-	readonly IMauiContext mauiContext;
-	bool attached;
-	Grid? overlay;
-	bool windowResizeHandlerAttached;
+    readonly IMauiContext mauiContext;
+    bool attached;
+    Grid? overlay;
+    bool windowResizeHandlerAttached;
+    readonly Platforms.Windows.PopupAnimator animator;
 
-	/// <summary>
-	/// The native popup view.
-	/// </summary>
-	public Microsoft.UI.Xaml.Controls.Primitives.Popup PopupView { get; protected set; }
+    /// <summary>
+    /// The native popup view.
+    /// </summary>
+    public Microsoft.UI.Xaml.Controls.Primitives.Popup PopupView { get; protected set; }
 
-	/// <summary>
-	/// The native fullscreen overlay
-	/// </summary>
-	public Grid? Overlay 
-	{
-		get
-		{
-			return overlay;
-		}
-	}
+    /// <summary>
+    /// The native fullscreen overlay
+    /// </summary>
+    public Grid? Overlay
+    {
+        get
+        {
+            return overlay;
+        }
+    }
 
-	/// <summary>
-	/// Gets or sets a value indicating whether the popup can be dismissed by tapping outside the popup.
-	/// </summary>
-	public bool CloseWhenBackgroundIsClicked { get; set; }
+    /// <summary>
+    /// Gets or sets a value indicating whether the popup can be dismissed by tapping outside the popup.
+    /// </summary>
+    public bool CloseWhenBackgroundIsClicked { get; set; }
 
     public bool IsFullScreen { get; set; }
 
     partial class BackgroundDimmer : Microsoft.UI.Xaml.Controls.Grid
-	{
-		public BackgroundDimmer(Action actionTapped)
-		{
-			// Only close on complete TAP gesture, not on press down
-			Tapped += (s, e) =>
-			{
-				e.Handled = true; // Consume the tap event
-				actionTapped?.Invoke();
-			};
-
-			// Also consume press/release events to prevent any leakage
-			PointerPressed += (s, e) =>
-			{
-				e.Handled = true;
-			};
-
-			PointerReleased += (s, e) =>
-			{
-				e.Handled = true;
-			};
-		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="mauiContext"></param>
-	/// <exception cref="ArgumentNullException"></exception>
-	public MauiPopup(IMauiContext mauiContext)
-	{
-
-		this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
-
-		HorizontalAlignment = HorizontalAlignment.Stretch;
-		VerticalAlignment = VerticalAlignment.Stretch;
-		Background = null;
-
-		PopupView = new ()
-		{
-			LightDismissOverlayMode = LightDismissOverlayMode.Off,
-			IsLightDismissEnabled = false
-		};
-
-		// Don't add PopupView to Children - we'll manage it differently
-		// Children.Add(PopupView);
-	}
-
-	/// <summary>
-	/// Method to initialize the native implementation.
-	/// </summary>
-	/// <param name="element">An instance of <see cref="IPopup"/>.</param>
-	public FrameworkElement? SetElement(IPopup? element)
-	{
-		if (element == null)
-		{
-			PopupView.IsOpen = false;
-			PopupView.Closed -= OnClosed;
-
-			try
-			{
-				var window = mauiContext.GetPlatformWindow();
-				if (window.Content is Panel rootPanel)
-				{
-					rootPanel.Children.Remove(this);
-				}
-			}
-			catch (Exception e)
-			{
-				Trace.WriteLine(e);
-			}
-
-			VirtualView = null;
-
-			if (Content is not null)
-			{
-				Content.SizeChanged -= OnSizeChanged;
-				Content = null;
-			}
-			
-			DetachWindowResizeHandler();
-
-			return null;
-		}
-
-		VirtualView = element;
-
-		if (TryCreateContent(VirtualView, out var mauiContent))
-		{
-			// NEW APPROACH: Create a composite popup content that includes both overlay and content
-			var compositeContent = CreateCompositePopupContent(mauiContent);
-
-			PopupView.Child = compositeContent;
-			Content = mauiContent; // Keep reference to the actual content
-			mauiContent.SizeChanged += OnSizeChanged;
-			PopupView.Closed += OnClosed;
-		}
-
-		return mauiContent;
-	}
-
-	FrameworkElement CreateCompositePopupContent(FrameworkElement actualContent)
-	{
-		// Create a full-screen container with no background to avoid transparency issues
-		var container = new Grid
-		{
-			HorizontalAlignment = HorizontalAlignment.Stretch,
-			VerticalAlignment = VerticalAlignment.Stretch,
-			Background = null // Explicitly null to avoid any white background blocking transparency
-		};
-
-		if (VirtualView == null)
-		{
-			return container;
-		}
-
-
-		// Create the full-screen overlay with proper transparency handling
-		var overlayColor = ((Popup)VirtualView).BackgroundColor;
-		overlay = new BackgroundDimmer(() =>
-		{
-			if (VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
-			{
-				VirtualView?.OnDismissedByTappingOutsideOfPopup();
-			}
-		})
-		{
-			HorizontalAlignment = HorizontalAlignment.Stretch,
-			VerticalAlignment = VerticalAlignment.Stretch
-		};
-
-		// Set background with proper transparency - avoid any white blocking issues
-		if (overlayColor != Colors.Transparent)
-		{
-			var windowsColor = overlayColor.ToWindowsColor();
-			overlay.Background = new SolidColorBrush(windowsColor);
-		}
-		else
-		{
-			overlay.Background = null; // Explicitly null for transparent overlays
-		}
-
-		// Add overlay first (behind content)
-		container.Children.Add(overlay);
-
-		// Position the actual content within the fullscreen container
-		PositionContentInContainer(container, actualContent);
-
-		return container;
-	}
-
-	/// <summary>
-	/// Calculates the layout (size and position) for popup content.
-	/// </summary>
-	/// <param name="actualContent">The actual popup content to calculate layout for.</param>
-	/// <returns>The calculated size and position.</returns>
-	(Size ContentSize, double X, double Y) CalculateContentLayout(FrameworkElement actualContent)
-	{
-		if (VirtualView is null || mauiContext is null)
-			return (new Size(300, 200), 0, 0);
-
-		// Get window bounds for layout calculation
-		var window = mauiContext.GetPlatformWindow();
-		var windowBounds = window.Bounds;
-		var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
-
-
-		var popupParentFrame = parentBounds;
-		Microsoft.Maui.Thickness safeAreaInsets = default;
-		if (!IsFullScreen)
-		{
-			var safeArea = PopupExtensions.GetSafeArea(mauiContext);
-			popupParentFrame = new Rect(safeArea.Left, safeArea.Y, safeArea.Width, safeArea.Height);
-			safeAreaInsets = new Microsoft.Maui.Thickness(
-				safeArea.X - parentBounds.X,
-				safeArea.Y - parentBounds.Y,
-				parentBounds.Right - safeArea.Right,
-				parentBounds.Bottom - safeArea.Bottom);
-		}
-
-		// Check if popup has explicit size requests first (similar to Android/Apple implementations)
-		// Cast to VisualElement to access HeightRequest/WidthRequest properties
-		var visualElement = VirtualView as VisualElement;
-		var hasExplicitWidth = visualElement?.WidthRequest > 0;
-		var hasExplicitHeight = visualElement?.HeightRequest > 0;
-
-		// For Fill layouts, we need to calculate size based on layout options, not measured content
-		// Check if we have Fill layout options first
-		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
-		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
-		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-
-		Size contentSize;
-
-		// If popup has explicit width and height requests, use them (similar to Apple implementation)
-		if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
-		{
-			contentSize = new Size(
-				Math.Min(visualElement.WidthRequest, parentBounds.Width),
-				Math.Min(visualElement.HeightRequest, parentBounds.Height));
-		}
-		else if (hasExplicitWidth == true || hasExplicitHeight == true)
-		{
-			// Mixed case: some explicit, some calculated (similar to Apple implementation)
-			double width, height;
-
-			if (hasExplicitWidth == true && visualElement != null)
-			{
-				width = Math.Min(visualElement.WidthRequest, parentBounds.Width);
-			}
-			else if (isFillWidth)
-			{
-				width = parentBounds.Width;
-			}
-			else
-			{
-				// Measure content for width
-				if (actualContent.DesiredSize.Width == 0)
-				{
-					actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-				}
-				width = actualContent.DesiredSize.Width;
-				if (width == 0)
-				{
-					width = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Width;
-				}
-			}
-
-			if (hasExplicitHeight == true && visualElement != null)
-			{
-				height = Math.Min(visualElement.HeightRequest, parentBounds.Height);
-			}
-			else if (isFillHeight)
-			{
-				height = parentBounds.Height;
-			}
-			else
-			{
-				// Measure content for height with the determined width
-				actualContent.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
-				height = actualContent.DesiredSize.Height;
-				if (height == 0)
-				{
-					height = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Height;
-				}
-			}
-
-			contentSize = new Size(width, height);
-		}
-		else if (isFillWidth || isFillHeight)
-		{
-			// For Fill layouts, use the layout calculator to get proper Fill sizing
-			contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
-		}
-		else
-		{
-			// For non-Fill layouts with no explicit requests, try to get actual/measured content size first
-			contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
-			if (contentSize.Width == 0 || contentSize.Height == 0)
-			{
-				if (actualContent.DesiredSize.Width == 0 || actualContent.DesiredSize.Height == 0)
-				{
-					actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-				}
-				contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
-			}
-
-			if (contentSize.Width == 0 || contentSize.Height == 0)
-			{
-				contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
-			}
-		}
-
-		// Calculate position based on popup alignment or anchor
-		double x, y;
-		if (VirtualView.Anchor != null)
-		{
-
-			var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
-			(x, y) = CrossPlatformAnchorCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds, safeAreaInsets);
-		}
-		else
-		{
-
-			(x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, safeAreaInsets);
-		}
-
-		return (contentSize, x, y);
-	}
-
-	void ApplyContentPositioning(FrameworkElement actualContent)
-	{
-		if (VirtualView == null) return;
-
-		var (contentSize, x, y) = CalculateContentLayout(actualContent);
-
-		// Get window bounds for available space calculation
-		var window = mauiContext?.GetPlatformWindow();
-		var windowBounds = window?.Bounds ?? new Windows.Foundation.Rect(0, 0, 1000, 1000);
-		var availableSize = new Size(windowBounds.Width, windowBounds.Height);
-
-		if (!IsFullScreen)
-		{
-			var safeArea = PopupExtensions.GetSafeArea(mauiContext!);
-			availableSize = new Size(safeArea.Width, safeArea.Height);
-		}
-
-		// Get padding offset to position content correctly within the popup
-		var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
-
-		var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
-		var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
-		var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-		var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
-
-		// Check if popup has explicit size requests
-		var visualElement = VirtualView as VisualElement;
-		var hasExplicitWidth = visualElement?.WidthRequest > 0;
-		var hasExplicitHeight = visualElement?.HeightRequest > 0;
-
-		// Calculate the available content size (subtract padding from total popup size)
-		var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize, availableSize);
-
-		// Set content size when we have Fill layout options OR explicit popup sizing
-		if (isFillWidth || hasExplicitWidth == true)
-		{
-			actualContent.Width = availableContentSize.Width;
-		}
-
-		if (isFillHeight || hasExplicitHeight == true)
-		{
-			actualContent.Height = availableContentSize.Height;
-		}
-
-		// Set positioning using margins, including padding offset
-		actualContent.HorizontalAlignment = HorizontalAlignment.Left;
-		actualContent.VerticalAlignment = VerticalAlignment.Top;
-		actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x + paddingX, y + paddingY, 0, 0);
-	}
-
-	/// <summary>
-	/// Positions the actual popup content within the fullscreen container using layout options.
-	/// </summary>
-	/// <param name="container">The fullscreen container Grid.</param>
-	/// <param name="actualContent">The popup content to position.</param>
-	void PositionContentInContainer(Grid container, FrameworkElement actualContent)
-	{
-
-		ApplyContentPositioning(actualContent);
-
-		// Add content to container
-		container.Children.Add(actualContent);
-	}
-
-	/// <summary>
-	/// Opens the popup and shows the dimmer.
-	/// </summary>
-	public void Show()
-	{
-		if (!attached)
-		{
-			var window = mauiContext.GetPlatformWindow();
-			if (window.Content is Panel rootPanel)
-			{
-				attached = true;
-				// Simple approach: just add to the end of the root panel
-				// The overlay is now part of the popup content, so it will automatically
-				// cover everything that was visible before this popup opened
-				rootPanel.Children.Add(this);
-			}
-			
-
-			AttachWindowResizeHandler();
-		}
-
-		PopupView.XamlRoot = this.XamlRoot;
-		PopupView.IsOpen = true;
-
-		_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null");
-		
-
-		DispatcherQueue.TryEnqueue(() =>
-		{
-			Layout();
-		});
-		
-		VirtualView.OnOpened();
-	}
-
-
-
-	void OnClosed(object? sender, object e)
-	{
-		if (!PopupView.IsOpen && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
-		{
-			VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
-		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	public void OnSizeChanged(object? sender, object e)
-	{
-		UpdateLayout();
-	}
-
-	/// <summary>
-	/// Measure and layout popup
-	/// </summary>
-	public void Layout()
-	{
-		if (VirtualView is not null)
-		{
-			PopupExtensions.SetSize(this, VirtualView, mauiContext);
+    {
+        public BackgroundDimmer(Action actionTapped)
+        {
+            // Only close on complete TAP gesture, not on press down
+            Tapped += (s, e) =>
+            {
+                e.Handled = true; // Consume the tap event
+                actionTapped?.Invoke();
+            };
+
+            // Also consume press/release events to prevent any leakage
+            PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            PointerReleased += (s, e) =>
+            {
+                e.Handled = true;
+            };
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mauiContext"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public MauiPopup(IMauiContext mauiContext)
+    {
+
+        this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
+
+        HorizontalAlignment = HorizontalAlignment.Stretch;
+        VerticalAlignment = VerticalAlignment.Stretch;
+        Background = null;
+
+        PopupView = new()
+        {
+            LightDismissOverlayMode = LightDismissOverlayMode.Off,
+            IsLightDismissEnabled = false
+        };
+
+        // Don't add PopupView to Children - we'll manage it differently
+        // Children.Add(PopupView);
+
+        // Initialize animator
+        animator = new Platforms.Windows.PopupAnimator();
+    }
+
+    /// <summary>
+    /// Method to initialize the native implementation.
+    /// </summary>
+    /// <param name="element">An instance of <see cref="IPopup"/>.</param>
+    public FrameworkElement? SetElement(IPopup? element)
+    {
+        if (element == null)
+        {
+            PopupView.IsOpen = false;
+            PopupView.Closed -= OnClosed;
+
+            try
+            {
+                var window = mauiContext.GetPlatformWindow();
+                if (window.Content is Panel rootPanel)
+                {
+                    rootPanel.Children.Remove(this);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e);
+            }
+
+            VirtualView = null;
+
+            if (Content is not null)
+            {
+                Content.SizeChanged -= OnSizeChanged;
+                Content = null;
+            }
+
+            DetachWindowResizeHandler();
+
+            return null;
+        }
+
+        VirtualView = element;
+
+        if (TryCreateContent(VirtualView, out var mauiContent))
+        {
+            // NEW APPROACH: Create a composite popup content that includes both overlay and content
+            var compositeContent = CreateCompositePopupContent(mauiContent);
+
+            PopupView.Child = compositeContent;
+            Content = mauiContent; // Keep reference to the actual content
+            mauiContent.SizeChanged += OnSizeChanged;
+            PopupView.Closed += OnClosed;
+        }
+
+        return mauiContent;
+    }
+
+    FrameworkElement CreateCompositePopupContent(FrameworkElement actualContent)
+    {
+        // Get window dimensions for initial sizing
+        var window = mauiContext?.GetPlatformWindow();
+        var windowWidth = window?.Bounds.Width ?? 1000;
+        var windowHeight = window?.Bounds.Height ?? 1000;
+
+        // Create a full-screen container with no background to avoid transparency issues
+        var container = new Grid
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Width = windowWidth,
+            Height = windowHeight,
+            Background = null // Explicitly null to avoid any white background blocking transparency
+        };
+
+        if (VirtualView == null)
+        {
+            return container;
+        }
+
+
+        // Create the full-screen overlay with proper transparency handling
+        var overlayColor = ((Popup)VirtualView).BackgroundColor;
+        overlay = new BackgroundDimmer(() =>
+        {
+            if (VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
+            {
+                VirtualView?.OnDismissedByTappingOutsideOfPopup();
+            }
+        })
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Width = windowWidth,
+            Height = windowHeight
+        };
+
+        // Set background with proper transparency - avoid any white blocking issues
+        if (overlayColor != Colors.Transparent)
+        {
+            var windowsColor = overlayColor.ToWindowsColor();
+            overlay.Background = new SolidColorBrush(windowsColor);
+        }
+        else
+        {
+            overlay.Background = null; // Explicitly null for transparent overlays
+        }
+
+        // Add overlay first (behind content)
+        container.Children.Add(overlay);
+
+        // Position the actual content within the fullscreen container
+        PositionContentInContainer(container, actualContent);
+
+        return container;
+    }
+
+    /// <summary>
+    /// Calculates the layout (size and position) for popup content.
+    /// </summary>
+    /// <param name="actualContent">The actual popup content to calculate layout for.</param>
+    /// <returns>The calculated size and position.</returns>
+    (Size ContentSize, double X, double Y) CalculateContentLayout(FrameworkElement actualContent)
+    {
+        if (VirtualView is null || mauiContext is null)
+            return (new Size(300, 200), 0, 0);
+
+        // Get window bounds for layout calculation
+        var window = mauiContext.GetPlatformWindow();
+        var windowBounds = window.Bounds;
+        var parentBounds = new Rect(0, 0, windowBounds.Width, windowBounds.Height);
+
+
+        var popupParentFrame = parentBounds;
+        Microsoft.Maui.Thickness safeAreaInsets = default;
+        if (!IsFullScreen)
+        {
+            var safeArea = PopupExtensions.GetSafeArea(mauiContext);
+            popupParentFrame = new Rect(safeArea.Left, safeArea.Y, safeArea.Width, safeArea.Height);
+            safeAreaInsets = new Microsoft.Maui.Thickness(
+                safeArea.X - parentBounds.X,
+                safeArea.Y - parentBounds.Y,
+                parentBounds.Right - safeArea.Right,
+                parentBounds.Bottom - safeArea.Bottom);
+        }
+
+        // Check if popup has explicit size requests first (similar to Android/Apple implementations)
+        // Cast to VisualElement to access HeightRequest/WidthRequest properties
+        var visualElement = VirtualView as VisualElement;
+        var hasExplicitWidth = visualElement?.WidthRequest > 0;
+        var hasExplicitHeight = visualElement?.HeightRequest > 0;
+
+        // For Fill layouts, we need to calculate size based on layout options, not measured content
+        // Check if we have Fill layout options first
+        var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+        var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+        var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+        var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+        Size contentSize;
+
+        // If popup has explicit width and height requests, use them (similar to Apple implementation)
+        if (hasExplicitWidth == true && hasExplicitHeight == true && visualElement != null)
+        {
+            contentSize = new Size(
+                Math.Min(visualElement.WidthRequest, parentBounds.Width),
+                Math.Min(visualElement.HeightRequest, parentBounds.Height));
+        }
+        else if (hasExplicitWidth == true || hasExplicitHeight == true)
+        {
+            // Mixed case: some explicit, some calculated (similar to Apple implementation)
+            double width, height;
+
+            if (hasExplicitWidth == true && visualElement != null)
+            {
+                width = Math.Min(visualElement.WidthRequest, parentBounds.Width);
+            }
+            else if (isFillWidth)
+            {
+                width = parentBounds.Width;
+            }
+            else
+            {
+                // Measure content for width
+                if (actualContent.DesiredSize.Width == 0)
+                {
+                    actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+                }
+                width = actualContent.DesiredSize.Width;
+                if (width == 0)
+                {
+                    width = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Width;
+                }
+            }
+
+            if (hasExplicitHeight == true && visualElement != null)
+            {
+                height = Math.Min(visualElement.HeightRequest, parentBounds.Height);
+            }
+            else if (isFillHeight)
+            {
+                height = parentBounds.Height;
+            }
+            else
+            {
+                // Measure content for height with the determined width
+                actualContent.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
+                height = actualContent.DesiredSize.Height;
+                if (height == 0)
+                {
+                    height = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Height;
+                }
+            }
+
+            contentSize = new Size(width, height);
+        }
+        else if (isFillWidth || isFillHeight)
+        {
+            // For Fill layouts, use the layout calculator to get proper Fill sizing
+            contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+        }
+        else
+        {
+            // For non-Fill layouts with no explicit requests, try to get actual/measured content size first
+            contentSize = new Size(actualContent.ActualWidth, actualContent.ActualHeight);
+            if (contentSize.Width == 0 || contentSize.Height == 0)
+            {
+                if (actualContent.DesiredSize.Width == 0 || actualContent.DesiredSize.Height == 0)
+                {
+                    actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+                }
+                contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+            }
+
+            if (contentSize.Width == 0 || contentSize.Height == 0)
+            {
+                contentSize = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets);
+            }
+        }
+
+        // Calculate position based on popup alignment or anchor
+        double x, y;
+        if (VirtualView.Anchor != null)
+        {
+
+            var anchorBounds = PopupExtensions.GetAnchorBounds(VirtualView.Anchor, mauiContext);
+            (x, y) = CrossPlatformAnchorCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds, parentBounds, safeAreaInsets);
+        }
+        else
+        {
+
+            (x, y) = PopupLayoutCalculator.CalculatePosition(VirtualView, contentSize, parentBounds, safeAreaInsets);
+        }
+
+        return (contentSize, x, y);
+    }
+
+    void ApplyContentPositioning(FrameworkElement actualContent)
+    {
+        if (VirtualView == null) return;
+
+        var (contentSize, x, y) = CalculateContentLayout(actualContent);
+
+        // Get window bounds for available space calculation
+        var window = mauiContext?.GetPlatformWindow();
+        var windowBounds = window?.Bounds ?? new Windows.Foundation.Rect(0, 0, 1000, 1000);
+        var availableSize = new Size(windowBounds.Width, windowBounds.Height);
+
+        if (!IsFullScreen)
+        {
+            var safeArea = PopupExtensions.GetSafeArea(mauiContext!);
+            availableSize = new Size(safeArea.Width, safeArea.Height);
+        }
+
+        // Get padding offset to position content correctly within the popup
+        var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(VirtualView);
+
+        var horizontalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.HorizontalOptions);
+        var verticalAlignment = PopupLayoutCalculator.GetLayoutAlignment(VirtualView.VerticalOptions);
+        var isFillWidth = horizontalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+        var isFillHeight = verticalAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill;
+
+        // Check if popup has explicit size requests
+        var visualElement = VirtualView as VisualElement;
+        var hasExplicitWidth = visualElement?.WidthRequest > 0;
+        var hasExplicitHeight = visualElement?.HeightRequest > 0;
+
+        // Calculate the available content size (subtract padding from total popup size)
+        var availableContentSize = PopupLayoutCalculator.ApplyPadding(VirtualView, contentSize, availableSize);
+
+        // Set content size when we have Fill layout options OR explicit popup sizing
+        if (isFillWidth || hasExplicitWidth == true)
+        {
+            actualContent.Width = availableContentSize.Width;
+        }
+
+        if (isFillHeight || hasExplicitHeight == true)
+        {
+            actualContent.Height = availableContentSize.Height;
+        }
+
+        // Set positioning using margins, including padding offset
+        actualContent.HorizontalAlignment = HorizontalAlignment.Left;
+        actualContent.VerticalAlignment = VerticalAlignment.Top;
+        actualContent.Margin = new Microsoft.UI.Xaml.Thickness(x + paddingX, y + paddingY, 0, 0);
+    }
+
+    /// <summary>
+    /// Positions the actual popup content within the fullscreen container using layout options.
+    /// </summary>
+    /// <param name="container">The fullscreen container Grid.</param>
+    /// <param name="actualContent">The popup content to position.</param>
+    void PositionContentInContainer(Grid container, FrameworkElement actualContent)
+    {
+
+        ApplyContentPositioning(actualContent);
+
+        // Add content to container
+        container.Children.Add(actualContent);
+    }
+
+    /// <summary>
+    /// Opens the popup and shows the dimmer.
+    /// </summary>
+    public async void Show()
+    {
+        if (!attached)
+        {
+            var window = mauiContext.GetPlatformWindow();
+            if (window.Content is Panel rootPanel)
+            {
+                attached = true;
+                // Simple approach: just add to the end of the root panel
+                // The overlay is now part of the popup content, so it will automatically
+                // cover everything that was visible before this popup opened
+                rootPanel.Children.Add(this);
+            }
+
+            AttachWindowResizeHandler();
+        }
+
+        PopupView.XamlRoot = this.XamlRoot;
+        PopupView.IsOpen = true;
+
+        _ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null");
+
+        DispatcherQueue.TryEnqueue(async () =>
+        {
+            Layout();
+
+            // Prepare animation showing. we cant starting animating yet because we need to wait for size to be set
+            if (Content != null && overlay != null && VirtualView is IPopup popup)
+            {
+                var animationType = popup.AnimationType;
+                if (animationType != PopupAnimationType.None)
+                {
+                    Content.Opacity = 0;
+                    overlay.Opacity = 0;
+                }
+            }
+
+            VirtualView.OnOpened();
+        });
+    }
+
+    /// <summary>
+    /// Closes the popup with animation.
+    /// </summary>
+    public async Task CloseWithAnimationAsync()
+    {
+        // Animate the popup hiding
+        if (Content != null && overlay != null && VirtualView is IPopup popup)
+        {
+            overlay.IsHitTestVisible = false;
+
+            var animationType = popup.AnimationType;
+            var duration = popup.AnimationDuration;
+            var easing = popup.AnimationEasing;
+
+            await animator.AnimateHideAsync(Content, overlay, animationType, duration, easing);
+        }
+
+        // Clean up animation transforms
+        animator.Cleanup(Content, overlay);
+    }
+
+
+
+    void OnClosed(object? sender, object e)
+    {
+        if (!PopupView.IsOpen && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
+        {
+            VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
+        }
+    }
+
+    private bool _appeared;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnSizeChanged(object? sender, object e)
+    {
+        UpdateLayout();
+
+        if (Content.ActualSize != Vector2.Zero)
+        {
+            if (!_appeared)
+            {
+                _appeared = true;
+
+                // Animate the popup showing
+                if (Content != null && overlay != null && VirtualView is IPopup popup)
+                {
+                    var animationType = popup.AnimationType;
+
+                    if (animationType != PopupAnimationType.None)
+                    {
+                        var duration = popup.AnimationDuration;
+                        var easing = popup.AnimationEasing;
+
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            try
+                            {
+                                await animator.AnimateShowAsync(Content, overlay, animationType, duration, easing);
+                            }
+                            catch (Exception exception)
+                            {
+                                Console.WriteLine(exception);
+                                Content.Opacity = 1;
+                                overlay.Opacity = 1;
+                            }
+                        });
+
+                    }
+                    else
+                    {
+                        Content.Opacity = 1;
+                        overlay.Opacity = 1;
+                    }
+                }
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Measure and layout popup
+    /// </summary>
+    public void Layout()
+    {
+        if (VirtualView is not null)
+        {
+            PopupExtensions.SetSize(this, VirtualView, mauiContext);
             PopupExtensions.SetLayout(this, VirtualView, mauiContext);
-		}
-	}
+        }
+    }
 
-	/// <summary>
-	/// Updates the content positioning within the popup.
-	/// </summary>
-	public void UpdateContentPositioning()
-	{
-		if (VirtualView is not null && PopupView.IsOpen && Content is not null)
-		{
-			// Find the actual content element within the composite popup and update its positioning
-			if (PopupView.Child is Grid container && container.Children.Count > 1)
-			{
-				var actualContent = container.Children.LastOrDefault() as FrameworkElement;
-				if (actualContent != null)
-				{
+    /// <summary>
+    /// Updates the content positioning within the popup.
+    /// </summary>
+    public void UpdateContentPositioning()
+    {
+        if (VirtualView is not null && PopupView.IsOpen && Content is not null)
+        {
+            // Find the actual content element within the composite popup and update its positioning
+            if (PopupView.Child is Grid container && container.Children.Count > 1)
+            {
+                var actualContent = container.Children.LastOrDefault() as FrameworkElement;
+                if (actualContent != null)
+                {
 
-					ApplyContentPositioning(actualContent);
-				}
-			}
-		}
-	}
+                    ApplyContentPositioning(actualContent);
+                }
+            }
+        }
+    }
 
-	/// <summary>
-	/// An instance of the <see cref="IPopup"/>.
-	/// </summary>
-	public IPopup? VirtualView { get; protected set; }
+    /// <summary>
+    /// An instance of the <see cref="IPopup"/>.
+    /// </summary>
+    public IPopup? VirtualView { get; protected set; }
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public FrameworkElement? Content { get; protected set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public FrameworkElement? Content { get; protected set; }
 
-	bool TryCreateContent(in IPopup popup, [NotNullWhen(true)] out FrameworkElement? container)
-	{
-		container = null;
+    bool TryCreateContent(in IPopup popup, [NotNullWhen(true)] out FrameworkElement? container)
+    {
+        container = null;
 
-		if (popup.Content is null)
-		{
-			return false;
-		}
+        if (popup.Content is null)
+        {
+            return false;
+        }
 
-		container = popup.Content.ToPlatform(mauiContext);
-		//Children.Add(container);
+        container = popup.Content.ToPlatform(mauiContext);
+        //Children.Add(container);
 
-		return true;
-	}
+        return true;
+    }
 
-	void AttachWindowResizeHandler()
-	{
-		if (windowResizeHandlerAttached)
-			return;
+    void AttachWindowResizeHandler()
+    {
+        if (windowResizeHandlerAttached)
+            return;
 
-		try
-		{
-			var window = mauiContext.GetPlatformWindow();
-			window.SizeChanged += OnWindowSizeChanged;
-			windowResizeHandlerAttached = true;
-		}
-		catch (Exception e)
-		{
-			Trace.WriteLine($"Failed to attach window resize handler: {e}");
-		}
-	}
+        try
+        {
+            var window = mauiContext.GetPlatformWindow();
+            window.SizeChanged += OnWindowSizeChanged;
+            windowResizeHandlerAttached = true;
+        }
+        catch
+        {
+            // Ignore errors during window resize handler attachment
+        }
+    }
 
-	void DetachWindowResizeHandler()
-	{
-		if (!windowResizeHandlerAttached)
-			return;
+    void DetachWindowResizeHandler()
+    {
+        if (!windowResizeHandlerAttached)
+            return;
 
-		try
-		{
-			var window = mauiContext.GetPlatformWindow();
-			window.SizeChanged -= OnWindowSizeChanged;
-			windowResizeHandlerAttached = false;
-		}
-		catch (Exception e)
-		{
-			Trace.WriteLine($"Failed to detach window resize handler: {e}");
-		}
-	}
+        try
+        {
+            var window = mauiContext.GetPlatformWindow();
+            window.SizeChanged -= OnWindowSizeChanged;
+            windowResizeHandlerAttached = false;
+        }
+        catch
+        {
+            // Ignore errors during window resize handler detachment
+        }
+    }
 
-	void OnWindowSizeChanged(object? sender, Microsoft.UI.Xaml.WindowSizeChangedEventArgs e)
-	{
-		UpdateContentPositioning();
-	}
+    void OnWindowSizeChanged(object? sender, Microsoft.UI.Xaml.WindowSizeChangedEventArgs e)
+    {
+        // Update overlay dimensions to match new window size
+        if (overlay != null && PopupView.Child is Grid container)
+        {
+            var window = mauiContext?.GetPlatformWindow();
+            if (window != null)
+            {
+                overlay.Width = window.Bounds.Width;
+                overlay.Height = window.Bounds.Height;
+                container.Width = window.Bounds.Width;
+                container.Height = window.Bounds.Height;
+            }
+        }
+
+        UpdateContentPositioning();
+    }
 
 
 }

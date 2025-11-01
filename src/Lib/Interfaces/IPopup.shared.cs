@@ -1,4 +1,5 @@
-﻿using IElement = Microsoft.Maui.IElement;
+﻿using AppoMobi.Maui.FastPopups;
+using IElement = Microsoft.Maui.IElement;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
 namespace FastPopups;
@@ -46,6 +47,24 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </remarks>
 	Microsoft.Maui.Thickness Padding { get; }
 
+	/// <summary>
+	/// Gets the animation type for the popup content.
+	/// Note: The background overlay always fades in/out synchronized with this animation's duration.
+	/// </summary>
+	PopupAnimationType AnimationType { get; }
+
+	/// <summary>
+	/// Gets the animation duration in milliseconds.
+	/// This duration applies to both the content animation and the overlay fade.
+	/// </summary>
+	int AnimationDuration { get; }
+
+	/// <summary>
+	/// Gets the easing curve for the popup content animation.
+	/// Note: The overlay fade always uses linear easing.
+	/// </summary>
+	PopupAnimationEasing AnimationEasing { get; }
+
     /// <summary>
     /// Override this to allow latter processing of CloseWhenBackgroundIsClicked, return false to block.
     /// </summary>
@@ -72,5 +91,7 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// Occurs when the Popup is dismissed by a user tapping outside the Popup.
 	/// </summary>
 	void OnDismissedByTappingOutsideOfPopup();
+
+    Task AnimateOutAsync(CancellationToken cancel);
 }
 

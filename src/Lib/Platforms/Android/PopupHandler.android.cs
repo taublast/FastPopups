@@ -144,6 +144,17 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	}
 
 	/// <summary>
+	/// Action that's triggered when animation properties change.
+	/// </summary>
+	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
+	public static void MapAnimation(PopupHandler handler, IPopup view)
+	{
+		// Animation properties are read directly from VirtualView when needed
+		// TODO: Implement Android animations in future
+	}
+
+	/// <summary>
 	/// Creates or recreates the dialog with proper setup.
 	/// </summary>
 	/// <param name="handler">The popup handler.</param>

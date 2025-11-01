@@ -22,7 +22,10 @@ public partial class PopupHandler
 #else
 		[nameof(IPopup.IsFullScreen)] = MapSize,
 #endif
-		[nameof(IPopup.CloseWhenBackgroundIsClicked)] = MapCloseWhenBackgroundIsClicked
+		[nameof(IPopup.CloseWhenBackgroundIsClicked)] = MapCloseWhenBackgroundIsClicked,
+		[nameof(IPopup.AnimationType)] = MapAnimation,
+		[nameof(IPopup.AnimationDuration)] = MapAnimation,
+		[nameof(IPopup.AnimationEasing)] = MapAnimation
 	};
 
 	/// <summary>

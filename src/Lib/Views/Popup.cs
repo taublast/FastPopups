@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using AppoMobi.Maui.FastPopups;
 using View = Microsoft.Maui.Controls.View;
 
 namespace FastPopups;
@@ -38,8 +39,25 @@ public partial class Popup : View, IPopup
 	public static readonly BindableProperty PaddingProperty =
 		BindableProperty.Create(nameof(Padding), typeof(Microsoft.Maui.Thickness), typeof(Popup), new Microsoft.Maui.Thickness(0));
 
+	/// <summary>
+	/// Backing BindableProperty for the <see cref="AnimationType"/> property.
+	/// </summary>
+	public static readonly BindableProperty AnimationTypeProperty =
+		BindableProperty.Create(nameof(AnimationType), typeof(PopupAnimationType), typeof(Popup), PopupAnimationType.Default);
 
- 
+	/// <summary>
+	/// Backing BindableProperty for the <see cref="AnimationDuration"/> property.
+	/// </summary>
+	public static readonly BindableProperty AnimationDurationProperty =
+		BindableProperty.Create(nameof(AnimationDuration), typeof(int), typeof(Popup), 250); // Default 250ms
+
+	/// <summary>
+	/// Backing BindableProperty for the <see cref="AnimationEasing"/> property.
+	/// </summary>
+	public static readonly BindableProperty AnimationEasingProperty =
+		BindableProperty.Create(nameof(AnimationEasing), typeof(PopupAnimationEasing), typeof(Popup), PopupAnimationEasing.Default);
+
+
 	readonly WeakEventManager dismissWeakEventManager = new();
 	readonly WeakEventManager openedWeakEventManager = new();
  
@@ -136,6 +154,43 @@ public partial class Popup : View, IPopup
 	}
 
 	/// <summary>
+	/// Gets or sets the animation type for the popup content.
+	/// </summary>
+	/// <remarks>
+	/// The background overlay always fades in/out synchronized with this animation's duration.
+	/// </remarks>
+	public PopupAnimationType AnimationType
+	{
+		get => (PopupAnimationType)GetValue(AnimationTypeProperty);
+		set => SetValue(AnimationTypeProperty, value);
+	}
+
+	/// <summary>
+	/// Gets or sets the animation duration in milliseconds.
+	/// </summary>
+	/// <remarks>
+	/// This duration applies to both the content animation and the overlay fade.
+	/// Default is 250ms.
+	/// </remarks>
+	public int AnimationDuration
+	{
+		get => (int)GetValue(AnimationDurationProperty);
+		set => SetValue(AnimationDurationProperty, value);
+	}
+
+	/// <summary>
+	/// Gets or sets the easing curve for the popup content animation.
+	/// </summary>
+	/// <remarks>
+	/// The overlay fade always uses linear easing regardless of this setting.
+	/// </remarks>
+	public PopupAnimationEasing AnimationEasing
+	{
+		get => (PopupAnimationEasing)GetValue(AnimationEasingProperty);
+		set => SetValue(AnimationEasingProperty, value);
+	}
+
+	/// <summary>
 	/// Gets or sets the <see cref="View"/> anchor.
 	/// </summary>
 	/// <remarks>
@@ -224,12 +279,17 @@ public partial class Popup : View, IPopup
 	{
 		token.ThrowIfCancellationRequested();
 
-		((IPopup)this).OnClosed(result);
+        await ((IPopup)this).AnimateOutAsync(token);
+
+        ((IPopup)this).OnClosed(result);
 
 		RemoveBinding(Popup.IsFullScreenProperty);
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
 		RemoveBinding(Popup.PaddingProperty);
+		RemoveBinding(Popup.AnimationTypeProperty);
+		RemoveBinding(Popup.AnimationDurationProperty);
+		RemoveBinding(Popup.AnimationEasingProperty);
 		RemoveBinding(Popup.StyleProperty);
 
 		await popupDismissedTaskCompletionSource.Task.WaitAsync(token);
@@ -276,7 +336,20 @@ public partial class Popup : View, IPopup
 
 
 	void IPopup.OnClosed(object? result) => Handler?.Invoke(nameof(IPopup.OnClosed), result);
-	void IPopup.OnOpened() => OnOpened();
+
+    Task IPopup.AnimateOutAsync(CancellationToken cancel)
+    {
+#if WINDOWS
+        if (Handler is PopupHandler handler)
+        {
+            return handler.PlatformView.CloseWithAnimationAsync();
+        }
+#endif
+
+        return Task.CompletedTask;
+    }
+
+    void IPopup.OnOpened() => OnOpened();
 
 	async void IPopup.OnDismissedByTappingOutsideOfPopup() =>
 		await OnDismissedByTappingOutsideOfPopup(CancellationToken.None);
