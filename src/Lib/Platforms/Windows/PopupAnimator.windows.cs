@@ -265,7 +265,7 @@ internal class PopupAnimator
 
         case PopupAnimationType.SprintBottom:
         // Elastic slide from bottom
-        view.Opacity = 0;
+        view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
         transform.TranslateY = viewContainer.Height - view.ActualOffset.Y;
@@ -276,7 +276,7 @@ internal class PopupAnimator
 
         case PopupAnimationType.SprintTop:
         // Elastic slide from top
-        view.Opacity = 0;
+        view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
         transform.TranslateY = -(view.ActualOffset.Y + view.ActualHeight);
@@ -287,7 +287,7 @@ internal class PopupAnimator
 
         case PopupAnimationType.SprintLeft:
         // Elastic slide from left
-        view.Opacity = 0;
+        view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
         transform.TranslateX = -(view.ActualOffset.X + view.ActualWidth);
@@ -298,7 +298,7 @@ internal class PopupAnimator
 
         case PopupAnimationType.SprintRight:
         // Elastic slide from right
-        view.Opacity = 0;
+        view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
         transform.TranslateX = viewContainer.ActualWidth - view.ActualOffset.X;
@@ -461,7 +461,7 @@ internal class PopupAnimator
         case PopupAnimationType.SprintBottom:
         // Elastic slide back down
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            view, "Opacity", currentOpacity, 0.5, duration, easingFunction));
         var slideDownElasticDistance = viewContainer.ActualHeight - view.ActualOffset.Y;
         var elasticEasingDownHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -471,7 +471,7 @@ internal class PopupAnimator
         case PopupAnimationType.SprintTop:
         // Elastic slide back up
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            view, "Opacity", currentOpacity, 0.5, duration, easingFunction));
         var slideUpElasticDistance = -(view.ActualHeight + view.ActualOffset.Y);
         var elasticEasingUpHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -481,7 +481,7 @@ internal class PopupAnimator
         case PopupAnimationType.SprintLeft:
         // Elastic slide back left
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            view, "Opacity", currentOpacity, 0.5, duration, easingFunction));
         var slideLeftElasticDistance = -(view.ActualOffset.X + view.ActualWidth);
         var elasticEasingLeftHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -491,7 +491,7 @@ internal class PopupAnimator
         case PopupAnimationType.SprintRight:
         // Elastic slide back right
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            view, "Opacity", currentOpacity, 0.5, duration, easingFunction));
         var slideRightElasticDistance = viewContainer.ActualWidth - view.ActualOffset.X;
         var elasticEasingRightHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(

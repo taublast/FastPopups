@@ -3,7 +3,7 @@
     x:Class="SampleApp.Views.AnimationDemoPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    BackgroundColor="#110044"
+    BackgroundColor="#002255"
     Title="Animation Demo">
 
     <ScrollView>
@@ -14,8 +14,9 @@
                 Margin="0,0,0,20"
                 FontSize="14"
                 HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
                 Text="Test all popup animations with different settings"
-                TextColor="White" />
+                TextColor="DarkGray" />
 
             <!--  Action Buttons  -->
             <Button

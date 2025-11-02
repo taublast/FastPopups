@@ -301,19 +301,27 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintBottom:
+        view.Alpha = 0.5f;
+        view.Transform = CGAffineTransform.MakeTranslation(0, containerHeight - view.Frame.Y);
+        break;
+
         case PopupAnimationType.Bottom:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(0, containerHeight - view.Frame.Y);
         break;
 
         case PopupAnimationType.SprintTop:
+        view.Alpha = 0.5f;
+        view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Y + view.Frame.Height));
+        break;
+
         case PopupAnimationType.Top:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Y + view.Frame.Height));
         break;
 
         case PopupAnimationType.SprintRight:
-        view.Alpha = 0f;
+        view.Alpha = 0.5f;
         view.Transform = CGAffineTransform.MakeTranslation(containerWidth - view.Frame.X, 0);
         break;
 
@@ -323,6 +331,10 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintLeft:
+        view.Alpha = 0.5f;
+        view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.Width + view.Frame.X), 0);
+        break;
+
         case PopupAnimationType.Left:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.Width + view.Frame.X), 0);
@@ -479,7 +491,7 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintBottom:
-        view.Alpha = 0f;
+        view.Alpha = 0.5f;
         view.Transform = CGAffineTransform.MakeTranslation(0, viewContainer.Frame.Height - view.Frame.Y);
         break;
 
@@ -488,7 +500,7 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintTop:
-        view.Alpha = 0f;
+        view.Alpha = 0.5f;
         view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Height + view.Frame.Y));
         break;
 
@@ -497,7 +509,7 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintRight:
-        view.Alpha = 0f;
+        view.Alpha = 0.5f;
         view.Transform = CGAffineTransform.MakeTranslation(viewContainer.Frame.Width - view.Frame.X, 0);
         break;
 
@@ -506,7 +518,7 @@ public class PopupAnimator
         break;
 
         case PopupAnimationType.SprintLeft:
-        view.Alpha = 0f;
+        view.Alpha = 0.5f;
         view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.X + view.Frame.Width), 0);
         break;
 
