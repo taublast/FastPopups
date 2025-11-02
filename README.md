@@ -21,9 +21,9 @@ It was found to be the fastest for opening popups among different libraries, was
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.0.0.8
+## ⬆️ What's New 1.1.0.1
 
-- Fix `Padding` property for non-Fill
+- Animations! See sample app.
 
 ---
 
