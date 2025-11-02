@@ -178,9 +178,9 @@ public class PopupAnimator
             PopupAnimationType.ZoomIn => true,
             PopupAnimationType.ZoomOut => true,
             PopupAnimationType.Whirl => true,
-            PopupAnimationType.BounceHorizontal => true,
-            PopupAnimationType.BounceVertical => true,
-            PopupAnimationType.Bounce => true,
+            PopupAnimationType.BounceInHorizontal => true,
+            PopupAnimationType.BounceInVertical => true,
+            PopupAnimationType.BounceIn => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false
@@ -196,31 +196,34 @@ public class PopupAnimator
         // Set content initial state based on animation type
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
         view.Alpha = 0f;
         break;
 
-        case PopupAnimationType.FromBottomElastic:
-        case PopupAnimationType.FromBottom:
+        case PopupAnimationType.SprintBottom:
+        case PopupAnimationType.Bottom:
         view.Alpha = 1f;
         view.TranslationY = viewContainer.Height - view.GetY();
         break;
 
-        case PopupAnimationType.FromTopElastic:
-        case PopupAnimationType.FromTop:
+        case PopupAnimationType.SprintTop:
+        case PopupAnimationType.Top:
         view.Alpha = 1f;
         view.TranslationY = -(view.GetY() + viewContainer.Height);
         break;
 
-        case PopupAnimationType.FromRightElastic:
-        case PopupAnimationType.FromRight:
+        case PopupAnimationType.SprintRight:
+        view.Alpha = 0f;
+        view.TranslationX = viewContainer.Width - view.GetX();
+        break;
+
+        case PopupAnimationType.Right:
         view.Alpha = 1f;
         view.TranslationX = viewContainer.Width - view.GetX();
         break;
 
-        case PopupAnimationType.FromLeftElastic:
-        case PopupAnimationType.FromLeft:
+        case PopupAnimationType.SprintLeft:
+        case PopupAnimationType.Left:
         view.Alpha = 1f;
         view.TranslationX = -(view.Width + view.GetX());
         break;
@@ -244,17 +247,17 @@ public class PopupAnimator
         view.ScaleY = 0.3f;
         break;
 
-        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceInHorizontal:
         view.Alpha = 1f;
         view.ScaleX = 0.5f;
         break;
 
-        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.BounceInVertical:
         view.Alpha = 1f;
         view.ScaleY = 0.5f;
         break;
 
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceIn:
         view.Alpha = 1f;
         view.ScaleX = 0.5f;
         view.ScaleY = 0.5f;
@@ -321,24 +324,23 @@ public class PopupAnimator
 
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromBottom:
+        case PopupAnimationType.Bottom:
         animators.Add(CreatePropertyAnimator(contentView, "translationY", contentView.TranslationY, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromTop:
+        case PopupAnimationType.Top:
         animators.Add(CreatePropertyAnimator(contentView, "translationY", contentView.TranslationY, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromRight:
+        case PopupAnimationType.Right:
         animators.Add(CreatePropertyAnimator(contentView, "translationX", contentView.TranslationX, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromLeft:
+        case PopupAnimationType.Left:
         animators.Add(CreatePropertyAnimator(contentView, "translationX", contentView.TranslationX, 0f, duration, interpolator));
         break;
 
@@ -361,27 +363,29 @@ public class PopupAnimator
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", 0.3f, 1f, duration, interpolator));
         break;
 
-        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceInHorizontal:
         animators.Add(CreateBounceAnimator(contentView, "scaleX", 0.5f, 1.1f, 1f, duration));
         break;
 
-        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.BounceInVertical:
         animators.Add(CreateBounceAnimator(contentView, "scaleY", 0.5f, 1.1f, 1f, duration));
         break;
 
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceIn:
         animators.Add(CreateBounceAnimator(contentView, "scaleX", 0.5f, 1.1f, 1f, duration));
         animators.Add(CreateBounceAnimator(contentView, "scaleY", 0.5f, 1.1f, 1f, duration));
         break;
 
-        case PopupAnimationType.FromBottomElastic:
-        case PopupAnimationType.FromTopElastic:
+        case PopupAnimationType.SprintBottom:
+        case PopupAnimationType.SprintTop:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
         var elasticInterpolator = new OvershootInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationY", contentView.TranslationY, 0f, duration, elasticInterpolator));
         break;
 
-        case PopupAnimationType.FromLeftElastic:
-        case PopupAnimationType.FromRightElastic:
+        case PopupAnimationType.SprintLeft:
+        case PopupAnimationType.SprintRight:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
         var elasticInterpolatorX = new OvershootInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationX", contentView.TranslationX, 0f, duration, elasticInterpolatorX));
         break;
@@ -455,27 +459,26 @@ public class PopupAnimator
 
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromBottom:
+        case PopupAnimationType.Bottom:
         var slideDownDistance = contentView.Height;
         animators.Add(CreatePropertyAnimator(contentView, "translationY", currentTranslationY, slideDownDistance, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromTop:
+        case PopupAnimationType.Top:
         var slideUpDistance = -contentView.Height;
         animators.Add(CreatePropertyAnimator(contentView, "translationY", currentTranslationY, slideUpDistance, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromRight:
+        case PopupAnimationType.Right:
         var slideRightDistance = contentView.Width;
         animators.Add(CreatePropertyAnimator(contentView, "translationX", currentTranslationX, slideRightDistance, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromLeft:
+        case PopupAnimationType.Left:
         var slideLeftDistance = -contentView.Width;
         animators.Add(CreatePropertyAnimator(contentView, "translationX", currentTranslationX, slideLeftDistance, duration, interpolator));
         break;
@@ -499,41 +502,45 @@ public class PopupAnimator
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", currentScaleY, 0.3f, duration, interpolator));
         break;
 
-        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceInHorizontal:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.BounceInVertical:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceIn:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.FromBottomElastic:
+        case PopupAnimationType.SprintBottom:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         var elasticDownDistance = contentView.Height;
         var anticipateInterpolator = new AnticipateInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationY", currentTranslationY, elasticDownDistance, duration, anticipateInterpolator));
         break;
 
-        case PopupAnimationType.FromTopElastic:
+        case PopupAnimationType.SprintTop:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         var elasticUpDistance = -contentView.Height;
         var anticipateInterpolatorUp = new AnticipateInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationY", currentTranslationY, elasticUpDistance, duration, anticipateInterpolatorUp));
         break;
 
-        case PopupAnimationType.FromLeftElastic:
+        case PopupAnimationType.SprintLeft:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         var elasticLeftDistance = -contentView.Width;
         var anticipateInterpolatorLeft = new AnticipateInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationX", currentTranslationX, elasticLeftDistance, duration, anticipateInterpolatorLeft));
         break;
 
-        case PopupAnimationType.FromRightElastic:
+        case PopupAnimationType.SprintRight:
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         var elasticRightDistance = contentView.Width;
         var anticipateInterpolatorRight = new AnticipateInterpolator(2f);
         animators.Add(CreatePropertyAnimator(contentView, "translationX", currentTranslationX, elasticRightDistance, duration, anticipateInterpolatorRight));

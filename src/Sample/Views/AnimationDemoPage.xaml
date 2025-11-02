@@ -8,14 +8,6 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <!--  Header  -->
-            <Label
-                Margin="0,0,0,10"
-                FontAttributes="Bold"
-                FontSize="28"
-                HorizontalOptions="Center"
-                Text="🎬 Animation Demo"
-                TextColor="DodgerBlue" />
 
             <Label
                 Margin="0,0,0,20"
@@ -23,6 +15,23 @@
                 HorizontalOptions="Center"
                 Text="Test all popup animations with different settings"
                 TextColor="Gray" />
+
+            <!--  Action Buttons  -->
+            <Button
+                Margin="0,10,0,0"
+                BackgroundColor="DodgerBlue"
+                Clicked="OnShowPopupClicked"
+                FontAttributes="Bold"
+                HeightRequest="50"
+                Text="Show Selected"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="DodgerBlue"
+                Clicked="OnShowAllAnimationsClicked"
+                HeightRequest="50"
+                Text="Show ALL!"
+                TextColor="White" />
 
             <!--  Animation Type Selection  -->
             <Border
@@ -50,22 +59,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!--  Action Buttons  -->
-            <Button
-                Margin="0,10,0,0"
-                BackgroundColor="DodgerBlue"
-                Clicked="OnShowPopupClicked"
-                FontAttributes="Bold"
-                HeightRequest="50"
-                Text="Show Selected"
-                TextColor="White" />
 
-            <Button
-                BackgroundColor="Green"
-                Clicked="OnShowAllAnimationsClicked"
-                HeightRequest="50"
-                Text="Show All"
-                TextColor="White" />
 
             <!--  Duration Setting  -->
             <Border
@@ -176,10 +170,6 @@
                         FontSize="14"
                         Text="💡 Notes:"
                         TextColor="#B8860B" />
-                    <Label
-                        FontSize="11"
-                        Text="• The overlay always fades in/out (hardcoded for UX consistency)"
-                        TextColor="#666" />
                     <Label
                         FontSize="11"
                         Text="• Duration applies to both overlay fade and content animation"

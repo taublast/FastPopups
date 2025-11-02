@@ -154,180 +154,187 @@ internal class PopupAnimator
 
         switch (type)
         {
-            case PopupAnimationType.Default:
-            case PopupAnimationType.Fade:
-                // Simple fade in
-                view.Opacity = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                break;
+        case PopupAnimationType.Fade:
+        // Simple fade in
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromBottom:
-                // Slide up from bottom
-                view.Opacity = 1;
-                transform.TranslateY = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", viewContainer.Height -  view.ActualOffset.Y, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.Bottom:
+        // Slide up from bottom
+        view.Opacity = 1;
+        transform.TranslateY = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", viewContainer.Height - view.ActualOffset.Y, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromTop:
-                // Slide down from top
-                view.Opacity = 1;
-                transform.TranslateY = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY",  - (view.ActualOffset.Y + view.ActualHeight), 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.Top:
+        // Slide down from top
+        view.Opacity = 1;
+        transform.TranslateY = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", -(view.ActualOffset.Y + view.ActualHeight), 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromRight:
-                // Slide in from right
-                view.Opacity = 1;
-                transform.TranslateX = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX",  viewContainer.ActualWidth - view.ActualOffset.X, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.Right:
+        // Slide in from right
+        view.Opacity = 1;
+        transform.TranslateX = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", viewContainer.ActualWidth - view.ActualOffset.X, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromLeft:
-                // Slide in from left
-                view.Opacity = 1;
-                transform.TranslateX = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", -(view.ActualWidth + view.ActualOffset.X), 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.Left:
+        // Slide in from left
+        view.Opacity = 1;
+        transform.TranslateX = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", -(view.ActualWidth + view.ActualOffset.X), 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.ZoomIn:
-                // Zoom in from small
-                view.Opacity = 0;
-                transform.ScaleX = 0.5;
-                transform.ScaleY = 0.5;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", 0.5, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", 0.5, 1, duration, easingFunction));
-                break;
+        case PopupAnimationType.ZoomIn:
+        // Zoom in from small
+        view.Opacity = 0;
+        transform.ScaleX = 0.5;
+        transform.ScaleY = 0.5;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", 0.5, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", 0.5, 1, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.ZoomOut:
-                // Zoom in from large
-                view.Opacity = 0;
-                transform.ScaleX = 1.5;
-                transform.ScaleY = 1.5;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", 1.5, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", 1.5, 1, duration, easingFunction));
-                break;
+        case PopupAnimationType.ZoomOut:
+        // Zoom in from large
+        view.Opacity = 0;
+        transform.ScaleX = 1.5;
+        transform.ScaleY = 1.5;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", 1.5, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", 1.5, 1, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.Whirl:
-                // 1080° rotation + zoom + fade (extended duration)
-                view.Opacity = 0;
-                transform.Rotation = -1080;
-                transform.ScaleX = 0.3;
-                transform.ScaleY = 0.3;
-                var extendedDuration = Math.Max(duration, 400); // Minimum 400ms for dramatic effect
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, extendedDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "Rotation", -1080, 0, extendedDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", 0.3, 1, extendedDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", 0.3, 1, extendedDuration, easingFunction));
-                break;
+        case PopupAnimationType.Whirl:
+        // 1080° rotation + zoom + fade (extended duration)
+        view.Opacity = 0;
+        transform.Rotation = -1080;
+        transform.ScaleX = 0.3;
+        transform.ScaleY = 0.3;
+        var extendedDuration = Math.Max(duration, 400); // Minimum 400ms for dramatic effect
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, extendedDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "Rotation", -1080, 0, extendedDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", 0.3, 1, extendedDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", 0.3, 1, extendedDuration, easingFunction));
+        break;
 
-            case PopupAnimationType.BounceHorizontal:
-                // Horizontal bounce effect with keyframe animation
-                view.Opacity = 1;
-                transform.ScaleX = 1;
-                var bounceAnimationH = CreateShrinkHorizontalAnimation(transform, duration);
-                storyboard.Children.Add(bounceAnimationH);
-                break;
+        case PopupAnimationType.BounceInHorizontal:
+        // Horizontal bounce effect with keyframe animation
+        view.Opacity = 1;
+        transform.ScaleX = 1;
+        var bounceAnimationH = CreateShrinkHorizontalAnimation(transform, duration);
+        storyboard.Children.Add(bounceAnimationH);
+        break;
 
-            case PopupAnimationType.BounceVertical:
-                // Vertical bounce effect with keyframe animation
-                view.Opacity = 1;
-                transform.ScaleY = 1;
-                var bounceAnimationV = CreateShrinkVerticalAnimation(transform, duration);
-                storyboard.Children.Add(bounceAnimationV);
-                break;
+        case PopupAnimationType.BounceInVertical:
+        // Vertical bounce effect with keyframe animation
+        view.Opacity = 1;
+        transform.ScaleY = 1;
+        var bounceAnimationV = CreateShrinkVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceAnimationV);
+        break;
 
-            case PopupAnimationType.Bounce:
-                // Combined bounce effect with keyframe animation on both axes
-                view.Opacity = 1;
-                transform.ScaleX = 1;
-                transform.ScaleY = 1;
-                var bounceAnimationBothX = CreateShrinkHorizontalAnimation(transform, duration);
-                var bounceAnimationBothY = CreateShrinkVerticalAnimation(transform, duration);
-                storyboard.Children.Add(bounceAnimationBothX);
-                storyboard.Children.Add(bounceAnimationBothY);
-                break;
+        case PopupAnimationType.BounceIn:
+        // Combined bounce effect with keyframe animation on both axes
+        view.Opacity = 1;
+        transform.ScaleX = 1;
+        transform.ScaleY = 1;
+        var bounceAnimationBothX = CreateShrinkHorizontalAnimation(transform, duration);
+        var bounceAnimationBothY = CreateShrinkVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceAnimationBothX);
+        storyboard.Children.Add(bounceAnimationBothY);
+        break;
 
-            case PopupAnimationType.FromBottomElastic:
-                // Elastic slide from bottom
-                view.Opacity = 1;
-                transform.TranslateY = viewContainer.Height - view.ActualOffset.Y;
-                var elasticEasingBottom = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", transform.TranslateY, 0, duration, elasticEasingBottom));
-                break;
+        case PopupAnimationType.SprintBottom:
+        // Elastic slide from bottom
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        transform.TranslateY = viewContainer.Height - view.ActualOffset.Y;
+        var elasticEasingBottom = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", transform.TranslateY, 0, duration, elasticEasingBottom));
+        break;
 
-            case PopupAnimationType.FromTopElastic:
-                // Elastic slide from top
-                view.Opacity = 1;
-                transform.TranslateY = -(view.ActualOffset.Y + view.ActualHeight);
-                var elasticEasingTop = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", transform.TranslateY, 0, duration, elasticEasingTop));
-                break;
+        case PopupAnimationType.SprintTop:
+        // Elastic slide from top
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        transform.TranslateY = -(view.ActualOffset.Y + view.ActualHeight);
+        var elasticEasingTop = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", transform.TranslateY, 0, duration, elasticEasingTop));
+        break;
 
-            case PopupAnimationType.FromLeftElastic:
-                // Elastic slide from left
-                view.Opacity = 1;
-                transform.TranslateX = -(view.ActualOffset.X + view.ActualWidth);
-                var elasticEasingLeft = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", transform.TranslateX, 0, duration, elasticEasingLeft));
-                break;
+        case PopupAnimationType.SprintLeft:
+        // Elastic slide from left
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        transform.TranslateX = -(view.ActualOffset.X + view.ActualWidth);
+        var elasticEasingLeft = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", transform.TranslateX, 0, duration, elasticEasingLeft));
+        break;
 
-            case PopupAnimationType.FromRightElastic:
-                // Elastic slide from right
-                view.Opacity = 1;
-                transform.TranslateX = viewContainer.ActualWidth - view.ActualOffset.X;
-                var elasticEasingRight = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", transform.TranslateX, 0, duration, elasticEasingRight));
-                break;
+        case PopupAnimationType.SprintRight:
+        // Elastic slide from right
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        transform.TranslateX = viewContainer.ActualWidth - view.ActualOffset.X;
+        var elasticEasingRight = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", transform.TranslateX, 0, duration, elasticEasingRight));
+        break;
 
-            case PopupAnimationType.FlipHorizontal:
-                // 3D horizontal flip using PlaneProjection (Projection property, not RenderTransform)
-                view.Opacity = 0;
-                var planeProjectionH = GetOrCreateProjection(view);
-                planeProjectionH.RotationY = -90;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    planeProjectionH, "RotationY", -90, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.FlipHorizontal:
+        // 3D horizontal flip using PlaneProjection (Projection property, not RenderTransform)
+        view.Opacity = 0;
+        var planeProjectionH = GetOrCreateProjection(view);
+        planeProjectionH.RotationY = -90;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            planeProjectionH, "RotationY", -90, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FlipVertical:
-                // 3D vertical flip using PlaneProjection (Projection property, not RenderTransform)
-                view.Opacity = 0;
-                var planeProjectionV = GetOrCreateProjection(view);
-                planeProjectionV.RotationX = -90;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    planeProjectionV, "RotationX", -90, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.FlipVertical:
+        // 3D vertical flip using PlaneProjection (Projection property, not RenderTransform)
+        view.Opacity = 0;
+        var planeProjectionV = GetOrCreateProjection(view);
+        planeProjectionV.RotationX = -90;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            planeProjectionV, "RotationX", -90, 0, duration, easingFunction));
+        break;
 
-            default:
-                // Fallback to fade
-                view.Opacity = 0;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                break;
+        default:
+        // Fallback to fade
+        view.Opacity = 0;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        break;
         }
 
         return storyboard;
@@ -357,172 +364,179 @@ internal class PopupAnimator
 
         switch (type)
         {
-            case PopupAnimationType.Default:
-            case PopupAnimationType.Fade:
-                // Fade out
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.Fade:
+        // Fade out
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromBottom:
-                // Slide down (reverse of slide up)
-                var slideDownDistance = viewContainer.ActualHeight - view.ActualOffset.Y;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", currentTranslateY, slideDownDistance, duration, easingFunction));
-                break;
+        case PopupAnimationType.Bottom:
+        // Slide down (reverse of slide up)
+        var slideDownDistance = viewContainer.ActualHeight - view.ActualOffset.Y;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", currentTranslateY, slideDownDistance, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromTop:
-                // Slide up (reverse of slide down)
-                var slideUpDistance = -(view.ActualHeight + view.ActualOffset.Y);
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", currentTranslateY, slideUpDistance, duration, easingFunction));
-                break;
+        case PopupAnimationType.Top:
+        // Slide up (reverse of slide down)
+        var slideUpDistance = -(view.ActualHeight + view.ActualOffset.Y);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", currentTranslateY, slideUpDistance, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromRight:
-                // Slide right
-                var slideRightDistance = viewContainer.ActualWidth - view.ActualOffset.X;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", currentTranslateX, slideRightDistance, duration, easingFunction));
-                break;
+        case PopupAnimationType.Right:
+        // Slide right
+        var slideRightDistance = viewContainer.ActualWidth - view.ActualOffset.X;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", currentTranslateX, slideRightDistance, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromLeft:
-                // Slide left
-                var slideLeftDistance = -(view.ActualOffset.X + view.ActualWidth);
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", currentTranslateX, slideLeftDistance, duration, easingFunction));
-                break;
+        case PopupAnimationType.Left:
+        // Slide left
+        var slideLeftDistance = -(view.ActualOffset.X + view.ActualWidth);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", currentTranslateX, slideLeftDistance, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.ZoomIn:
-                // Zoom out to small (fade + scale down)
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", currentScaleX, 0.5, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", currentScaleY, 0.5, duration, easingFunction));
-                break;
+        case PopupAnimationType.ZoomIn:
+        // Zoom out to small (fade + scale down)
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", currentScaleX, 0.5, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", currentScaleY, 0.5, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.ZoomOut:
-                // Zoom out to large (fade + scale up)
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", currentScaleX, 1.5, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", currentScaleY, 1.5, duration, easingFunction));
-                break;
+        case PopupAnimationType.ZoomOut:
+        // Zoom out to large (fade + scale up)
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", currentScaleX, 1.5, duration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", currentScaleY, 1.5, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.Whirl:
-                // Reverse rotation + zoom + fade
-                var targetRotation = type == PopupAnimationType.Whirl ? 1080 : 180;
-                var whirlDuration = type == PopupAnimationType.Whirl ? Math.Max(duration, 400) : duration;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, whirlDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "Rotation", currentRotation, targetRotation, whirlDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", currentScaleX, 0.3, whirlDuration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", currentScaleY, 0.3, whirlDuration, easingFunction));
-                break;
+        case PopupAnimationType.Whirl:
+        // Reverse rotation + zoom + fade
+        var targetRotation = type == PopupAnimationType.Whirl ? 1080 : 180;
+        var whirlDuration = type == PopupAnimationType.Whirl ? Math.Max(duration, 400) : duration;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, whirlDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "Rotation", currentRotation, targetRotation, whirlDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleX", currentScaleX, 0.3, whirlDuration, easingFunction));
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "ScaleY", currentScaleY, 0.3, whirlDuration, easingFunction));
+        break;
 
-            case PopupAnimationType.BounceHorizontal:
-                // Reverse horizontal bounce (1.0→0.9→0.5)
-                var reverseBounceH = CreateReverseShrinkHorizontalAnimation(transform, duration);
-                storyboard.Children.Add(reverseBounceH);
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.BounceInHorizontal:
+        // Reverse horizontal bounce (1.0→0.9→0.5)
+        var reverseBounceH = CreateReverseShrinkHorizontalAnimation(transform, duration);
+        storyboard.Children.Add(reverseBounceH);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.BounceVertical:
-                // Reverse vertical bounce (1.0→0.9→0.5)
-                var reverseBounceV = CreateReverseShrinkVerticalAnimation(transform, duration);
-                storyboard.Children.Add(reverseBounceV);
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.BounceInVertical:
+        // Reverse vertical bounce (1.0→0.9→0.5)
+        var reverseBounceV = CreateReverseShrinkVerticalAnimation(transform, duration);
+        storyboard.Children.Add(reverseBounceV);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.Bounce:
-                // Reverse combined bounce (1.0→0.9→0.5)
-                var reverseBothX = CreateReverseShrinkHorizontalAnimation(transform, duration);
-                var reverseBothY = CreateReverseShrinkVerticalAnimation(transform, duration);
-                storyboard.Children.Add(reverseBothX);
-                storyboard.Children.Add(reverseBothY);
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                break;
+        case PopupAnimationType.BounceIn:
+        // Reverse combined bounce (1.0→0.9→0.5)
+        var reverseBothX = CreateReverseShrinkHorizontalAnimation(transform, duration);
+        var reverseBothY = CreateReverseShrinkVerticalAnimation(transform, duration);
+        storyboard.Children.Add(reverseBothX);
+        storyboard.Children.Add(reverseBothY);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
 
-            case PopupAnimationType.FromBottomElastic:
-                // Elastic slide back down
-                var slideDownElasticDistance = viewContainer.ActualHeight - view.ActualOffset.Y;
-                var elasticEasingDownHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", currentTranslateY, slideDownElasticDistance, duration, elasticEasingDownHide));
-                break;
+        case PopupAnimationType.SprintBottom:
+        // Elastic slide back down
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        var slideDownElasticDistance = viewContainer.ActualHeight - view.ActualOffset.Y;
+        var elasticEasingDownHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", currentTranslateY, slideDownElasticDistance, duration, elasticEasingDownHide));
+        break;
 
-            case PopupAnimationType.FromTopElastic:
-                // Elastic slide back up
-                var slideUpElasticDistance = -(view.ActualHeight + view.ActualOffset.Y);
-                var elasticEasingUpHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateY", currentTranslateY, slideUpElasticDistance, duration, elasticEasingUpHide));
-                break;
+        case PopupAnimationType.SprintTop:
+        // Elastic slide back up
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        var slideUpElasticDistance = -(view.ActualHeight + view.ActualOffset.Y);
+        var elasticEasingUpHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateY", currentTranslateY, slideUpElasticDistance, duration, elasticEasingUpHide));
+        break;
 
-            case PopupAnimationType.FromLeftElastic:
-                // Elastic slide back left
-                var slideLeftElasticDistance = -(view.ActualOffset.X + view.ActualWidth);
-                var elasticEasingLeftHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", currentTranslateX, slideLeftElasticDistance, duration, elasticEasingLeftHide));
-                break;
+        case PopupAnimationType.SprintLeft:
+        // Elastic slide back left
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        var slideLeftElasticDistance = -(view.ActualOffset.X + view.ActualWidth);
+        var elasticEasingLeftHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", currentTranslateX, slideLeftElasticDistance, duration, elasticEasingLeftHide));
+        break;
 
-            case PopupAnimationType.FromRightElastic:
-                // Elastic slide back right
-                var slideRightElasticDistance = viewContainer.ActualWidth - view.ActualOffset.X;
-                var elasticEasingRightHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "TranslateX", currentTranslateX, slideRightElasticDistance, duration, elasticEasingRightHide));
-                break;
+        case PopupAnimationType.SprintRight:
+        // Elastic slide back right
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        var slideRightElasticDistance = viewContainer.ActualWidth - view.ActualOffset.X;
+        var elasticEasingRightHide = new ElasticEase { EasingMode = EasingMode.EaseIn, Oscillations = 1, Springiness = 5 };
+        storyboard.Children.Add(CreateDoubleAnimation(
+            transform, "TranslateX", currentTranslateX, slideRightElasticDistance, duration, elasticEasingRightHide));
+        break;
 
-            case PopupAnimationType.FlipHorizontal:
-                // Reverse 3D horizontal flip
-                if (view.Projection is Microsoft.UI.Xaml.Media.PlaneProjection planeH)
-                {
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        planeH, "RotationY", planeH.RotationY, 90, duration, easingFunction));
-                }
-                else
-                {
-                    // Fallback to fade if no projection
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                }
-                break;
+        case PopupAnimationType.FlipHorizontal:
+        // Reverse 3D horizontal flip
+        if (view.Projection is Microsoft.UI.Xaml.Media.PlaneProjection planeH)
+        {
+            storyboard.Children.Add(CreateDoubleAnimation(
+                view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            storyboard.Children.Add(CreateDoubleAnimation(
+                planeH, "RotationY", planeH.RotationY, 90, duration, easingFunction));
+        }
+        else
+        {
+            // Fallback to fade if no projection
+            storyboard.Children.Add(CreateDoubleAnimation(
+                view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        }
+        break;
 
-            case PopupAnimationType.FlipVertical:
-                // Reverse 3D vertical flip
-                if (view.Projection is Microsoft.UI.Xaml.Media.PlaneProjection planeV)
-                {
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        planeV, "RotationX", planeV.RotationX, 90, duration, easingFunction));
-                }
-                else
-                {
-                    // Fallback to fade if no projection
-                    storyboard.Children.Add(CreateDoubleAnimation(
-                        view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                }
-                break;
+        case PopupAnimationType.FlipVertical:
+        // Reverse 3D vertical flip
+        if (view.Projection is Microsoft.UI.Xaml.Media.PlaneProjection planeV)
+        {
+            storyboard.Children.Add(CreateDoubleAnimation(
+                view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            storyboard.Children.Add(CreateDoubleAnimation(
+                planeV, "RotationX", planeV.RotationX, 90, duration, easingFunction));
+        }
+        else
+        {
+            // Fallback to fade if no projection
+            storyboard.Children.Add(CreateDoubleAnimation(
+                view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        }
+        break;
 
-            default:
-                // Fallback to fade out
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", currentOpacity, 0, duration, easingFunction));
-                break;
+        default:
+        // Fallback to fade out
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
         }
 
         return storyboard;
@@ -556,12 +570,14 @@ internal class PopupAnimator
 
         // Keyframes for bounce effect: 0.5 → 1.1 → 1.0
         animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 0.5 });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.7)),
             Value = 1.1,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
             Value = 1.0,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
@@ -581,12 +597,14 @@ internal class PopupAnimator
 
         // Keyframes for bounce effect: 0.5 → 1.1 → 1.0
         animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 0.5 });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.7)),
             Value = 1.1,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
             Value = 1.0,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
@@ -606,12 +624,14 @@ internal class PopupAnimator
 
         // Keyframes for reverse bounce effect: 1.0 → 0.9 → 0.5
         animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.0 });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.3)),
             Value = 0.9,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
             Value = 0.5,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
@@ -631,12 +651,14 @@ internal class PopupAnimator
 
         // Keyframes for reverse bounce effect: 1.0 → 0.9 → 0.5
         animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.0 });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.3)),
             Value = 0.9,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         });
-        animation.KeyFrames.Add(new EasingDoubleKeyFrame {
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
             Value = 0.5,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }

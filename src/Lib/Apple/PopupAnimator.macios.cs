@@ -296,31 +296,34 @@ public class PopupAnimator
         // Set content initial state based on animation type
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
         view.Alpha = 0f;
         break;
 
-        case PopupAnimationType.FromBottomElastic:
-        case PopupAnimationType.FromBottom:
+        case PopupAnimationType.SprintBottom:
+        case PopupAnimationType.Bottom:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(0, containerHeight - view.Frame.Y);
         break;
 
-        case PopupAnimationType.FromTopElastic:
-        case PopupAnimationType.FromTop:
+        case PopupAnimationType.SprintTop:
+        case PopupAnimationType.Top:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Y + view.Frame.Height));
         break;
 
-        case PopupAnimationType.FromRightElastic:
-        case PopupAnimationType.FromRight:
+        case PopupAnimationType.SprintRight:
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeTranslation(containerWidth - view.Frame.X, 0);
+        break;
+
+        case PopupAnimationType.Right:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(containerWidth - view.Frame.X, 0);
         break;
 
-        case PopupAnimationType.FromLeftElastic:
-        case PopupAnimationType.FromLeft:
+        case PopupAnimationType.SprintLeft:
+        case PopupAnimationType.Left:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.Width + view.Frame.X), 0);
         break;
@@ -342,17 +345,17 @@ public class PopupAnimator
         view.Transform = CGAffineTransform.Multiply(scale3, rotation3);
         break;
 
-        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceInHorizontal:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(0.5f, 1f);
         break;
 
-        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.BounceInVertical:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(1f, 0.5f);
         break;
 
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceIn:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(0.5f, 0.5f);
         break;
@@ -384,16 +387,15 @@ public class PopupAnimator
     {
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
-        case PopupAnimationType.FromBottom:
-        case PopupAnimationType.FromTop:
-        case PopupAnimationType.FromRight:
-        case PopupAnimationType.FromLeft:
-        case PopupAnimationType.FromBottomElastic:
-        case PopupAnimationType.FromTopElastic:
-        case PopupAnimationType.FromLeftElastic:
-        case PopupAnimationType.FromRightElastic:
+        case PopupAnimationType.Bottom:
+        case PopupAnimationType.Top:
+        case PopupAnimationType.Right:
+        case PopupAnimationType.Left:
+        case PopupAnimationType.SprintBottom:
+        case PopupAnimationType.SprintTop:
+        case PopupAnimationType.SprintLeft:
+        case PopupAnimationType.SprintRight:
         contentView.Alpha = 1f;
         contentView.Transform = CGAffineTransform.MakeIdentity();
         break;
@@ -427,9 +429,9 @@ public class PopupAnimator
         contentView.Layer.AddAnimation(whirlIn3Rotation, "whirlRotation");
         break;
 
-        case PopupAnimationType.BounceHorizontal:
-        case PopupAnimationType.BounceVertical:
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceInHorizontal:
+        case PopupAnimationType.BounceInVertical:
+        case PopupAnimationType.BounceIn:
         // Use keyframe animation for bounce effect
         UIView.AnimateKeyframes(
             duration: 0.3, // Will be overridden by parent animation
@@ -439,9 +441,9 @@ public class PopupAnimator
             {
                 UIView.AddKeyframeWithRelativeStartTime(0, 0.7, () =>
                 {
-                    var overshoot = animationType == PopupAnimationType.BounceHorizontal
+                    var overshoot = animationType == PopupAnimationType.BounceInHorizontal
                         ? CGAffineTransform.MakeScale(1.1f, 1f)
-                        : animationType == PopupAnimationType.BounceVertical
+                        : animationType == PopupAnimationType.BounceInVertical
                             ? CGAffineTransform.MakeScale(1f, 1.1f)
                             : CGAffineTransform.MakeScale(1.1f, 1.1f);
                     contentView.Transform = overshoot;
@@ -466,41 +468,45 @@ public class PopupAnimator
 
     private void AnimateHideContent(UIView view, UIView viewContainer, PopupAnimationType animationType)
     {
-        // DEBUG: Log the actual state when hide starts
-        System.Diagnostics.Debug.WriteLine($"AnimateHideContent - {animationType}:");
-        System.Diagnostics.Debug.WriteLine($"  view.Frame: X={view.Frame.X}, Y={view.Frame.Y}, W={view.Frame.Width}, H={view.Frame.Height}");
-        System.Diagnostics.Debug.WriteLine($"  view.Bounds: X={view.Bounds.X}, Y={view.Bounds.Y}, W={view.Bounds.Width}, H={view.Bounds.Height}");
-        System.Diagnostics.Debug.WriteLine($"  view.Center: X={view.Center.X}, Y={view.Center.Y}");
-        System.Diagnostics.Debug.WriteLine($"  view.Transform: {view.Transform}");
-        System.Diagnostics.Debug.WriteLine($"  viewContainer.Bounds: W={viewContainer.Bounds.Width}, H={viewContainer.Bounds.Height}");
-
         switch (animationType)
         {
-        case PopupAnimationType.Default:
         case PopupAnimationType.Fade:
         view.Alpha = 0f;
         break;
 
-        case PopupAnimationType.FromBottom:
-        case PopupAnimationType.FromBottomElastic:
+        case PopupAnimationType.Bottom:
         view.Transform = CGAffineTransform.MakeTranslation(0, viewContainer.Frame.Height - view.Frame.Y);
         break;
 
-        case PopupAnimationType.FromTop:
-        case PopupAnimationType.FromTopElastic:
-        view.Alpha = 1f;
+        case PopupAnimationType.SprintBottom:
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeTranslation(0, viewContainer.Frame.Height - view.Frame.Y);
+        break;
+
+        case PopupAnimationType.Top:
         view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Height + view.Frame.Y));
         break;
 
-        case PopupAnimationType.FromRight:
-        case PopupAnimationType.FromRightElastic:
-            view.Alpha = 1f;
+        case PopupAnimationType.SprintTop:
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeTranslation(0, -(view.Frame.Height + view.Frame.Y));
+        break;
+
+        case PopupAnimationType.Right:
         view.Transform = CGAffineTransform.MakeTranslation(viewContainer.Frame.Width - view.Frame.X, 0);
         break;
 
-        case PopupAnimationType.FromLeft:
-        case PopupAnimationType.FromLeftElastic:
-            view.Alpha = 1f;
+        case PopupAnimationType.SprintRight:
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeTranslation(viewContainer.Frame.Width - view.Frame.X, 0);
+        break;
+
+        case PopupAnimationType.Left:
+        view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.X + view.Frame.Width), 0);
+        break;
+
+        case PopupAnimationType.SprintLeft:
+        view.Alpha = 0f;
         view.Transform = CGAffineTransform.MakeTranslation(-(view.Frame.X + view.Frame.Width), 0);
         break;
 
@@ -521,9 +527,9 @@ public class PopupAnimator
         view.Transform = CGAffineTransform.MakeScale(0.3f, 0.3f);
         break;
 
-        case PopupAnimationType.BounceHorizontal:
-        case PopupAnimationType.BounceVertical:
-        case PopupAnimationType.Bounce:
+        case PopupAnimationType.BounceInHorizontal:
+        case PopupAnimationType.BounceInVertical:
+        case PopupAnimationType.BounceIn:
         // Reverse bounce effect with keyframes
         UIView.AnimateKeyframes(
             duration: 0.3,
@@ -533,9 +539,9 @@ public class PopupAnimator
             {
                 UIView.AddKeyframeWithRelativeStartTime(0, 0.3, () =>
                 {
-                    var undershoot = animationType == PopupAnimationType.BounceHorizontal
+                    var undershoot = animationType == PopupAnimationType.BounceInHorizontal
                         ? CGAffineTransform.MakeScale(0.9f, 1f)
-                        : animationType == PopupAnimationType.BounceVertical
+                        : animationType == PopupAnimationType.BounceInVertical
                             ? CGAffineTransform.MakeScale(1f, 0.9f)
                             : CGAffineTransform.MakeScale(0.9f, 0.9f);
                     view.Transform = undershoot;
@@ -543,9 +549,9 @@ public class PopupAnimator
 
                 UIView.AddKeyframeWithRelativeStartTime(0.3, 0.7, () =>
                 {
-                    var final = animationType == PopupAnimationType.BounceHorizontal
+                    var final = animationType == PopupAnimationType.BounceInHorizontal
                         ? CGAffineTransform.MakeScale(0.5f, 1f)
-                        : animationType == PopupAnimationType.BounceVertical
+                        : animationType == PopupAnimationType.BounceInVertical
                             ? CGAffineTransform.MakeScale(1f, 0.5f)
                             : CGAffineTransform.MakeScale(0.5f, 0.5f);
                     view.Transform = final;
@@ -571,9 +577,9 @@ public class PopupAnimator
             PopupAnimationType.ZoomIn => true,
             PopupAnimationType.ZoomOut => true,
             PopupAnimationType.Whirl => true,
-            PopupAnimationType.BounceHorizontal => true,
-            PopupAnimationType.BounceVertical => true,
-            PopupAnimationType.Bounce => true,
+            PopupAnimationType.BounceInHorizontal => true,
+            PopupAnimationType.BounceInVertical => true,
+            PopupAnimationType.BounceIn => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false
@@ -584,10 +590,10 @@ public class PopupAnimator
     {
         return animationType switch
         {
-            PopupAnimationType.FromBottomElastic => true,
-            PopupAnimationType.FromTopElastic => true,
-            PopupAnimationType.FromLeftElastic => true,
-            PopupAnimationType.FromRightElastic => true,
+            PopupAnimationType.SprintBottom => true,
+            PopupAnimationType.SprintTop => true,
+            PopupAnimationType.SprintLeft => true,
+            PopupAnimationType.SprintRight => true,
             _ => false
         };
     }
@@ -635,6 +641,6 @@ public class PopupAnimator
 }
 
 
- 
+
 
 #endif

@@ -29,7 +29,7 @@
                 TextColor="Gray" />
 
             <Button
-                Text="🎬 Animations"
+                Text="Animations"
                 BackgroundColor="MediumPurple"
                 TextColor="White"
                 Clicked="OnAnimationDemoClicked"

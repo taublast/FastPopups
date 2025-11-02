@@ -111,7 +111,7 @@ public partial class Popup : View, IPopup
 	/// Backing BindableProperty for the <see cref="AnimationType"/> property.
 	/// </summary>
 	public static readonly BindableProperty AnimationTypeProperty =
-		BindableProperty.Create(nameof(AnimationType), typeof(PopupAnimationType), typeof(Popup), PopupAnimationType.Default);
+		BindableProperty.Create(nameof(AnimationType), typeof(PopupAnimationType), typeof(Popup), PopupAnimationType.ZoomIn);
 
 	/// <summary>
 	/// Backing BindableProperty for the <see cref="AnimationDuration"/> property.

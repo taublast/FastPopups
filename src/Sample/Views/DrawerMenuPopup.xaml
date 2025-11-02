@@ -6,7 +6,7 @@
     xmlns:popups="clr-namespace:FastPopups;assembly=FastPopups"
     AnimationDuration="800"
     AnimationEasing="Decelerate"
-    AnimationType="FromLeft"
+    AnimationType="Left"
     BackgroundColor="#99000000"
     CloseWhenBackgroundIsClicked="True"
     HorizontalOptions="Start"

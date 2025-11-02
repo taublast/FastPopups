@@ -9,6 +9,7 @@
     BackgroundColor="#80000000"
     CloseWhenBackgroundIsClicked="True"
     HeightRequest="600"
+    Padding="16"
     HorizontalOptions="Center"
     VerticalOptions="Center"
     WidthRequest="500">
@@ -22,89 +23,82 @@
             <RoundRectangle CornerRadius="14" />
         </Border.StrokeShape>
 
-        <ScrollView>
-            <VerticalStackLayout Spacing="15">
+        <VerticalStackLayout Spacing="15">
 
-                <!--  Title  -->
-                <Label
+            <!--  Title  -->
+            <Label
                     FontAttributes="Bold"
                     FontSize="24"
                     HorizontalOptions="Center"
-                    Text="{Binding AnimationName}"
+                    Text="{Binding AnimationName, StringFormat='🎬 {0}'}"
                     TextColor="Red" />
 
-                <Label
-                    Margin="0,0,0,10"
-                    FontSize="12"
-                    HorizontalOptions="Center"
-                    Text="Tap outside to close"
-                    TextColor="Gray" />
 
-                <!--  Animation Info  -->
-                <Border
+            <!--  Animation Info  -->
+            <Border
                     Padding="15"
                     BackgroundColor="#F0F8FF"
                     Stroke="LightBlue"
                     StrokeThickness="1">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="8" />
-                    </Border.StrokeShape>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
 
-                    <VerticalStackLayout Spacing="8">
-                        <Label
+                <VerticalStackLayout Spacing="8">
+                    <Label
                             FontSize="13"
                             Text="{Binding AnimationDescription}"
                             TextColor="DodgerBlue" />
-                        <Label
+                    <Label
                             FontSize="11"
                             Text="{Binding AnimationDetails}"
                             TextColor="Gray" />
-                    </VerticalStackLayout>
-                </Border>
+                </VerticalStackLayout>
+            </Border>
 
-                <!--  Close Button  -->
-                <Button
+            <!--  Close Button  -->
+            <Button
                     Margin="0,10,0,0"
                     BackgroundColor="DodgerBlue"
                     Clicked="OnCloseClicked"
                     Text="Close Popup"
                     TextColor="White" />
 
-                <!--  Sample Content  -->
-                <BoxView
+            <!--  Sample Content  -->
+            <BoxView
                     Margin="0,10"
                     HeightRequest="1"
                     Color="LightGray" />
 
-                <Label
+            <Label
                     FontAttributes="Bold"
                     FontSize="14"
                     Text="Sample Content Area"
                     TextColor="#666" />
 
-                <Label
+            <Label
                     FontSize="12"
                     LineBreakMode="WordWrap"
                     Text="This popup demonstrates different animation types. The overlay always fades in/out while the content uses the selected animation."
                     TextColor="#999" />
 
-                <!--  Visual indicator  -->
-                <Border
+            <!--  Visual indicator  -->
+            <Border
                     Margin="0,10"
                     Padding="20"
                     BackgroundColor="LightBlue"
                     HorizontalOptions="Center">
-                    <Border.StrokeShape>
-                        <Ellipse />
-                    </Border.StrokeShape>
-                    <Label
+                <Border.StrokeShape>
+                    <Ellipse />
+                </Border.StrokeShape>
+                <Label
                         FontSize="40"
                         HorizontalOptions="Center"
                         Text="🎨" />
-                </Border>
+            </Border>
 
-            </VerticalStackLayout>
-        </ScrollView>
+        </VerticalStackLayout>
+
     </Border>
 
 </fastpopups:Popup>
