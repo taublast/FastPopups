@@ -263,6 +263,41 @@ internal class PopupAnimator
         storyboard.Children.Add(bounceAnimationBothY);
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn: 1.5 → 0.9 → 1.0
+        view.Opacity = 0;
+        transform.ScaleX = 1.5;
+        transform.ScaleY = 1.5;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        var bounceOutShowX = CreateBounceOutShowHorizontalAnimation(transform, duration);
+        var bounceOutShowY = CreateBounceOutShowVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutShowX);
+        storyboard.Children.Add(bounceOutShowY);
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal: X: 1.5 → 0.9 → 1.0
+        view.Opacity = 0;
+        transform.ScaleX = 1.5;
+        transform.ScaleY = 1;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        var bounceOutShowHX = CreateBounceOutShowHorizontalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutShowHX);
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical: Y: 1.5 → 0.9 → 1.0
+        view.Opacity = 0;
+        transform.ScaleX = 1;
+        transform.ScaleY = 1.5;
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", 0, 1, duration, easingFunction));
+        var bounceOutShowVY = CreateBounceOutShowVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutShowVY);
+        break;
+
         case PopupAnimationType.SprintBottom:
         // Elastic slide from bottom
         view.Opacity = 0.5;
@@ -314,8 +349,9 @@ internal class PopupAnimator
         planeProjectionH.RotationY = -90;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
+        // Use hardcoded EaseOut for smooth flip effect
         storyboard.Children.Add(CreateDoubleAnimation(
-            planeProjectionH, "RotationY", -90, 0, duration, easingFunction));
+            planeProjectionH, "RotationY", -90, 0, duration, new QuadraticEase { EasingMode = EasingMode.EaseOut }));
         break;
 
         case PopupAnimationType.FlipVertical:
@@ -325,8 +361,9 @@ internal class PopupAnimator
         planeProjectionV.RotationX = -90;
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", 0, 1, duration, easingFunction));
+        // Use hardcoded EaseOut for smooth flip effect
         storyboard.Children.Add(CreateDoubleAnimation(
-            planeProjectionV, "RotationX", -90, 0, duration, easingFunction));
+            planeProjectionV, "RotationX", -90, 0, duration, new QuadraticEase { EasingMode = EasingMode.EaseOut }));
         break;
 
         default:
@@ -458,6 +495,32 @@ internal class PopupAnimator
             view, "Opacity", currentOpacity, 0, duration, easingFunction));
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn hide: 1.0 → 1.1 → 1.5
+        var bounceOutHideX = CreateBounceOutHideHorizontalAnimation(transform, duration);
+        var bounceOutHideY = CreateBounceOutHideVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutHideX);
+        storyboard.Children.Add(bounceOutHideY);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal hide: X: 1.0 → 1.1 → 1.5
+        var bounceOutHideHX = CreateBounceOutHideHorizontalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutHideHX);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical hide: Y: 1.0 → 1.1 → 1.5
+        var bounceOutHideVY = CreateBounceOutHideVerticalAnimation(transform, duration);
+        storyboard.Children.Add(bounceOutHideVY);
+        storyboard.Children.Add(CreateDoubleAnimation(
+            view, "Opacity", currentOpacity, 0, duration, easingFunction));
+        break;
+
         case PopupAnimationType.SprintBottom:
         // Elastic slide back down
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -504,8 +567,9 @@ internal class PopupAnimator
         {
             storyboard.Children.Add(CreateDoubleAnimation(
                 view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            // Use hardcoded EaseIn for smooth flip effect on hide
             storyboard.Children.Add(CreateDoubleAnimation(
-                planeH, "RotationY", planeH.RotationY, 90, duration, easingFunction));
+                planeH, "RotationY", planeH.RotationY, 90, duration, new QuadraticEase { EasingMode = EasingMode.EaseIn }));
         }
         else
         {
@@ -521,8 +585,9 @@ internal class PopupAnimator
         {
             storyboard.Children.Add(CreateDoubleAnimation(
                 view, "Opacity", currentOpacity, 0, duration, easingFunction));
+            // Use hardcoded EaseIn for smooth flip effect on hide
             storyboard.Children.Add(CreateDoubleAnimation(
-                planeV, "RotationX", planeV.RotationX, 90, duration, easingFunction));
+                planeV, "RotationX", planeV.RotationX, 90, duration, new QuadraticEase { EasingMode = EasingMode.EaseIn }));
         }
         else
         {
@@ -641,6 +706,62 @@ internal class PopupAnimator
     }
 
     /// <summary>
+    /// Creates a bounce out show horizontal animation for BounceOut entry (ScaleX only).
+    /// Opposite of BounceIn: 1.5 → 0.9 → 1.0
+    /// </summary>
+    private DoubleAnimationUsingKeyFrames CreateBounceOutShowHorizontalAnimation(CompositeTransform transform, int duration)
+    {
+        var animation = new DoubleAnimationUsingKeyFrames();
+        Storyboard.SetTarget(animation, transform);
+        Storyboard.SetTargetProperty(animation, "ScaleX");
+
+        // Keyframes for bounce out show: 1.5 → 0.9 → 1.0
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.5 });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.7)),
+            Value = 0.9,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
+            Value = 1.0,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        });
+
+        return animation;
+    }
+
+    /// <summary>
+    /// Creates a bounce out hide horizontal animation for BounceOut exit (ScaleX only).
+    /// Opposite of BounceIn hide: 1.0 → 1.1 → 1.5
+    /// </summary>
+    private DoubleAnimationUsingKeyFrames CreateBounceOutHideHorizontalAnimation(CompositeTransform transform, int duration)
+    {
+        var animation = new DoubleAnimationUsingKeyFrames();
+        Storyboard.SetTarget(animation, transform);
+        Storyboard.SetTargetProperty(animation, "ScaleX");
+
+        // Keyframes for bounce out hide: 1.0 → 1.1 → 1.5
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.0 });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.3)),
+            Value = 1.1,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
+            Value = 1.5,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        });
+
+        return animation;
+    }
+
+    /// <summary>
     /// Creates a reverse vertical bounce animation for hiding (ScaleY only).
     /// </summary>
     private DoubleAnimationUsingKeyFrames CreateReverseShrinkVerticalAnimation(CompositeTransform transform, int duration)
@@ -661,6 +782,62 @@ internal class PopupAnimator
         {
             KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
             Value = 0.5,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        });
+
+        return animation;
+    }
+
+    /// <summary>
+    /// Creates a bounce out show vertical animation for BounceOut entry (ScaleY only).
+    /// Opposite of BounceIn: 1.5 → 0.9 → 1.0
+    /// </summary>
+    private DoubleAnimationUsingKeyFrames CreateBounceOutShowVerticalAnimation(CompositeTransform transform, int duration)
+    {
+        var animation = new DoubleAnimationUsingKeyFrames();
+        Storyboard.SetTarget(animation, transform);
+        Storyboard.SetTargetProperty(animation, "ScaleY");
+
+        // Keyframes for bounce out show: 1.5 → 0.9 → 1.0
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.5 });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.7)),
+            Value = 0.9,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
+            Value = 1.0,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        });
+
+        return animation;
+    }
+
+    /// <summary>
+    /// Creates a bounce out hide vertical animation for BounceOut exit (ScaleY only).
+    /// Opposite of BounceIn hide: 1.0 → 1.1 → 1.5
+    /// </summary>
+    private DoubleAnimationUsingKeyFrames CreateBounceOutHideVerticalAnimation(CompositeTransform transform, int duration)
+    {
+        var animation = new DoubleAnimationUsingKeyFrames();
+        Storyboard.SetTarget(animation, transform);
+        Storyboard.SetTargetProperty(animation, "ScaleY");
+
+        // Keyframes for bounce out hide: 1.0 → 1.1 → 1.5
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero), Value = 1.0 });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration * 0.3)),
+            Value = 1.1,
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        });
+        animation.KeyFrames.Add(new EasingDoubleKeyFrame
+        {
+            KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(duration)),
+            Value = 1.5,
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
         });
 

@@ -5,11 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:fastpopups="clr-namespace:FastPopups;assembly=FastPopups"
     xmlns:views="clr-namespace:SampleApp.Views"
+    Padding="8"
     x:DataType="views:AnimationTestPopup"
     BackgroundColor="#80000000"
     CloseWhenBackgroundIsClicked="True"
     HeightRequest="600"
-    Padding="8"
     HorizontalOptions="Center"
     VerticalOptions="Center"
     WidthRequest="500">
@@ -27,74 +27,74 @@
 
             <!--  Title  -->
             <Label
-                    FontAttributes="Bold"
-                    FontSize="24"
-                    HorizontalOptions="Center"
-                    Text="{Binding AnimationName, StringFormat='🎬 {0}'}"
-                    TextColor="Red" />
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="{Binding AnimationName, StringFormat='🎬 {0}'}"
+                TextColor="Red" />
 
 
             <!--  Animation Info  -->
             <Border
-                    Padding="15"
-                    BackgroundColor="#F0F8FF"
-                    Stroke="LightBlue"
-                    StrokeThickness="1">
+                Padding="15"
+                BackgroundColor="#F0F8FF"
+                Stroke="LightBlue"
+                StrokeThickness="1">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="8" />
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="8">
                     <Label
-                            FontSize="13"
-                            Text="{Binding AnimationDescription}"
-                            TextColor="DodgerBlue" />
+                        FontSize="13"
+                        Text="{Binding AnimationDescription}"
+                        TextColor="DodgerBlue" />
                     <Label
-                            FontSize="11"
-                            Text="{Binding AnimationDetails}"
-                            TextColor="Gray" />
+                        FontSize="11"
+                        Text="{Binding AnimationDetails}"
+                        TextColor="Gray" />
                 </VerticalStackLayout>
             </Border>
 
             <!--  Close Button  -->
             <Button
-                    Margin="0,10,0,0"
-                    BackgroundColor="DodgerBlue"
-                    Clicked="OnCloseClicked"
-                    Text="Close Popup"
-                    TextColor="White" />
+                Margin="0,10,0,0"
+                BackgroundColor="DodgerBlue"
+                Clicked="OnCloseClicked"
+                Text="Close Popup"
+                TextColor="White" />
 
             <!--  Sample Content  -->
             <BoxView
-                    Margin="0,10"
-                    HeightRequest="1"
-                    Color="LightGray" />
+                Margin="0,10"
+                HeightRequest="1"
+                Color="LightGray" />
 
             <Label
-                    FontAttributes="Bold"
-                    FontSize="14"
-                    Text="Sample Content Area"
-                    TextColor="#666" />
+                FontAttributes="Bold"
+                FontSize="14"
+                Text="Sample Content Area"
+                TextColor="#666" />
 
             <Label
-                    FontSize="12"
-                    LineBreakMode="WordWrap"
-                    Text="This popup demonstrates different animation types. The overlay always fades in/out while the content uses the selected animation."
-                    TextColor="#999" />
+                FontSize="12"
+                LineBreakMode="WordWrap"
+                Text="This popup demonstrates different animation types. The overlay always fades in/out while the content uses the selected animation."
+                TextColor="#999" />
 
             <!--  Visual indicator  -->
             <Border
-                    Margin="0,10"
-                    Padding="20"
-                    BackgroundColor="LightBlue"
-                    HorizontalOptions="Center">
+                Margin="0,10"
+                Padding="20"
+                BackgroundColor="LightBlue"
+                HorizontalOptions="Center">
                 <Border.StrokeShape>
                     <Ellipse />
                 </Border.StrokeShape>
                 <Label
-                        FontSize="40"
-                        HorizontalOptions="Center"
-                        Text="🎨" />
+                    FontSize="40"
+                    HorizontalOptions="Center"
+                    Text="🎨" />
             </Border>
 
         </VerticalStackLayout>

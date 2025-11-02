@@ -111,7 +111,8 @@ public partial class MainPage : ContentPage
     // Drawer Menu Demo
     private async void OnDrawerMenuDemoClicked(object? sender, EventArgs e)
     {
-        await Navigation.PushAsync(new Views.DrawerMenuPage());
+        var drawerPopup = new DrawerMenuPopup();
+        await this.ShowPopupAsync(drawerPopup);
     }
 
 }

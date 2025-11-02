@@ -51,6 +51,24 @@ public enum PopupAnimationType
     BounceInVertical,
 
     /// <summary>
+    /// Bounce out effect - opposite of BounceIn (show: 1.5→0.9→1.0, hide: 1.0→1.1→1.5)
+    /// </summary>
+    [Description("Opposite of BounceIn. Bounces in from large, bounces out to large. Mirror effect.")]
+    BounceOut,
+
+    /// <summary>
+    /// Horizontal bounce out effect - opposite of BounceInHorizontal (show: X:1.5→0.9→1.0, hide: X:1.0→1.1→1.5)
+    /// </summary>
+    [Description("Opposite of BounceInHorizontal. Horizontal width bounce from large to normal.")]
+    BounceOutHorizontal,
+
+    /// <summary>
+    /// Vertical bounce out effect - opposite of BounceInVertical (show: Y:1.5→0.9→1.0, hide: Y:1.0→1.1→1.5)
+    /// </summary>
+    [Description("Opposite of BounceInVertical. Vertical height bounce from large to normal.")]
+    BounceOutVertical,
+
+    /// <summary>
     /// 3D flip animation rotating around Y axis (horizontal flip like card)
     /// </summary>
     [Description("3D horizontal flip like a card turning. Rotates 90° around Y-axis.")]

@@ -11,30 +11,39 @@
     CloseWhenBackgroundIsClicked="True"
     HorizontalOptions="Start"
     IsFullScreen="True"
+    WidthRequest="280"
     VerticalOptions="Fill">
 
     <popups:Popup.Content>
 
         <Grid
-            VerticalOptions="Fill"
             Padding="0"
             BackgroundColor="White"
-            WidthRequest="280">
+            VerticalOptions="Fill">
 
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
             </Grid.GestureRecognizers>
 
-            <VerticalStackLayout Spacing="0" VerticalOptions="Fill" InputTransparent="True">
+            <VerticalStackLayout
+                InputTransparent="True"
+                Spacing="0"
+                VerticalOptions="Fill">
 
                 <!--  Drawer Header  -->
                 <Grid
                     Padding="20"
                     BackgroundColor="#2196F3"
                     HeightRequest="120">
+                    
+                    
+                    <!--  not working in ios https://github.com/dotnet/maui/issues/19099  -->
+                    <!--  use communitytookit toucheffect, mrgestures.maui or appomobi.maui.gestures, sharpnado has a touch effect too  -->
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
                     </Grid.GestureRecognizers>
+
+
                     <VerticalStackLayout Spacing="5" VerticalOptions="Center">
                         <Label
                             FontAttributes="Bold"
@@ -44,7 +53,7 @@
                         <Label
                             FontSize="12"
                             Opacity="0.9"
-                            Text="Navigation Drawer Demo"
+                            Text="This is a POPUP!"
                             TextColor="White" />
                     </VerticalStackLayout>
                 </Grid>
@@ -200,8 +209,10 @@
 
             </VerticalStackLayout>
 
-            <Grid Padding="20,15" VerticalOptions="End"
-                  BackgroundColor="#F0F0F0">
+            <Grid
+                Padding="20,15"
+                BackgroundColor="#F0F0F0"
+                VerticalOptions="End">
 
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />

@@ -182,6 +182,9 @@ public class PopupAnimator
             PopupAnimationType.BounceInHorizontal => true,
             PopupAnimationType.BounceInVertical => true,
             PopupAnimationType.BounceIn => true,
+            PopupAnimationType.BounceOut => true,
+            PopupAnimationType.BounceOutHorizontal=> true,
+            PopupAnimationType.BounceOutVertical => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false
@@ -264,8 +267,26 @@ public class PopupAnimator
         view.ScaleY = 0.5f;
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn - starts large instead of small
+        view.Alpha = 0f;
+        view.ScaleX = 1.5f;
+        view.ScaleY = 1.5f;
+        break;
 
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal - starts wide
+        view.Alpha = 0f;
+        view.ScaleX = 1.5f;
+        view.ScaleY = 1f;
+        break;
 
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical - starts tall
+        view.Alpha = 0f;
+        view.ScaleX = 1f;
+        view.ScaleY = 1.5f;
+        break;
 
         case PopupAnimationType.FlipHorizontal:
         view.Alpha = 0f;
@@ -377,6 +398,25 @@ public class PopupAnimator
         animators.Add(CreateBounceAnimator(contentView, "scaleY", 0.5f, 1.1f, 1f, duration));
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn: 1.5 → 0.9 → 1.0
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
+        animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1.5f, 0.9f, 1f, duration));
+        animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1.5f, 0.9f, 1f, duration));
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal: X: 1.5 → 0.9 → 1.0
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
+        animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1.5f, 0.9f, 1f, duration));
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical: Y: 1.5 → 0.9 → 1.0
+        animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
+        animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1.5f, 0.9f, 1f, duration));
+        break;
+
         case PopupAnimationType.SprintBottom:
         case PopupAnimationType.SprintTop:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", 0.5f, 1f, duration, interpolator));
@@ -393,12 +433,14 @@ public class PopupAnimator
 
         case PopupAnimationType.FlipHorizontal:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(contentView, "rotationY", -90f, 0f, duration, interpolator));
+        // Use hardcoded DecelerateInterpolator for smooth flip effect
+        animators.Add(CreatePropertyAnimator(contentView, "rotationY", -90f, 0f, duration, new DecelerateInterpolator()));
         break;
 
         case PopupAnimationType.FlipVertical:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(contentView, "rotationX", -90f, 0f, duration, interpolator));
+        // Use hardcoded DecelerateInterpolator for smooth flip effect
+        animators.Add(CreatePropertyAnimator(contentView, "rotationX", -90f, 0f, duration, new DecelerateInterpolator()));
         break;
 
         default:
@@ -548,14 +590,35 @@ public class PopupAnimator
         animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn hide: 1.0 → 1.1 → 1.5
+        animators.Add(CreateBounceAnimator(view, "scaleX", 1f, 1.1f, 1.5f, duration));
+        animators.Add(CreateBounceAnimator(view, "scaleY", 1f, 1.1f, 1.5f, duration));
+        animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal hide: X: 1.0 → 1.1 → 1.5
+        animators.Add(CreateBounceAnimator(view, "scaleX", 1f, 1.1f, 1.5f, duration));
+        animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical hide: Y: 1.0 → 1.1 → 1.5
+        animators.Add(CreateBounceAnimator(view, "scaleY", 1f, 1.1f, 1.5f, duration));
+        animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
+        break;
+
         case PopupAnimationType.FlipHorizontal:
         animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(view, "rotationY", currentRotationY, 90f, duration, interpolator));
+        // Use hardcoded AccelerateInterpolator for smooth flip effect on hide
+        animators.Add(CreatePropertyAnimator(view, "rotationY", currentRotationY, 90f, duration, new AccelerateInterpolator()));
         break;
 
         case PopupAnimationType.FlipVertical:
         animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(view, "rotationX", currentRotationX, 90f, duration, interpolator));
+        // Use hardcoded AccelerateInterpolator for smooth flip effect on hide
+        animators.Add(CreatePropertyAnimator(view, "rotationX", currentRotationX, 90f, duration, new AccelerateInterpolator()));
         break;
 
         default:

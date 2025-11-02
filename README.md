@@ -132,6 +132,96 @@ popup.Padding = new Thickness(left: 10, top: 20, right: 10, bottom: 20);
 - ✅ **Visual spacing**: Creates clean borders between content and popup edges
 - ✅ **Layout aware**: Works with all layout options (Fill, Center, Start, End)
 
+## Animations
+
+FastPopups supports rich, platform-native animations for both show and hide transitions. You can customize animation type, duration, and easing curves.
+
+### Animation Types
+
+Available animation types:
+- **Fade** - Simple fade in/out
+- **Bottom/Top/Left/Right** - Slide from edges
+- **SprintBottom/Top/Left/Right** - Slide with elastic overshoot effect
+- **ZoomIn/ZoomOut** - Scale animations
+- **Whirl** - Rotate + scale effect
+- **BounceIn/BounceInHorizontal/BounceInVertical** - Bounce-in from small (0.5→1.1→1.0)
+- **BounceOut/BounceOutHorizontal/BounceOutVertical** - Opposite of BounceIn - bounces in from large (1.5→0.9→1.0) and out to large (1.0→1.1→1.5)
+- **FlipHorizontal/FlipVertical** - 3D flip animations
+
+### Animation Properties
+
+```csharp
+var popup = new Popup
+{
+    Content = myContent,
+    AnimationType = PopupAnimationType.SprintBottom, // Animation style
+    AnimationDuration = 300, // Duration in milliseconds
+    AnimationEasing = PopupAnimationEasing.Decelerate // Easing curve
+};
+```
+
+### Animation Easing Options
+
+The `AnimationEasing` property controls how the animation accelerates and decelerates:
+
+- **Default** - Platform-specific default (Decelerate for show, Accelerate for hide)
+- **Linear** - Constant speed throughout
+- **Decelerate** - Fast start, slow end (ease-out)
+- **Accelerate** - Slow start, fast end (ease-in)
+- **AccelerateDecelerate** - Slow-fast-slow S-curve (ease-in-out)
+- **Spring** - Spring physics with overshoot
+- **Elastic** - Elastic bounce effect
+
+### Special Easing Behavior
+
+**IMPORTANT:** Some animation types require specific easing curves to maintain their characteristic visual effects:
+
+#### Sprint Animations (SprintTop, SprintBottom, SprintLeft, SprintRight)
+These animations use a **hardcoded elastic easing** for the movement/translation to create the characteristic overshoot effect. Your `AnimationEasing` setting is still applied to:
+- Content opacity fade
+- Overlay background fade
+
+**Why?** The elastic overshoot is the defining feature of Sprint animations. Using a different easing curve would eliminate the "sprint" effect entirely.
+
+```csharp
+// Sprint animations always use elastic easing for movement
+var popup = new Popup
+{
+    AnimationType = PopupAnimationType.SprintBottom,
+    AnimationEasing = PopupAnimationEasing.Linear, // Applied to opacity and overlay
+    // Movement still uses elastic easing regardless
+};
+```
+
+#### Flip Animations (FlipHorizontal, FlipVertical)
+These animations use **hardcoded ease-out/ease-in curves** for the 3D rotation to create smooth flipping motion. Your `AnimationEasing` setting is still applied to:
+- Content opacity fade
+- Overlay background fade
+
+**Why?** The smooth deceleration is essential for natural-looking 3D rotation. Other easing curves can make the flip appear jerky or unnatural.
+
+```csharp
+// Flip animations always use ease-out for rotation
+var popup = new Popup
+{
+    AnimationType = PopupAnimationType.FlipHorizontal,
+    AnimationEasing = PopupAnimationEasing.Spring, // Applied to opacity and overlay
+    // Rotation still uses ease-out regardless
+};
+```
+
+#### All Other Animations
+For all other animation types (Fade, Bottom/Top/Left/Right, ZoomIn/ZoomOut, BounceIn, Whirl), your `AnimationEasing` setting is **fully respected** for all animation properties.
+
+### Cross-Platform Consistency
+
+Animations are implemented using native platform APIs for optimal performance:
+- **iOS/macOS**: `UIViewPropertyAnimator` with timing curves
+- **Android**: `ObjectAnimator` with interpolators
+- **Windows**: XAML `Storyboard` with easing functions
+
+Despite using different native APIs, the visual appearance is consistent across all platforms.
+
 ## Gestures
 
 When `CloseWhenBackgroundIsClicked` is set to `true` then tapping somewhere where gestures are not user-handled will close your popup.

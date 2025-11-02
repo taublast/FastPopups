@@ -9,7 +9,7 @@
             Spacing="12">
             
             <Label
-                Text="Maui Popups"
+                Text="⚡️Fast Popups"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" 
                 HorizontalOptions="Center" />
@@ -19,14 +19,8 @@
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
                 HorizontalOptions="Center"
+                Margin="0,0,0,20"
                 SemanticProperties.Description="Popup library demonstration" />
-
-            <Label
-                Text="This sample demonstrates the popup functionality"
-                HorizontalOptions="Center"
-                HorizontalTextAlignment="Center"
-                Margin="0,10,0,20"
-                TextColor="Gray" />
 
             <Button
                 Text="Animations"
