@@ -46,32 +46,26 @@
                         Title="Select Animation Type"
                         SelectedIndexChanged="OnAnimationTypeChanged"
                         TextColor="Red"
-                        TitleColor="Black">
-                        <Picker.Items>
-                            <x:String>Default</x:String>
-                            <x:String>None</x:String>
-                            <x:String>Fade</x:String>
-                            <x:String>SlideFromBottom</x:String>
-                            <x:String>SlideFromTop</x:String>
-                            <x:String>SlideFromRight</x:String>
-                            <x:String>SlideFromLeft</x:String>
-                            <x:String>ZoomIn</x:String>
-                            <x:String>ZoomOut</x:String>
-                            <x:String>WhirlIn</x:String>
-                            <x:String>WhirlIn3</x:String>
-                            <x:String>ShrinkHorizontal</x:String>
-                            <x:String>ShrinkVertical</x:String>
-                            <x:String>ShrinkBoth</x:String>
-                            <x:String>ElasticFromBottom</x:String>
-                            <x:String>ElasticFromTop</x:String>
-                            <x:String>ElasticFromLeft</x:String>
-                            <x:String>ElasticFromRight</x:String>
-                            <x:String>FlipHorizontal</x:String>
-                            <x:String>FlipVertical</x:String>
-                        </Picker.Items>
-                    </Picker>
+                        TitleColor="Black" />
                 </VerticalStackLayout>
             </Border>
+
+            <!--  Action Buttons  -->
+            <Button
+                Margin="0,10,0,0"
+                BackgroundColor="DodgerBlue"
+                Clicked="OnShowPopupClicked"
+                FontAttributes="Bold"
+                HeightRequest="50"
+                Text="Show Selected"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="Green"
+                Clicked="OnShowAllAnimationsClicked"
+                HeightRequest="50"
+                Text="Show All"
+                TextColor="White" />
 
             <!--  Duration Setting  -->
             <Border
@@ -134,18 +128,7 @@
                         x:Name="EasingPicker"
                         Title="Select Easing Type"
                         TextColor="Red"
-                        TitleColor="Black">
-
-                        <Picker.Items>
-                            <x:String>Default</x:String>
-                            <x:String>Linear</x:String>
-                            <x:String>Decelerate</x:String>
-                            <x:String>Accelerate</x:String>
-                            <x:String>AccelerateDecelerate</x:String>
-                            <x:String>Spring</x:String>
-                            <x:String>Elastic</x:String>
-                        </Picker.Items>
-                    </Picker>
+                        TitleColor="Black" />
                 </VerticalStackLayout>
             </Border>
 
@@ -174,22 +157,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!--  Action Buttons  -->
-            <Button
-                Margin="0,10,0,0"
-                BackgroundColor="DodgerBlue"
-                Clicked="OnShowPopupClicked"
-                FontAttributes="Bold"
-                HeightRequest="50"
-                Text="Show Popup with Selected Animation"
-                TextColor="White" />
 
-            <Button
-                BackgroundColor="MediumPurple"
-                Clicked="OnShowAllAnimationsClicked"
-                HeightRequest="50"
-                Text="Show All Animations (Sequential)"
-                TextColor="White" />
 
             <!--  Notes  -->
             <Border

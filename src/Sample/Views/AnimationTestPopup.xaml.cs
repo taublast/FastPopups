@@ -1,5 +1,6 @@
 using AppoMobi.Maui.FastPopups;
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace SampleApp.Views;
@@ -64,23 +65,11 @@ public partial class AnimationTestPopup : Popup, INotifyPropertyChanged
 
     private string GetAnimationDescription(PopupAnimationType type)
     {
-        return type switch
-        {
-            PopupAnimationType.Default => "Platform-specific default animation",
-            PopupAnimationType.None => "Instant display without animation",
-            PopupAnimationType.Fade => "Smooth fade in/out effect",
-            PopupAnimationType.FromBottom => "Slides up from bottom (most common for modals)",
-            PopupAnimationType.FromTop => "Slides down from top",
-            PopupAnimationType.FromRight => "Slides in from right side",
-            PopupAnimationType.FromLeft => "Slides in from left side",
-            PopupAnimationType.ZoomIn => "Zooms in from center (scale 0.5→1.0)",
-            PopupAnimationType.ZoomOut => "Zooms out to center (scale 1.5→1.0)",
-            PopupAnimationType.WhirlIn => "180° rotation with zoom effect",
-            PopupAnimationType.WhirlIn3 => "1080° rotation with zoom (extended duration)",
-            PopupAnimationType.ShrinkHorizontal => "Horizontal scale overshoot",
-            PopupAnimationType.FromBottomElastic => "Slide from bottom with spring physics",
-            _ => "No description available"
-        };
+        // Get description from [Description] attribute via reflection
+        var fieldInfo = type.GetType().GetField(type.ToString());
+        var descriptionAttribute = fieldInfo?.GetCustomAttribute<DescriptionAttribute>();
+
+        return descriptionAttribute?.Description ?? "No description available";
     }
 
     private void OnCloseClicked(object? sender, EventArgs e)

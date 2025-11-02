@@ -72,7 +72,7 @@ public class PopupAnimator
             }
 
             // Adjust duration for WhirlIn3
-            var durationSeconds = animationType == PopupAnimationType.WhirlIn3
+            var durationSeconds = animationType == PopupAnimationType.Whirl
                 ? Math.Max(duration, 400) / 1000.0
                 : duration / 1000.0;
 
@@ -179,7 +179,7 @@ public class PopupAnimator
             }
 
             // Adjust duration for WhirlIn3
-            var durationSeconds = animationType == PopupAnimationType.WhirlIn3
+            var durationSeconds = animationType == PopupAnimationType.Whirl
                 ? Math.Max(duration, 400) / 1000.0
                 : duration / 1000.0;
 
@@ -196,11 +196,11 @@ public class PopupAnimator
             }
 
             // Special handling for WhirlIn/WhirlIn3: Add rotation animation separately
-            if (animationType == PopupAnimationType.WhirlIn || animationType == PopupAnimationType.WhirlIn3)
+            if (animationType == PopupAnimationType.Whirl)
             {
                 // HIDE rotates in OPPOSITE direction from SHOW (CCW instead of CW)
-                var rotationRadians = animationType == PopupAnimationType.WhirlIn3 ? -Math.PI * 6 : -Math.PI;
-                var whirlDuration = animationType == PopupAnimationType.WhirlIn3 ? 0.4 : durationSeconds;
+                var rotationRadians = animationType == PopupAnimationType.Whirl ? -Math.PI * 6 : -Math.PI;
+                var whirlDuration = animationType == PopupAnimationType.Whirl ? 0.4 : durationSeconds;
 
                 var hideRotation = CABasicAnimation.FromKeyPath("transform.rotation.z");
                 hideRotation.From = new NSNumber(0);
@@ -335,31 +335,24 @@ public class PopupAnimator
         view.Transform = CGAffineTransform.MakeScale(1.5f, 1.5f);
         break;
 
-        case PopupAnimationType.WhirlIn:
-        view.Alpha = 0f;
-        var rotation1 = CGAffineTransform.MakeRotation((nfloat)(-Math.PI));
-        var scale1 = CGAffineTransform.MakeScale(0.3f, 0.3f);
-        view.Transform = CGAffineTransform.Multiply(scale1, rotation1);
-        break;
-
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         view.Alpha = 0f;
         var rotation3 = CGAffineTransform.MakeRotation((nfloat)(-Math.PI * 6));
         var scale3 = CGAffineTransform.MakeScale(0.3f, 0.3f);
         view.Transform = CGAffineTransform.Multiply(scale3, rotation3);
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
+        case PopupAnimationType.BounceHorizontal:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(0.5f, 1f);
         break;
 
-        case PopupAnimationType.ShrinkVertical:
+        case PopupAnimationType.BounceVertical:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(1f, 0.5f);
         break;
 
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.Bounce:
         view.Alpha = 1f;
         view.Transform = CGAffineTransform.MakeScale(0.5f, 0.5f);
         break;
@@ -411,11 +404,6 @@ public class PopupAnimator
         contentView.Transform = CGAffineTransform.MakeScale(1f, 1f);
         break;
 
-        case PopupAnimationType.WhirlIn:
-        // WhirlIn: 1 rotation (180° or π radians)
-        contentView.Alpha = 1f;
-        contentView.Transform = CGAffineTransform.MakeScale(1f, 1f);
-
         // Use CABasicAnimation for proper rotation
         var whirlInRotation = CABasicAnimation.FromKeyPath("transform.rotation.z");
         whirlInRotation.From = new NSNumber(-Math.PI);
@@ -425,7 +413,7 @@ public class PopupAnimator
         contentView.Layer.AddAnimation(whirlInRotation, "whirlRotation");
         break;
 
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         // WhirlIn3: 6 rotations (1080° or 6π radians)
         contentView.Alpha = 1f;
         contentView.Transform = CGAffineTransform.MakeScale(1f, 1f);
@@ -439,9 +427,9 @@ public class PopupAnimator
         contentView.Layer.AddAnimation(whirlIn3Rotation, "whirlRotation");
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
-        case PopupAnimationType.ShrinkVertical:
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.Bounce:
         // Use keyframe animation for bounce effect
         UIView.AnimateKeyframes(
             duration: 0.3, // Will be overridden by parent animation
@@ -451,9 +439,9 @@ public class PopupAnimator
             {
                 UIView.AddKeyframeWithRelativeStartTime(0, 0.7, () =>
                 {
-                    var overshoot = animationType == PopupAnimationType.ShrinkHorizontal
+                    var overshoot = animationType == PopupAnimationType.BounceHorizontal
                         ? CGAffineTransform.MakeScale(1.1f, 1f)
-                        : animationType == PopupAnimationType.ShrinkVertical
+                        : animationType == PopupAnimationType.BounceVertical
                             ? CGAffineTransform.MakeScale(1f, 1.1f)
                             : CGAffineTransform.MakeScale(1.1f, 1.1f);
                     contentView.Transform = overshoot;
@@ -526,17 +514,16 @@ public class PopupAnimator
         view.Transform = CGAffineTransform.MakeScale(1.5f, 1.5f);
         break;
 
-        case PopupAnimationType.WhirlIn:
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         // Rotation is handled separately via CABasicAnimation in AnimateHideAsync
         // Here we only handle scale and alpha
         view.Alpha = 0f;
         view.Transform = CGAffineTransform.MakeScale(0.3f, 0.3f);
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
-        case PopupAnimationType.ShrinkVertical:
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.BounceHorizontal:
+        case PopupAnimationType.BounceVertical:
+        case PopupAnimationType.Bounce:
         // Reverse bounce effect with keyframes
         UIView.AnimateKeyframes(
             duration: 0.3,
@@ -546,9 +533,9 @@ public class PopupAnimator
             {
                 UIView.AddKeyframeWithRelativeStartTime(0, 0.3, () =>
                 {
-                    var undershoot = animationType == PopupAnimationType.ShrinkHorizontal
+                    var undershoot = animationType == PopupAnimationType.BounceHorizontal
                         ? CGAffineTransform.MakeScale(0.9f, 1f)
-                        : animationType == PopupAnimationType.ShrinkVertical
+                        : animationType == PopupAnimationType.BounceVertical
                             ? CGAffineTransform.MakeScale(1f, 0.9f)
                             : CGAffineTransform.MakeScale(0.9f, 0.9f);
                     view.Transform = undershoot;
@@ -556,9 +543,9 @@ public class PopupAnimator
 
                 UIView.AddKeyframeWithRelativeStartTime(0.3, 0.7, () =>
                 {
-                    var final = animationType == PopupAnimationType.ShrinkHorizontal
+                    var final = animationType == PopupAnimationType.BounceHorizontal
                         ? CGAffineTransform.MakeScale(0.5f, 1f)
-                        : animationType == PopupAnimationType.ShrinkVertical
+                        : animationType == PopupAnimationType.BounceVertical
                             ? CGAffineTransform.MakeScale(1f, 0.5f)
                             : CGAffineTransform.MakeScale(0.5f, 0.5f);
                     view.Transform = final;
@@ -583,11 +570,10 @@ public class PopupAnimator
         {
             PopupAnimationType.ZoomIn => true,
             PopupAnimationType.ZoomOut => true,
-            PopupAnimationType.WhirlIn => true,
-            PopupAnimationType.WhirlIn3 => true,
-            PopupAnimationType.ShrinkHorizontal => true,
-            PopupAnimationType.ShrinkVertical => true,
-            PopupAnimationType.ShrinkBoth => true,
+            PopupAnimationType.Whirl => true,
+            PopupAnimationType.BounceHorizontal => true,
+            PopupAnimationType.BounceVertical => true,
+            PopupAnimationType.Bounce => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false

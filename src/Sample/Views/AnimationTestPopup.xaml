@@ -30,8 +30,8 @@
                     FontAttributes="Bold"
                     FontSize="24"
                     HorizontalOptions="Center"
-                    Text="Animation Test"
-                    TextColor="DodgerBlue" />
+                    Text="{Binding AnimationName}"
+                    TextColor="Red" />
 
                 <Label
                     Margin="0,0,0,10"
@@ -52,14 +52,9 @@
 
                     <VerticalStackLayout Spacing="8">
                         <Label
-                            FontAttributes="Bold"
-                            FontSize="16"
-                            Text="{Binding AnimationName}"
-                            TextColor="DodgerBlue" />
-                        <Label
                             FontSize="13"
                             Text="{Binding AnimationDescription}"
-                            TextColor="#333" />
+                            TextColor="DodgerBlue" />
                         <Label
                             FontSize="11"
                             Text="{Binding AnimationDetails}"

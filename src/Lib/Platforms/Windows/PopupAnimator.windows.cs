@@ -220,23 +220,7 @@ internal class PopupAnimator
                     transform, "ScaleY", 1.5, 1, duration, easingFunction));
                 break;
 
-            case PopupAnimationType.WhirlIn:
-                // 180° rotation + zoom + fade
-                view.Opacity = 0;
-                transform.Rotation = -180;
-                transform.ScaleX = 0.3;
-                transform.ScaleY = 0.3;
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    view, "Opacity", 0, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "Rotation", -180, 0, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleX", 0.3, 1, duration, easingFunction));
-                storyboard.Children.Add(CreateDoubleAnimation(
-                    transform, "ScaleY", 0.3, 1, duration, easingFunction));
-                break;
-
-            case PopupAnimationType.WhirlIn3:
+            case PopupAnimationType.Whirl:
                 // 1080° rotation + zoom + fade (extended duration)
                 view.Opacity = 0;
                 transform.Rotation = -1080;
@@ -253,7 +237,7 @@ internal class PopupAnimator
                     transform, "ScaleY", 0.3, 1, extendedDuration, easingFunction));
                 break;
 
-            case PopupAnimationType.ShrinkHorizontal:
+            case PopupAnimationType.BounceHorizontal:
                 // Horizontal bounce effect with keyframe animation
                 view.Opacity = 1;
                 transform.ScaleX = 1;
@@ -261,7 +245,7 @@ internal class PopupAnimator
                 storyboard.Children.Add(bounceAnimationH);
                 break;
 
-            case PopupAnimationType.ShrinkVertical:
+            case PopupAnimationType.BounceVertical:
                 // Vertical bounce effect with keyframe animation
                 view.Opacity = 1;
                 transform.ScaleY = 1;
@@ -269,7 +253,7 @@ internal class PopupAnimator
                 storyboard.Children.Add(bounceAnimationV);
                 break;
 
-            case PopupAnimationType.ShrinkBoth:
+            case PopupAnimationType.Bounce:
                 // Combined bounce effect with keyframe animation on both axes
                 view.Opacity = 1;
                 transform.ScaleX = 1;
@@ -428,11 +412,10 @@ internal class PopupAnimator
                     transform, "ScaleY", currentScaleY, 1.5, duration, easingFunction));
                 break;
 
-            case PopupAnimationType.WhirlIn:
-            case PopupAnimationType.WhirlIn3:
+            case PopupAnimationType.Whirl:
                 // Reverse rotation + zoom + fade
-                var targetRotation = type == PopupAnimationType.WhirlIn3 ? 1080 : 180;
-                var whirlDuration = type == PopupAnimationType.WhirlIn3 ? Math.Max(duration, 400) : duration;
+                var targetRotation = type == PopupAnimationType.Whirl ? 1080 : 180;
+                var whirlDuration = type == PopupAnimationType.Whirl ? Math.Max(duration, 400) : duration;
                 storyboard.Children.Add(CreateDoubleAnimation(
                     view, "Opacity", currentOpacity, 0, whirlDuration, easingFunction));
                 storyboard.Children.Add(CreateDoubleAnimation(
@@ -443,7 +426,7 @@ internal class PopupAnimator
                     transform, "ScaleY", currentScaleY, 0.3, whirlDuration, easingFunction));
                 break;
 
-            case PopupAnimationType.ShrinkHorizontal:
+            case PopupAnimationType.BounceHorizontal:
                 // Reverse horizontal bounce (1.0→0.9→0.5)
                 var reverseBounceH = CreateReverseShrinkHorizontalAnimation(transform, duration);
                 storyboard.Children.Add(reverseBounceH);
@@ -451,7 +434,7 @@ internal class PopupAnimator
                     view, "Opacity", currentOpacity, 0, duration, easingFunction));
                 break;
 
-            case PopupAnimationType.ShrinkVertical:
+            case PopupAnimationType.BounceVertical:
                 // Reverse vertical bounce (1.0→0.9→0.5)
                 var reverseBounceV = CreateReverseShrinkVerticalAnimation(transform, duration);
                 storyboard.Children.Add(reverseBounceV);
@@ -459,7 +442,7 @@ internal class PopupAnimator
                     view, "Opacity", currentOpacity, 0, duration, easingFunction));
                 break;
 
-            case PopupAnimationType.ShrinkBoth:
+            case PopupAnimationType.Bounce:
                 // Reverse combined bounce (1.0→0.9→0.5)
                 var reverseBothX = CreateReverseShrinkHorizontalAnimation(transform, duration);
                 var reverseBothY = CreateReverseShrinkVerticalAnimation(transform, duration);

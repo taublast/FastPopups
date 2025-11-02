@@ -177,11 +177,10 @@ public class PopupAnimator
         {
             PopupAnimationType.ZoomIn => true,
             PopupAnimationType.ZoomOut => true,
-            PopupAnimationType.WhirlIn => true,
-            PopupAnimationType.WhirlIn3 => true,
-            PopupAnimationType.ShrinkHorizontal => true,
-            PopupAnimationType.ShrinkVertical => true,
-            PopupAnimationType.ShrinkBoth => true,
+            PopupAnimationType.Whirl => true,
+            PopupAnimationType.BounceHorizontal => true,
+            PopupAnimationType.BounceVertical => true,
+            PopupAnimationType.Bounce => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false
@@ -238,31 +237,24 @@ public class PopupAnimator
         view.ScaleY = 1.5f;
         break;
 
-        case PopupAnimationType.WhirlIn:
-        view.Alpha = 0f;
-        view.Rotation = -180f;
-        view.ScaleX = 0.3f;
-        view.ScaleY = 0.3f;
-        break;
-
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         view.Alpha = 0f;
         view.Rotation = -1080f;
         view.ScaleX = 0.3f;
         view.ScaleY = 0.3f;
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
+        case PopupAnimationType.BounceHorizontal:
         view.Alpha = 1f;
         view.ScaleX = 0.5f;
         break;
 
-        case PopupAnimationType.ShrinkVertical:
+        case PopupAnimationType.BounceVertical:
         view.Alpha = 1f;
         view.ScaleY = 0.5f;
         break;
 
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.Bounce:
         view.Alpha = 1f;
         view.ScaleX = 0.5f;
         view.ScaleY = 0.5f;
@@ -322,7 +314,7 @@ public class PopupAnimator
         var interpolator = GetInterpolator(easing, isShow: true);
 
         // Adjust duration for WhirlIn3
-        if (animationType == PopupAnimationType.WhirlIn3)
+        if (animationType == PopupAnimationType.Whirl)
         {
             duration = Math.Max(duration, 400);
         }
@@ -362,23 +354,22 @@ public class PopupAnimator
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", 1.5f, 1f, duration, interpolator));
         break;
 
-        case PopupAnimationType.WhirlIn:
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", 0f, 1f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "rotation", contentView.Rotation, 0f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "scaleX", 0.3f, 1f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", 0.3f, 1f, duration, interpolator));
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
+        case PopupAnimationType.BounceHorizontal:
         animators.Add(CreateBounceAnimator(contentView, "scaleX", 0.5f, 1.1f, 1f, duration));
         break;
 
-        case PopupAnimationType.ShrinkVertical:
+        case PopupAnimationType.BounceVertical:
         animators.Add(CreateBounceAnimator(contentView, "scaleY", 0.5f, 1.1f, 1f, duration));
         break;
 
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.Bounce:
         animators.Add(CreateBounceAnimator(contentView, "scaleX", 0.5f, 1.1f, 1f, duration));
         animators.Add(CreateBounceAnimator(contentView, "scaleY", 0.5f, 1.1f, 1f, duration));
         break;
@@ -448,7 +439,7 @@ public class PopupAnimator
         var interpolator = GetInterpolator(easing, isShow: false);
 
         // Adjust duration for WhirlIn3
-        if (animationType == PopupAnimationType.WhirlIn3)
+        if (animationType == PopupAnimationType.Whirl)
         {
             duration = Math.Max(duration, 400);
         }
@@ -501,31 +492,24 @@ public class PopupAnimator
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", currentScaleY, 1.5f, duration, interpolator));
         break;
 
-        case PopupAnimationType.WhirlIn:
-        animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(contentView, "rotation", currentRotation, 180f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(contentView, "scaleX", currentScaleX, 0.3f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(contentView, "scaleY", currentScaleY, 0.3f, duration, interpolator));
-        break;
-
-        case PopupAnimationType.WhirlIn3:
+        case PopupAnimationType.Whirl:
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "rotation", currentRotation, 1080f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "scaleX", currentScaleX, 0.3f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(contentView, "scaleY", currentScaleY, 0.3f, duration, interpolator));
         break;
 
-        case PopupAnimationType.ShrinkHorizontal:
+        case PopupAnimationType.BounceHorizontal:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.ShrinkVertical:
+        case PopupAnimationType.BounceVertical:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
         break;
 
-        case PopupAnimationType.ShrinkBoth:
+        case PopupAnimationType.Bounce:
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleX", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreateReverseBounceAnimator(contentView, "scaleY", 1f, 0.9f, 0.5f, duration));
         animators.Add(CreatePropertyAnimator(contentView, "alpha", currentAlpha, 0f, duration, interpolator));
