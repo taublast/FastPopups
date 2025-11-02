@@ -199,8 +199,33 @@ public static partial class PopupExtensions
 		else
 		{
 			// Mixed case: some explicit, some calculated
-			var width = hasExplicitWidth == true && visualElement != null ? visualElement.WidthRequest :
-				double.IsNaN(popup.Content.Width) ? adjustedFrame.Width : popup.Content.Width;
+			double width;
+			if (hasExplicitWidth == true && visualElement != null)
+			{
+				width = visualElement.WidthRequest;
+			}
+			else if (!double.IsNaN(popup.Content.Width))
+			{
+				width = popup.Content.Width;
+			}
+			else
+			{
+				// Need to measure content for auto-sizing width
+				if (popup.Content.Handler == null)
+				{
+					_ = popup.Content.ToPlatform(
+					popup.Handler?.MauiContext ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} Cannot Be Null"));
+				}
+
+				// Measure with infinite width or full width if Fill is requested
+				var measureWidth = IsLayoutFill(popup.HorizontalOptions) ? adjustedFrame.Width : double.PositiveInfinity;
+				var measureHeight = hasExplicitHeight == true && visualElement != null ? visualElement.HeightRequest : double.PositiveInfinity;
+
+				var contentSize = popup.Content.Measure(measureWidth, measureHeight);
+
+				// Use full width if Fill is requested, otherwise use measured width constrained to available space
+				width = IsLayoutFill(popup.HorizontalOptions) ? adjustedFrame.Width : Math.Min(contentSize.Width, adjustedFrame.Width);
+			}
 
 			double height;
 			if (hasExplicitHeight == true && visualElement != null)
@@ -220,14 +245,14 @@ public static partial class PopupExtensions
 					popup.Handler?.MauiContext ?? throw new InvalidOperationException($"{nameof(popup.Handler.MauiContext)} Cannot Be Null"));
 				}
 
-				// Measure with the determined width and infinite height for auto-sizing
+				// Measure with the determined width and check if height should fill
 				var measureWidth = width;
-				var measureHeight = double.PositiveInfinity; // Always use infinite for auto-sizing
+				var measureHeight = IsLayoutFill(popup.VerticalOptions) ? adjustedFrame.Height : double.PositiveInfinity;
 
 				var contentSize = popup.Content.Measure(measureWidth, measureHeight);
 
-				// Use measured height, but constrain to available space if needed
-				height = Math.Min(contentSize.Height, adjustedFrame.Height);
+				// Use full height if Fill is requested, otherwise use measured height constrained to available space
+				height = IsLayoutFill(popup.VerticalOptions) ? adjustedFrame.Height : Math.Min(contentSize.Height, adjustedFrame.Height);
 			}
 
 			currentSize = new CGSize(width, height);

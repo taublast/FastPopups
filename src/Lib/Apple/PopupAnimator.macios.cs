@@ -76,10 +76,15 @@ public class PopupAnimator
                 ? Math.Max(duration, 400) / 1000.0
                 : duration / 1000.0;
 
-            // FORCE Elastic easing for Elastic animation types (regardless of user's easing setting)
+            // Save original user's easing for overlay
+            var overlayEasing = easing;
+
+            // FORCE Elastic easing for Sprint animation types (content only, not overlay)
+            // This maintains the characteristic overshoot effect
+            var contentEasing = easing;
             if (IsElasticAnimation(animationType))
             {
-                easing = PopupAnimationEasing.Elastic;
+                contentEasing = PopupAnimationEasing.Elastic;
             }
 
             // Set anchor point (pivot) to CENTER for scale/rotation animations
@@ -89,6 +94,7 @@ public class PopupAnimator
             }
 
             // Special handling for Flip animations: Use CABasicAnimation for smooth 3D rotation
+            // The rotation uses hardcoded EaseOut to maintain the flip effect
             if (animationType == PopupAnimationType.FlipHorizontal || animationType == PopupAnimationType.FlipVertical)
             {
                 // Set stronger perspective for better 3D effect
@@ -96,7 +102,7 @@ public class PopupAnimator
                 transform.M34 = -1.0f / 200.0f; // Stronger perspective (was 500)
                 contentView.Layer.Transform = transform;
 
-                // Create rotation animation
+                // Create rotation animation with hardcoded easing for proper flip effect
                 var keyPath = animationType == PopupAnimationType.FlipHorizontal ? "transform.rotation.y" : "transform.rotation.x";
                 var flipAnimation = CABasicAnimation.FromKeyPath(keyPath);
                 flipAnimation.From = new NSNumber(-Math.PI / 2); // -90°
@@ -108,33 +114,48 @@ public class PopupAnimator
                 contentView.Layer.AddAnimation(flipAnimation, "flipShowRotation");
             }
 
-            // Create property animator with timing curve
-            var timingParameters = GetTimingParameters(easing);
-            var animator = new UIViewPropertyAnimator(durationSeconds, timingParameters);
+            // Create separate animators for overlay and content to allow different easing curves
+            var overlayTimingParameters = GetTimingParameters(overlayEasing);
+            var overlayAnimator = new UIViewPropertyAnimator(durationSeconds, overlayTimingParameters);
 
-            // Add animations
-            animator.AddAnimations(() =>
+            var contentTimingParameters = GetTimingParameters(contentEasing);
+            var contentAnimator = new UIViewPropertyAnimator(durationSeconds, contentTimingParameters);
+
+            // Animate overlay with user's selected easing
+            overlayAnimator.AddAnimations(() =>
             {
-                // Animate overlay (always linear fade)
                 overlayView.Alpha = 1f;
-                contentView.Alpha = 1;
+            });
 
+            // Animate content with appropriate easing (forced for Sprint animations)
+            contentAnimator.AddAnimations(() =>
+            {
+                contentView.Alpha = 1;
                 // Animate content based on type
                 AnimateShowContent(contentView, overlayView, animationType);
             });
 
-            // Create task completion source
-            var tcs = new TaskCompletionSource<bool>();
-            animator.AddCompletion((position) =>
+            // Create task completion sources for both animators
+            var overlayTcs = new TaskCompletionSource<bool>();
+            var contentTcs = new TaskCompletionSource<bool>();
+
+            overlayAnimator.AddCompletion((position) =>
             {
-                Cleanup(contentView, overlayView);
-                tcs.TrySetResult(position == UIViewAnimatingPosition.End);
+                overlayTcs.TrySetResult(position == UIViewAnimatingPosition.End);
             });
 
-            // Start animation
-            animator.StartAnimation();
+            contentAnimator.AddCompletion((position) =>
+            {
+                Cleanup(contentView, overlayView);
+                contentTcs.TrySetResult(position == UIViewAnimatingPosition.End);
+            });
 
-            await tcs.Task;
+            // Start both animations
+            overlayAnimator.StartAnimation();
+            contentAnimator.StartAnimation();
+
+            // Wait for both to complete
+            await Task.WhenAll(overlayTcs.Task, contentTcs.Task);
         }
         finally
         {
@@ -183,10 +204,15 @@ public class PopupAnimator
                 ? Math.Max(duration, 400) / 1000.0
                 : duration / 1000.0;
 
-            // FORCE Elastic easing for Elastic animation types (regardless of user's easing setting)
+            // Save original user's easing for overlay
+            var overlayEasing = easing;
+
+            // FORCE Elastic easing for Sprint animation types (content only, not overlay)
+            // This maintains the characteristic overshoot effect
+            var contentEasing = easing;
             if (IsElasticAnimation(animationType))
             {
-                easing = PopupAnimationEasing.Elastic;
+                contentEasing = PopupAnimationEasing.Elastic;
             }
 
             // Set anchor point (pivot) to CENTER for scale/rotation animations
@@ -213,6 +239,7 @@ public class PopupAnimator
             }
 
             // Special handling for Flip animations: Use CABasicAnimation for smooth 3D rotation
+            // The rotation uses hardcoded EaseOut to maintain the flip effect
             if (animationType == PopupAnimationType.FlipHorizontal || animationType == PopupAnimationType.FlipVertical)
             {
                 // Set stronger perspective for better 3D effect
@@ -220,7 +247,7 @@ public class PopupAnimator
                 transform.M34 = -1.0f / 200.0f; // Stronger perspective
                 contentView.Layer.Transform = transform;
 
-                // Create rotation animation - HIDE rotates opposite direction (to +90°)
+                // Create rotation animation with hardcoded easing for proper flip effect - HIDE rotates opposite direction (to +90°)
                 var keyPath = animationType == PopupAnimationType.FlipHorizontal ? "transform.rotation.y" : "transform.rotation.x";
                 var flipAnimation = CABasicAnimation.FromKeyPath(keyPath);
                 flipAnimation.From = new NSNumber(0); // 0°
@@ -232,31 +259,46 @@ public class PopupAnimator
                 contentView.Layer.AddAnimation(flipAnimation, "flipHideRotation");
             }
 
-            // Create property animator with timing curve
-            var timingParameters = GetTimingParameters(easing);
-            var animator = new UIViewPropertyAnimator(durationSeconds, timingParameters);
+            // Create separate animators for overlay and content to allow different easing curves
+            var overlayTimingParameters = GetTimingParameters(overlayEasing);
+            var overlayAnimator = new UIViewPropertyAnimator(durationSeconds, overlayTimingParameters);
 
-            // Add animations
-            animator.AddAnimations(() =>
+            var contentTimingParameters = GetTimingParameters(contentEasing);
+            var contentAnimator = new UIViewPropertyAnimator(durationSeconds, contentTimingParameters);
+
+            // Animate overlay with user's selected easing
+            overlayAnimator.AddAnimations(() =>
             {
-                // Animate overlay (always linear fade)
                 overlayView.Alpha = 0f;
+            });
 
+            // Animate content with appropriate easing (forced for Sprint animations)
+            contentAnimator.AddAnimations(() =>
+            {
                 // Animate content based on type
                 AnimateHideContent(contentView, overlayView, animationType);
             });
 
-            // Create task completion source
-            var tcs = new TaskCompletionSource<bool>();
-            animator.AddCompletion((position) =>
+            // Create task completion sources for both animators
+            var overlayTcs = new TaskCompletionSource<bool>();
+            var contentTcs = new TaskCompletionSource<bool>();
+
+            overlayAnimator.AddCompletion((position) =>
             {
-                tcs.TrySetResult(position == UIViewAnimatingPosition.End);
+                overlayTcs.TrySetResult(position == UIViewAnimatingPosition.End);
             });
 
-            // Start animation
-            animator.StartAnimation();
+            contentAnimator.AddCompletion((position) =>
+            {
+                contentTcs.TrySetResult(position == UIViewAnimatingPosition.End);
+            });
 
-            await tcs.Task;
+            // Start both animations
+            overlayAnimator.StartAnimation();
+            contentAnimator.StartAnimation();
+
+            // Wait for both to complete
+            await Task.WhenAll(overlayTcs.Task, contentTcs.Task);
         }
         finally
         {
@@ -372,6 +414,24 @@ public class PopupAnimator
         view.Transform = CGAffineTransform.MakeScale(0.5f, 0.5f);
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn - starts large instead of small
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeScale(1.5f, 1.5f);
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal - starts wide
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeScale(1.5f, 1f);
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical - starts tall
+        view.Alpha = 0f;
+        view.Transform = CGAffineTransform.MakeScale(1f, 1.5f);
+        break;
+
         case PopupAnimationType.FlipHorizontal:
         view.Alpha = 0f;
         var transformH = CATransform3D.Identity;
@@ -467,6 +527,74 @@ public class PopupAnimator
                 });
             },
             completion: null);
+        break;
+
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn: 1.5 → 0.9 → 1.0
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.7, () =>
+                {
+                    // Undershoot - shrink below normal
+                    contentView.Transform = CGAffineTransform.MakeScale(0.9f, 0.9f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.7, 0.3, () =>
+                {
+                    // Settle to normal
+                    contentView.Transform = CGAffineTransform.MakeIdentity();
+                });
+            },
+            completion: null);
+        contentView.Alpha = 1f;
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal: X: 1.5 → 0.9 → 1.0
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.7, () =>
+                {
+                    contentView.Transform = CGAffineTransform.MakeScale(0.9f, 1f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.7, 0.3, () =>
+                {
+                    contentView.Transform = CGAffineTransform.MakeIdentity();
+                });
+            },
+            completion: null);
+        contentView.Alpha = 1f;
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical: Y: 1.5 → 0.9 → 1.0
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.7, () =>
+                {
+                    contentView.Transform = CGAffineTransform.MakeScale(1f, 0.9f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.7, 0.3, () =>
+                {
+                    contentView.Transform = CGAffineTransform.MakeIdentity();
+                });
+            },
+            completion: null);
+        contentView.Alpha = 1f;
         break;
 
         case PopupAnimationType.FlipHorizontal:
@@ -573,6 +701,74 @@ public class PopupAnimator
         view.Alpha = 0f;
         break;
 
+        case PopupAnimationType.BounceOut:
+        // BounceOut is opposite of BounceIn hide: 1.0 → 1.1 → 1.5
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.3, () =>
+                {
+                    // Overshoot - grow larger
+                    view.Transform = CGAffineTransform.MakeScale(1.1f, 1.1f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.3, 0.7, () =>
+                {
+                    // Grow out large
+                    view.Transform = CGAffineTransform.MakeScale(1.5f, 1.5f);
+                });
+            },
+            completion: null);
+        view.Alpha = 0f;
+        break;
+
+        case PopupAnimationType.BounceOutHorizontal:
+        // BounceOutHorizontal hide: X: 1.0 → 1.1 → 1.5
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.3, () =>
+                {
+                    view.Transform = CGAffineTransform.MakeScale(1.1f, 1f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.3, 0.7, () =>
+                {
+                    view.Transform = CGAffineTransform.MakeScale(1.5f, 1f);
+                });
+            },
+            completion: null);
+        view.Alpha = 0f;
+        break;
+
+        case PopupAnimationType.BounceOutVertical:
+        // BounceOutVertical hide: Y: 1.0 → 1.1 → 1.5
+        UIView.AnimateKeyframes(
+            duration: 0.3,
+            delay: 0,
+            options: UIViewKeyframeAnimationOptions.CalculationModeCubic,
+            animations: () =>
+            {
+                UIView.AddKeyframeWithRelativeStartTime(0, 0.3, () =>
+                {
+                    view.Transform = CGAffineTransform.MakeScale(1f, 1.1f);
+                });
+
+                UIView.AddKeyframeWithRelativeStartTime(0.3, 0.7, () =>
+                {
+                    view.Transform = CGAffineTransform.MakeScale(1f, 1.5f);
+                });
+            },
+            completion: null);
+        view.Alpha = 0f;
+        break;
+
         case PopupAnimationType.FlipHorizontal:
         case PopupAnimationType.FlipVertical:
         // Only handle alpha - rotation is handled by CABasicAnimation for smooth 3D effect
@@ -592,6 +788,9 @@ public class PopupAnimator
             PopupAnimationType.BounceInHorizontal => true,
             PopupAnimationType.BounceInVertical => true,
             PopupAnimationType.BounceIn => true,
+            PopupAnimationType.BounceOut => true,
+            PopupAnimationType.BounceOutHorizontal => true,
+            PopupAnimationType.BounceOutVertical => true,
             PopupAnimationType.FlipHorizontal => true,
             PopupAnimationType.FlipVertical => true,
             _ => false
