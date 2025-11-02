@@ -257,7 +257,10 @@ public static partial class PopupExtensions
 		// Get the adjusted frame based on safe areas (and MacCatalyst margins).
 		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IsFullScreen);
 
-		popup.Content.Arrange(new Rect(0,0, adjustedFrame.Width, adjustedFrame.Height));
+		// Calculate the padded size for content arrangement
+		var paddedWidth = Math.Max(0, adjustedFrame.Width - popup.Padding.Left - popup.Padding.Right);
+		var paddedHeight = Math.Max(0, adjustedFrame.Height - popup.Padding.Top - popup.Padding.Bottom);
+		popup.Content.Arrange(new Rect(0, 0, paddedWidth, paddedHeight));
 		
 #if MACCATALYST
 		var titleBarHeight = mauiPopup.ViewController?.NavigationController?.NavigationBar.Frame.Y ?? 0;
@@ -283,60 +286,71 @@ public static partial class PopupExtensions
 				contentSize.Height = (nfloat)popup.Content.Height;
 			}
 
-			// Apply padding offset to position content correctly within the popup
-			var (paddingX, paddingY) = PopupLayoutCalculator.GetPaddingOffset(popup);
-
 			// Calculate the available content size (subtract padding from total popup size)
 			var totalSize = new Size(contentSize.Width, contentSize.Height);
 			var availableSize = new Size(adjustedFrame.Width, adjustedFrame.Height);
 			var availableContentSize = PopupLayoutCalculator.ApplyPadding(popup, totalSize, availableSize);
 
 			// Compute the horizontal position based on the HorizontalOptions within the adjusted frame.
+			// The content should be positioned within the padded frame area.
 			nfloat x;
 			if (IsLayoutStart(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X + (nfloat)paddingX;
+				x = adjustedFrame.X + (nfloat)popup.Padding.Left;
 			}
 			else if (IsLayoutEnd(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X + adjustedFrame.Width - (nfloat)availableContentSize.Width - (nfloat)paddingX;
+				x = adjustedFrame.X + adjustedFrame.Width - (nfloat)availableContentSize.Width - (nfloat)popup.Padding.Right;
 			}
 			else if (IsLayoutCenter(popup.HorizontalOptions))
 			{
-				x = adjustedFrame.X + (adjustedFrame.Width - (nfloat)availableContentSize.Width) / 2 + (nfloat)paddingX;
+				// Center the content within the padded frame area
+				var paddedFrameX = adjustedFrame.X + (nfloat)popup.Padding.Left;
+				var paddedFrameWidth = adjustedFrame.Width - (nfloat)popup.Padding.Left - (nfloat)popup.Padding.Right;
+				x = paddedFrameX + (paddedFrameWidth - (nfloat)availableContentSize.Width) / 2;
 			}
 			else if (IsLayoutFill(popup.HorizontalOptions))
 			{
-				// For Fill, position at adjusted frame + padding (don't center)
-				x = adjustedFrame.X + (nfloat)paddingX;
+				// For Fill, position at adjusted frame + left padding
+				x = adjustedFrame.X + (nfloat)popup.Padding.Left;
 			}
 			else
 			{
-				x = adjustedFrame.X + (adjustedFrame.Width - (nfloat)availableContentSize.Width) / 2 + (nfloat)paddingX;
+				// Default to center
+				var paddedFrameX = adjustedFrame.X + (nfloat)popup.Padding.Left;
+				var paddedFrameWidth = adjustedFrame.Width - (nfloat)popup.Padding.Left - (nfloat)popup.Padding.Right;
+				x = paddedFrameX + (paddedFrameWidth - (nfloat)availableContentSize.Width) / 2;
 			}
 
 			// Compute the vertical position based on the VerticalOptions within the adjusted frame.
+			// The content should be positioned within the padded frame area.
 			nfloat y;
 			if (IsLayoutStart(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)paddingY;
+				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)popup.Padding.Top;
 			}
 			else if (IsLayoutEnd(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + adjustedFrame.Height - (nfloat)availableContentSize.Height - additionalVerticalOffset - (nfloat)paddingY;
+				y = adjustedFrame.Y + adjustedFrame.Height - (nfloat)availableContentSize.Height - additionalVerticalOffset - (nfloat)popup.Padding.Bottom;
 			}
 			else if (IsLayoutCenter(popup.VerticalOptions))
 			{
-				y = adjustedFrame.Y + (adjustedFrame.Height - (nfloat)availableContentSize.Height) / 2 - additionalVerticalOffset + (nfloat)paddingY;
+				// Center the content within the padded frame area
+				var paddedFrameY = adjustedFrame.Y + (nfloat)popup.Padding.Top;
+				var paddedFrameHeight = adjustedFrame.Height - (nfloat)popup.Padding.Top - (nfloat)popup.Padding.Bottom;
+				y = paddedFrameY + (paddedFrameHeight - (nfloat)availableContentSize.Height) / 2 + additionalVerticalOffset;
 			}
 			else if (IsLayoutFill(popup.VerticalOptions))
 			{
-				// For Fill, position at adjusted frame + padding (don't center)
-				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)paddingY;
+				// For Fill, position at adjusted frame + top padding
+				y = adjustedFrame.Y + additionalVerticalOffset + (nfloat)popup.Padding.Top;
 			}
 			else
 			{
-				y = adjustedFrame.Y + (adjustedFrame.Height - (nfloat)availableContentSize.Height) / 2 + (nfloat)paddingY;
+				// Default to center
+				var paddedFrameY = adjustedFrame.Y + (nfloat)popup.Padding.Top;
+				var paddedFrameHeight = adjustedFrame.Height - (nfloat)popup.Padding.Top - (nfloat)popup.Padding.Bottom;
+				y = paddedFrameY + (paddedFrameHeight - (nfloat)availableContentSize.Height) / 2 + additionalVerticalOffset;
 			}
 
 			if (mauiPopup.Control?.ViewController?.View is UIView contentView)
