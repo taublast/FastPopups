@@ -1,66 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<popup:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:popup="clr-namespace:FastPopups;assembly=FastPopups"
-             x:Class="SampleApp.Views.NavigationStackPopup"
-             HeightRequest="400"
-             WidthRequest="350"
-             BackgroundColor="#80000000"
-             CloseWhenBackgroundIsClicked="True">
+<popup:Popup
+    x:Class="SampleApp.Views.NavigationStackPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:FastPopups;assembly=FastPopups"
+    BackgroundColor="#80000000"
+    CloseWhenBackgroundIsClicked="True"
+    VerticalOptions="Center"
+    WidthRequest="350">
 
-    <Border BackgroundColor="White"
-            StrokeThickness="2"
-            Stroke="DarkBlue"
-            StrokeShape="RoundRectangle 15">
-        
+    <Border
+        BackgroundColor="White"
+        Stroke="DarkBlue"
+        StrokeShape="RoundRectangle 15"
+        StrokeThickness="2">
+
         <StackLayout Padding="20" Spacing="15">
-            
-            <Label Text="{Binding Title}"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="DarkBlue" />
-            
-            <Label Text="{Binding Description}"
-                   FontSize="14"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"
-                   TextColor="Gray" />
-            
-            <BoxView HeightRequest="1" 
-                     BackgroundColor="LightGray" 
-                     Margin="0,10" />
-            
-            <Label Text="{Binding StackInfo}"
-                   FontSize="12"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"
-                   TextColor="DarkGreen"
-                   FontAttributes="Italic" />
-            
-            <Button Text="Show Next Popup"
-                    BackgroundColor="DarkBlue"
-                    TextColor="White"
-                    Clicked="OnShowNextClicked"
-                    IsVisible="{Binding CanShowNext}" />
-            
-            <Button Text="Close This Popup"
-                    BackgroundColor="Orange"
-                    TextColor="White"
-                    Clicked="OnCloseThisClicked" />
-            
-            <Button Text="Close Top Popup"
-                    BackgroundColor="Red"
-                    TextColor="White"
-                    Clicked="OnCloseTopClicked" />
-            
-            <Button Text="Close All Popups"
-                    BackgroundColor="DarkRed"
-                    TextColor="White"
-                    Clicked="OnCloseAllClicked" />
-            
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="20"
+                HorizontalOptions="Center"
+                Text="{Binding Title}"
+                TextColor="DarkBlue" />
+
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="{Binding Description}"
+                TextColor="Gray" />
+
+            <BoxView
+                Margin="0,10"
+                BackgroundColor="LightGray"
+                HeightRequest="1" />
+
+            <Label
+                FontAttributes="Italic"
+                FontSize="12"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="{Binding StackInfo}"
+                TextColor="DarkGreen" />
+
+            <Button
+                BackgroundColor="DarkBlue"
+                Clicked="OnShowNextClicked"
+                IsVisible="{Binding CanShowNext}"
+                Text="Show Next Popup"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="Orange"
+                Clicked="OnCloseThisClicked"
+                Text="Close This Popup"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="Red"
+                Clicked="OnCloseTopClicked"
+                Text="Close Top Popup"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="DarkRed"
+                Clicked="OnCloseAllClicked"
+                Text="Close All Popups"
+                TextColor="White" />
+
         </StackLayout>
-        
+
     </Border>
-    
+
 </popup:Popup>
