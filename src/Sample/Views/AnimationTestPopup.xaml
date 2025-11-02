@@ -9,7 +9,7 @@
     BackgroundColor="#80000000"
     CloseWhenBackgroundIsClicked="True"
     HeightRequest="600"
-    Padding="16"
+    Padding="8"
     HorizontalOptions="Center"
     VerticalOptions="Center"
     WidthRequest="500">
