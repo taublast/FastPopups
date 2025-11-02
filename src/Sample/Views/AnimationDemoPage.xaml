@@ -3,8 +3,8 @@
     x:Class="SampleApp.Views.AnimationDemoPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    BackgroundColor="#fefefe"
-    Title="Animation Demo">
+    Title="Animation Demo"
+    BackgroundColor="#fefefe">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">

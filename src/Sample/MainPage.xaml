@@ -1,83 +1,82 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SampleApp.MainPage">
+<ContentPage
+    x:Class="SampleApp.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="12">
-            
-            <Label
-                Text="⚡️Fast Popups"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" 
-                HorizontalOptions="Center" />
+        <VerticalStackLayout Padding="30,0" Spacing="12">
 
             <Label
-                Text="Sample Application"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
                 HorizontalOptions="Center"
+                SemanticProperties.HeadingLevel="Level1"
+                Style="{StaticResource Headline}"
+                Text="⚡️Fast Popups" />
+
+            <Label
                 Margin="0,0,0,20"
-                SemanticProperties.Description="Popup library demonstration" />
+                HorizontalOptions="Center"
+                SemanticProperties.Description="Popup library demonstration"
+                SemanticProperties.HeadingLevel="Level2"
+                Style="{StaticResource SubHeadline}"
+                Text="Sample Application" />
 
             <Button
-                Text="Animations"
+                Margin="0,5"
                 BackgroundColor="MediumPurple"
-                TextColor="White"
                 Clicked="OnAnimationDemoClicked"
                 HorizontalOptions="Fill"
-                Margin="0,5" />
+                Text="Animations"
+                TextColor="White" />
 
             <Button
-                Text="Drawer Simulation"
+                Margin="0,5"
                 BackgroundColor="DarkCyan"
-                TextColor="White"
                 Clicked="OnDrawerMenuDemoClicked"
                 HorizontalOptions="Fill"
-                Margin="0,5" />
+                Text="Drawer Simulation"
+                TextColor="White" />
 
             <Button
-                Text="Centered Popup XAML" 
+                Margin="0,5"
                 BackgroundColor="DarkBlue"
-                TextColor="White"
                 Clicked="OnSimplePopupClicked"
-                HorizontalOptions="Fill" 
-                Margin="0,5" />
+                HorizontalOptions="Fill"
+                Text="Centered Popup XAML"
+                TextColor="White" />
 
             <Button
-                Text="Fill Popup XAML" 
+                Margin="0,5"
                 BackgroundColor="SeaGreen"
-                TextColor="White"
                 Clicked="OnFillPopupClicked"
-                HorizontalOptions="Fill" 
-                Margin="0,5" />
+                HorizontalOptions="Fill"
+                Text="Fill Popup XAML"
+                TextColor="White" />
 
             <Button
                 x:Name="AnchoredButton"
-                Text="Show Anchored Popup" 
+                Margin="0,5"
                 BackgroundColor="Orange"
-                TextColor="White"
                 Clicked="OnAnchoredPopupClicked"
-                HorizontalOptions="Fill" 
-                Margin="0,5" />
+                HorizontalOptions="Fill"
+                Text="Show Anchored Popup"
+                TextColor="White" />
 
             <Button
-                Text="Custom Popup Code"
+                Margin="0,5"
                 BackgroundColor="Purple"
-                TextColor="White"
                 Clicked="OnCustomSizePopupClicked"
                 HorizontalOptions="Fill"
-                Margin="0,5" />
+                Text="Custom Popup Code"
+                TextColor="White" />
 
             <Button
-                Text="Navigation Stack Demo"
+                Margin="0,5"
                 BackgroundColor="DarkGreen"
-                TextColor="White"
                 Clicked="OnNavigationStackDemoClicked"
                 HorizontalOptions="Fill"
-                Margin="0,5" />
+                Text="Navigation Stack Demo"
+                TextColor="White" />
 
 
 

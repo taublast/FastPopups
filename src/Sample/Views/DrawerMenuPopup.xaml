@@ -19,7 +19,8 @@
         <Grid
             Padding="0"
             BackgroundColor="White"
-            VerticalOptions="Fill">
+            VerticalOptions="Fill"
+            WidthRequest="280">
 
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
@@ -31,7 +32,7 @@
                 VerticalOptions="Fill">
 
                 <!--  Drawer Header  -->
-                <Grid
+                <Border
                     Padding="20"
                     BackgroundColor="#2196F3"
                     HeightRequest="120">
@@ -39,9 +40,9 @@
                     
                     <!--  not working in ios https://github.com/dotnet/maui/issues/19099  -->
                     <!--  use communitytookit toucheffect, mrgestures.maui or appomobi.maui.gestures, sharpnado has a touch effect too  -->
-                    <Grid.GestureRecognizers>
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
-                    </Grid.GestureRecognizers>
+                    </Border.GestureRecognizers>
 
 
                     <VerticalStackLayout Spacing="5" VerticalOptions="Center">
@@ -56,7 +57,7 @@
                             Text="This is a POPUP!"
                             TextColor="White" />
                     </VerticalStackLayout>
-                </Grid>
+                </Border>
 
                 <!--  Menu Items  -->
                 <ScrollView BackgroundColor="White">
