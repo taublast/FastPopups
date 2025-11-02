@@ -1,7 +1,9 @@
 #if MACCATALYST || IOS
 
 using System.Diagnostics.CodeAnalysis;
+using AppoMobi.Maui.FastPopups;
 using FastPopups.Extensions;
+using FastPopups.Platforms.iOS;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
@@ -24,7 +26,11 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 	internal bool CanBeDismissedByTappingInternal;
 	readonly IMauiContext mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
+	readonly PopupAnimator animator = new PopupAnimator();
+	bool _appeared = false;
+	bool _isAnimating = false;
 	UIView? overlay;
+	UIView? _contentView;
 
 	/// <summary>
 	/// The native fullscreen overlay
@@ -81,10 +87,43 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 		SetElementSize(new Size(View.Bounds.Width, View.Bounds.Height));
 
-		if (VirtualView is not null)
+		// CRITICAL: Do NOT reposition during HIDE animation - it overrides transforms!
+		if (VirtualView is not null && !_isAnimating)
 		{
 			this.SetSize(VirtualView);
 			this.SetLayout(VirtualView);
+		}
+
+		// Trigger animation after layout is complete and view has proper size
+		if (!_appeared && _contentView != null && overlay != null && VirtualView is Popup popup)
+		{
+			if (_contentView.Bounds.Width > 0 && _contentView.Bounds.Height > 0)
+			{
+				_appeared = true;
+				if (popup.AnimationType != PopupAnimationType.None)
+				{
+					MainThread.BeginInvokeOnMainThread(async () =>
+					{
+						_isAnimating = true;
+						try
+						{
+							animator.PrepareShowAnimation(_contentView, overlay, popup.AnimationType,
+								popup.AnimationDuration, popup.AnimationEasing);
+							await animator.AnimateShowAsync(_contentView, overlay, popup.AnimationType,
+								popup.AnimationDuration, popup.AnimationEasing);
+							popup.OnOpened();
+						}
+						finally
+						{
+							_isAnimating = false;
+						}
+					});
+				}
+				else
+				{
+					popup.OnOpened();
+				}
+			}
 		}
 	}
 
@@ -177,6 +216,9 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 		_ = ViewController ?? throw new InvalidOperationException($"{nameof(ViewController)} cannot be null.");
 
+		// Store content view reference for animation
+		_contentView = Control.ViewController?.View;
+
 		AddToCurrentPageViewController(ViewController);
 
 		if (virtualView.Handler != null)
@@ -203,7 +245,8 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 								return; // Don't dismiss if tap is on content
 						}
 
-						DismissViewController(true, null);
+						// DON'T dismiss here - let the handler flow run the animation first
+						// The actual dismissal will happen in MapOnClosed after animation completes
 						_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null.");
 						VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
 					}
@@ -234,12 +277,45 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 	}
 
+	/// <summary>
+	/// Presents this popup view controller modally over the specified view controller.
+	/// </summary>
+	/// <param name="viewController">The view controller that will present this popup.</param>
+	/// <remarks>
+	/// This method uses <see cref="UIModalPresentationStyle.OverFullScreen"/> to present
+	/// the popup over the entire screen with a transparent background, allowing the underlying
+	/// content to remain visible through the overlay.
+	/// Presents without animation (animated: false) because our custom animation
+	/// runs in ViewDidLayoutSubviews after the view has proper size.
+	/// </remarks>
 	public void AddToCurrentPageViewController(UIViewController viewController)
 	{
-		viewController.PresentViewController(this, true, null);
+		// Present WITHOUT iOS animation - our custom animation will run in ViewDidLayoutSubviews
+		viewController.PresentViewController(this, false, null);
 	}
 
-
+	/// <summary>
+	/// Closes the popup with animation.
+	/// </summary>
+	public async Task CloseWithAnimationAsync()
+	{
+		if (_contentView != null && overlay != null && VirtualView is Popup popup)
+		{
+			if (popup.AnimationType != PopupAnimationType.None)
+			{
+				_isAnimating = true;
+				try
+				{
+					await animator.AnimateHideAsync(_contentView, overlay, popup.AnimationType,
+						popup.AnimationDuration, popup.AnimationEasing);
+				}
+				finally
+				{
+					_isAnimating = false;
+				}
+			}
+		}
+	}
 
 }
 

@@ -92,6 +92,32 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	/// </summary>
 	void OnDismissedByTappingOutsideOfPopup();
 
-    Task AnimateOutAsync(CancellationToken cancel);
+	/// <summary>
+	/// Asynchronously plays the popup's hide animation before closing.
+	/// </summary>
+	/// <param name="cancel">A cancellation token to observe while waiting for the animation to complete.</param>
+	/// <returns>A task that represents the asynchronous animation operation.</returns>
+	/// <remarks>
+	/// <para>
+	/// This method is called internally during the popup close lifecycle to play the configured
+	/// hide animation (reverse of <see cref="AnimationType"/>) before the popup is removed from the screen.
+	/// </para>
+	/// <para>
+	/// <b>Animation Timing:</b> The hide animation plays asynchronously. The popup waits for this animation
+	/// to complete before finalizing the close operation and raising the Closed event.
+	/// </para>
+	/// <para>
+	/// <b>Platform Behavior:</b>
+	/// <list type="bullet">
+	/// <item><description><b>Windows:</b> Uses XAML Storyboard animations with reverse keyframes</description></item>
+	/// <item><description><b>Android:</b> Uses ObjectAnimator with reverse property values</description></item>
+	/// <item><description><b>iOS/macOS:</b> Uses UIView.Animate with reverse transforms</description></item>
+	/// </list>
+	/// </para>
+	/// <para>
+	/// If <see cref="AnimationType"/> is <see cref="PopupAnimationType.None"/>, this method completes immediately.
+	/// </para>
+	/// </remarks>
+	Task AnimateOutAsync(CancellationToken cancel);
 }
 

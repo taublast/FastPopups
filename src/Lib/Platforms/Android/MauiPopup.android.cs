@@ -842,7 +842,8 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                         {
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
-                                animator.SetInitialAnimationState(content, overlay, popup.AnimationType);
+                                animator.PrepareShowAnimation(content, overlay, popup.AnimationType,
+                                    popup.AnimationDuration, popup.AnimationEasing);
 
                                 await animator.AnimateShowAsync(
                                     content,

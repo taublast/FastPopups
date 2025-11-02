@@ -6,7 +6,7 @@
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
-            Spacing="25">
+            Spacing="12">
             
             <Label
                 Text="Maui Popups"
@@ -27,6 +27,22 @@
                 HorizontalTextAlignment="Center"
                 Margin="0,10,0,20"
                 TextColor="Gray" />
+
+            <Button
+                Text="🎬 Animations Demo"
+                BackgroundColor="MediumPurple"
+                TextColor="White"
+                Clicked="OnAnimationDemoClicked"
+                HorizontalOptions="Fill"
+                Margin="0,5" />
+
+            <Button
+                Text="Drawer Simulation"
+                BackgroundColor="DarkCyan"
+                TextColor="White"
+                Clicked="OnDrawerMenuDemoClicked"
+                HorizontalOptions="Fill"
+                Margin="0,5" />
 
             <Button
                 Text="Centered Popup XAML" 
@@ -69,13 +85,7 @@
                 HorizontalOptions="Fill"
                 Margin="0,5" />
 
-            <Button
-                Text="🎬 Animation Demo (NEW!)"
-                BackgroundColor="MediumPurple"
-                TextColor="White"
-                Clicked="OnAnimationDemoClicked"
-                HorizontalOptions="Fill"
-                Margin="0,5" />
+
 
 
         </VerticalStackLayout>

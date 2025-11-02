@@ -8,6 +8,74 @@ namespace FastPopups;
 /// <summary>
 /// Represents a small View that pops up at front the Page. Implements <see cref="IPopup"/>.
 /// </summary>
+/// <remarks>
+/// <para>
+/// <b>Animation Lifecycle:</b> Popup animations follow a precise 3-phase lifecycle to ensure smooth,
+/// glitch-free animations across all platforms:
+/// </para>
+/// <list type="number">
+/// <item>
+/// <term>Phase 1: Prepare (Before Show)</term>
+/// <description>
+/// Animation initial state is set BEFORE the popup becomes visible. This ensures the popup appears
+/// in its "start" position (e.g., off-screen for slide animations, scaled down for zoom animations).
+/// <br/><b>Timing:</b> Happens during platform view creation, before native presentation.
+/// </description>
+/// </item>
+/// <item>
+/// <term>Phase 2: Wait for Size</term>
+/// <description>
+/// The system waits for the popup view to be laid out with proper bounds. This is CRITICAL because
+/// animations need accurate dimensions (e.g., container height for slide-from-bottom).
+/// <br/><b>Platform Detection:</b>
+/// <list type="bullet">
+/// <item><description><b>Windows:</b> Checks ActualHeight/ActualWidth in Loaded event</description></item>
+/// <item><description><b>Android:</b> Uses OnLayoutChangeListener to detect Width > 0 &amp;&amp; Height > 0</description></item>
+/// <item><description><b>iOS:</b> Checks Bounds.Width/Height in ViewDidLayoutSubviews</description></item>
+/// </list>
+/// </description>
+/// </item>
+/// <item>
+/// <term>Phase 3: Animate (After Size Available)</term>
+/// <description>
+/// The show animation plays, transitioning from the initial state to the final visible state.
+/// The overlay fade-in animates in parallel. <see cref="Opened"/> event fires after animation completes.
+/// <br/><b>Duration:</b> Controlled by <see cref="AnimationDuration"/> (default 250ms).
+/// <br/><b>Easing:</b> Controlled by <see cref="AnimationEasing"/> enum.
+/// </description>
+/// </item>
+/// </list>
+/// <para>
+/// <b>Hide Animation:</b> When closing, the process reverses:
+/// <list type="number">
+/// <item><description>Hide animation plays (symmetrical reverse of show animation)</description></item>
+/// <item><description>Platform native dismissal occurs</description></item>
+/// <item><description><see cref="Closed"/> event fires with result</description></item>
+/// </list>
+/// </para>
+/// <para>
+/// <b>Important:</b> Never assume views have size immediately. Always wait for the platform's
+/// layout pass to complete before reading dimensions or starting animations.
+/// </para>
+/// </remarks>
+/// <example>
+/// Basic usage:
+/// <code>
+/// var popup = new Popup
+/// {
+///     Content = new Label { Text = "Hello!" },
+///     AnimationType = PopupAnimationType.FromBottom,
+///     AnimationDuration = 300,
+///     AnimationEasing = PopupAnimationEasing.Spring
+/// };
+///
+/// popup.Opened += (s, e) => Debug.WriteLine("Animation complete, popup visible");
+/// popup.Closed += (s, e) => Debug.WriteLine($"Popup closed with result: {e.Result}");
+///
+/// await popup.Show();
+/// var result = await popup.Result; // Wait for user interaction
+/// </code>
+/// </example>
 [ContentProperty(nameof(Content))]
 public partial class Popup : View, IPopup
 //, IWindowController, IPropertyPropagationController, IResourcesProvider, IStyleSelectable, IStyleElement
@@ -182,7 +250,7 @@ public partial class Popup : View, IPopup
 	/// Gets or sets the easing curve for the popup content animation.
 	/// </summary>
 	/// <remarks>
-	/// The overlay fade always uses linear easing regardless of this setting.
+	/// <para>The overlay fade always uses linear easing regardless of this setting.</para>
 	/// </remarks>
 	public PopupAnimationEasing AnimationEasing
 	{
@@ -325,6 +393,10 @@ public partial class Popup : View, IPopup
 				Content.Parent = null;
 				Content.Parent = this;
 			}
+            else
+            {
+                Content.BindingContext = this.BindingContext; //for some reason was needed for iOS
+            }
 		}
 	}
 
@@ -352,6 +424,11 @@ public partial class Popup : View, IPopup
             {
                 return dialog.CloseWithAnimationAsync();
             }
+        }
+#elif MACCATALYST || IOS
+        if (Handler is PopupHandler handler && handler.PlatformView.Popup != null)
+        {
+            return handler.PlatformView.Popup.CloseWithAnimationAsync();
         }
 #endif
 

@@ -37,7 +37,27 @@ internal static IWindow GetWindow(this IElement element) =>
 
 #endif
 
-    public static Page GetCurrentPage(this Page currentPage)
+	/// <summary>
+	/// Recursively navigates the MAUI page hierarchy to find the currently visible page.
+	/// </summary>
+	/// <param name="currentPage">The page to start searching from, typically the application's main page.</param>
+	/// <returns>The currently visible <see cref="Page"/> in the navigation hierarchy.</returns>
+	/// <remarks>
+	/// <para>
+	/// This method intelligently traverses different MAUI navigation patterns to find the actual visible page:
+	/// </para>
+	/// <list type="number">
+	/// <item><description>Checks for modal pages (highest priority)</description></item>
+	/// <item><description>Navigates into <see cref="FlyoutPage"/> detail pages</description></item>
+	/// <item><description>Resolves <see cref="Shell"/> presented pages</description></item>
+	/// <item><description>Traverses <see cref="IPageContainer{T}"/> containers (TabbedPage, NavigationPage, etc.)</description></item>
+	/// <item><description>Returns the page itself if no container wrapping is found</description></item>
+	/// </list>
+	/// <para>
+	/// This is used internally to determine where to attach popups in the visual tree.
+	/// </para>
+	/// </remarks>
+	public static Page GetCurrentPage(this Page currentPage)
     {
         if (currentPage.NavigationProxy.ModalStack.LastOrDefault() is Page modal)
             return modal;

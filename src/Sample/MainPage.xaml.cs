@@ -108,4 +108,10 @@ public partial class MainPage : ContentPage
         await Navigation.PushAsync(new Views.AnimationDemoPage());
     }
 
+    // Drawer Menu Demo
+    private async void OnDrawerMenuDemoClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new Views.DrawerMenuPage());
+    }
+
 }

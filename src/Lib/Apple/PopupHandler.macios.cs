@@ -27,9 +27,15 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
         try
         {
             var popup = handler.PlatformView.Popup;
+
+            // CRITICAL: Run the hide animation BEFORE dismissing the view controller
+            // This ensures CloseWithAnimationAsync has already been called by AnimateOutAsync,
+            // so we don't dismiss with fade animation
+
             if (popup?.PresentationController?.PresentedViewController is UIViewController presentationViewController)
             {
-                await presentationViewController.DismissViewControllerAsync(true);
+                // Dismiss WITHOUT animation (animated: false) because our custom animation already ran
+                await presentationViewController.DismissViewControllerAsync(false);
             }
 
             // Remove from navigation stack if it's a Popup
@@ -118,7 +124,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	}
 
 	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.Size"/> property changes.
+	/// Action that's triggered when the Popup size-related properties change.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:Popup
+    x:Class="SampleApp.Views.DrawerMenuPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popups="clr-namespace:FastPopups;assembly=FastPopups"
+    AnimationDuration="800"
+    AnimationEasing="Decelerate"
+    AnimationType="FromLeft"
+    BackgroundColor="#99000000"
+    CloseWhenBackgroundIsClicked="True"
+    HorizontalOptions="Start"
+    IsFullScreen="True"
+    VerticalOptions="Fill">
+
+    <popups:Popup.Content>
+
+        <Grid
+            VerticalOptions="Fill"
+            Padding="0"
+            BackgroundColor="White"
+            WidthRequest="280">
+
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
+            </Grid.GestureRecognizers>
+
+            <VerticalStackLayout Spacing="0" VerticalOptions="Fill" InputTransparent="True">
+
+                <!--  Drawer Header  -->
+                <Grid
+                    Padding="20"
+                    BackgroundColor="#2196F3"
+                    HeightRequest="120">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
+                    </Grid.GestureRecognizers>
+                    <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="24"
+                            Text="Menu"
+                            TextColor="White" />
+                        <Label
+                            FontSize="12"
+                            Opacity="0.9"
+                            Text="Navigation Drawer Demo"
+                            TextColor="White" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!--  Menu Items  -->
+                <ScrollView BackgroundColor="White">
+                    <ScrollView.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
+                    </ScrollView.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+
+                        <!--  Home  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="🏠"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Home"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView
+                            Margin="20,0"
+                            HeightRequest="1"
+                            Color="#E0E0E0" />
+
+                        <!--  Profile  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="👤"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Profile"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView
+                            Margin="20,0"
+                            HeightRequest="1"
+                            Color="#E0E0E0" />
+
+                        <!--  Settings  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="⚙️"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Settings"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView
+                            Margin="20,0"
+                            HeightRequest="1"
+                            Color="#E0E0E0" />
+
+                        <!--  Messages  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="💬"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Messages"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView
+                            Margin="20,0"
+                            HeightRequest="1"
+                            Color="#E0E0E0" />
+
+                        <!--  Favorites  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="⭐"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Favorites"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView
+                            Margin="20,0"
+                            HeightRequest="1"
+                            Color="#E0E0E0" />
+
+                        <!--  Help  -->
+                        <Grid Padding="20,15" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMenuItemTapped" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="15">
+                                <Label
+                                    FontSize="20"
+                                    Text="❓"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="16"
+                                    Text="Help"
+                                    TextColor="#212121"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!--  Footer  -->
+                <BoxView
+                    HeightRequest="1"
+                    VerticalOptions="End"
+                    Color="#E0E0E0" />
+
+            </VerticalStackLayout>
+
+            <Grid Padding="20,15" VerticalOptions="End"
+                  BackgroundColor="#F0F0F0">
+
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEmptySpaceTapped" />
+                </Grid.GestureRecognizers>
+
+                <Label
+                    FontSize="12"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    Text="App Version 1.0.0"
+                    TextColor="Gray" />
+
+            </Grid>
+
+        </Grid>
+    </popups:Popup.Content>
+
+</popups:Popup>

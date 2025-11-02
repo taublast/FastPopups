@@ -102,7 +102,7 @@ public static partial class PopupExtensions
 	{
 		var anchorView = anchor.ToPlatform(mauiContext);
 		
-		if (anchorView.Superview == null)
+		if (anchorView. Superview == null)
 		{
 			return Rect.Zero;
 		}
@@ -119,7 +119,7 @@ public static partial class PopupExtensions
 
 
 	/// <summary>
-	/// Method to update the <see cref="IPopup.Size"/> of the Popup.
+	/// Method to update the size of the Popup based on its content and layout options.
 	/// </summary>
 	/// <param name="mauiPopup">An instance of <see cref="MauiPopup"/>.</param>
 	/// <param name="popup">An instance of <see cref="IPopup"/>.</param>

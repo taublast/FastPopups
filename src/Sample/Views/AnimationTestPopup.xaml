@@ -1,97 +1,111 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<fastpopups:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:fastpopups="clr-namespace:FastPopups;assembly=FastPopups"
-       xmlns:views="clr-namespace:SampleApp.Views"
-       x:Class="SampleApp.Views.AnimationTestPopup"
-       x:DataType="views:AnimationTestPopup"
-       CloseWhenBackgroundIsClicked="True"
-       BackgroundColor="#80000000"
-       HorizontalOptions="Center"
-       VerticalOptions="Center"
-       WidthRequest="500"
-       HeightRequest="600">
+<fastpopups:Popup
+    x:Class="SampleApp.Views.AnimationTestPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fastpopups="clr-namespace:FastPopups;assembly=FastPopups"
+    xmlns:views="clr-namespace:SampleApp.Views"
+    x:DataType="views:AnimationTestPopup"
+    BackgroundColor="#80000000"
+    CloseWhenBackgroundIsClicked="True"
+    HeightRequest="600"
+    HorizontalOptions="Center"
+    VerticalOptions="Center"
+    WidthRequest="500">
 
-    <Border BackgroundColor="White"
-            StrokeThickness="3"
-            Stroke="DodgerBlue"
-            Padding="20">
+    <Border
+        Padding="20"
+        BackgroundColor="White"
+        Stroke="DodgerBlue"
+        StrokeThickness="3">
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="14"/>
+            <RoundRectangle CornerRadius="14" />
         </Border.StrokeShape>
 
         <ScrollView>
             <VerticalStackLayout Spacing="15">
 
-                <!-- Title -->
-                <Label Text="Animation Test"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       TextColor="DodgerBlue"/>
+                <!--  Title  -->
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    HorizontalOptions="Center"
+                    Text="Animation Test"
+                    TextColor="DodgerBlue" />
 
-                <Label Text="Tap outside to close"
-                       FontSize="12"
-                       HorizontalOptions="Center"
-                       TextColor="Gray"
-                       Margin="0,0,0,10"/>
+                <Label
+                    Margin="0,0,0,10"
+                    FontSize="12"
+                    HorizontalOptions="Center"
+                    Text="Tap outside to close"
+                    TextColor="Gray" />
 
-                <!-- Animation Info -->
-                <Border BackgroundColor="#F0F8FF"
-                        Padding="15"
-                        StrokeThickness="1"
-                        Stroke="LightBlue">
+                <!--  Animation Info  -->
+                <Border
+                    Padding="15"
+                    BackgroundColor="#F0F8FF"
+                    Stroke="LightBlue"
+                    StrokeThickness="1">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="8"/>
+                        <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
 
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="{Binding AnimationName}"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="DodgerBlue"/>
-                        <Label Text="{Binding AnimationDescription}"
-                               FontSize="13"
-                               TextColor="#333"/>
-                        <Label Text="{Binding AnimationDetails}"
-                               FontSize="11"
-                               TextColor="Gray"/>
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="{Binding AnimationName}"
+                            TextColor="DodgerBlue" />
+                        <Label
+                            FontSize="13"
+                            Text="{Binding AnimationDescription}"
+                            TextColor="#333" />
+                        <Label
+                            FontSize="11"
+                            Text="{Binding AnimationDetails}"
+                            TextColor="Gray" />
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Close Button -->
-                <Button Text="Close Popup"
-                        BackgroundColor="DodgerBlue"
-                        TextColor="White"
-                        Clicked="OnCloseClicked"
-                        Margin="0,10,0,0"/>
+                <!--  Close Button  -->
+                <Button
+                    Margin="0,10,0,0"
+                    BackgroundColor="DodgerBlue"
+                    Clicked="OnCloseClicked"
+                    Text="Close Popup"
+                    TextColor="White" />
 
-                <!-- Sample Content -->
-                <BoxView HeightRequest="1"
-                         Color="LightGray"
-                         Margin="0,10"/>
+                <!--  Sample Content  -->
+                <BoxView
+                    Margin="0,10"
+                    HeightRequest="1"
+                    Color="LightGray" />
 
-                <Label Text="Sample Content Area"
-                       FontSize="14"
-                       FontAttributes="Bold"
-                       TextColor="#666"/>
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    Text="Sample Content Area"
+                    TextColor="#666" />
 
-                <Label Text="This popup demonstrates different animation types. The overlay always fades in/out while the content uses the selected animation."
-                       FontSize="12"
-                       TextColor="#999"
-                       LineBreakMode="WordWrap"/>
+                <Label
+                    FontSize="12"
+                    LineBreakMode="WordWrap"
+                    Text="This popup demonstrates different animation types. The overlay always fades in/out while the content uses the selected animation."
+                    TextColor="#999" />
 
-                <!-- Visual indicator -->
-                <Border BackgroundColor="LightBlue"
-                        Padding="20"
-                        HorizontalOptions="Center"
-                        Margin="0,10">
+                <!--  Visual indicator  -->
+                <Border
+                    Margin="0,10"
+                    Padding="20"
+                    BackgroundColor="LightBlue"
+                    HorizontalOptions="Center">
                     <Border.StrokeShape>
-                        <Ellipse/>
+                        <Ellipse />
                     </Border.StrokeShape>
-                    <Label Text="🎨"
-                           FontSize="40"
-                           HorizontalOptions="Center"/>
+                    <Label
+                        FontSize="40"
+                        HorizontalOptions="Center"
+                        Text="🎨" />
                 </Border>
 
             </VerticalStackLayout>
