@@ -7,6 +7,7 @@ using Foundation;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Platform;
+using ObjCRuntime;
 using UIKit;
 
 namespace FastPopups.Platforms.iOS;
@@ -283,7 +284,8 @@ public class PopupAnimator
     /// </summary>
     public void SetInitialAnimationState(UIView view, UIView viewContainer, PopupAnimationType animationType)
     {
-        view.Layer.ZPosition = 9999; //solves flip etc covered by dimmer layer
+        view.Superview?.BringSubviewToFront(view);
+        view.Layer.ZPosition = 9999;
 
         // Always start overlay as invisible
         viewContainer.Alpha = 0f;
@@ -615,10 +617,12 @@ public class PopupAnimator
             PopupAnimationEasing.Decelerate => new UICubicTimingParameters(UIViewAnimationCurve.EaseOut),
             PopupAnimationEasing.Accelerate => new UICubicTimingParameters(UIViewAnimationCurve.EaseIn),
             PopupAnimationEasing.AccelerateDecelerate => new UICubicTimingParameters(UIViewAnimationCurve.EaseInOut),
-            // Spring: dampingRatio 0.7 = slightly bouncy, initialVelocity = zero
             PopupAnimationEasing.Spring => new UISpringTimingParameters(0.7f, new CGVector(0, 0)),
-            // Elastic: dampingRatio 0.5 = more bouncy for elastic effect, initialVelocity = zero
-            PopupAnimationEasing.Elastic => new UISpringTimingParameters(0.5f, new CGVector(0, 0)),
+            PopupAnimationEasing.Elastic => new UICubicTimingParameters(
+                point1: new CGPoint(0.20, 0.00),
+                point2: new CGPoint(0.15, 1.40)
+            ),
+
             PopupAnimationEasing.Default => new UICubicTimingParameters(UIViewAnimationCurve.EaseOut),
             _ => new UICubicTimingParameters(UIViewAnimationCurve.EaseOut)
         };
@@ -638,6 +642,13 @@ public class PopupAnimator
             view.Center.X - transition.X,
             view.Center.Y - transition.Y);
     }
+
+
+
+
 }
+
+
+ 
 
 #endif
