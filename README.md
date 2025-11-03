@@ -4,8 +4,7 @@
 
 ## About
 
-Initially built on top of CommunityToolkit popups version 1, the code that is no longer used by CommunityToolkit, so merging there wasn't possible.
-It was found to be the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
+Initially built on top of CommunityToolkit popups version one, it was found to be the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack, hotreload support, animations, and much more.
 
 ---
 
@@ -27,9 +26,14 @@ It was found to be the fastest for opening popups among different libraries, was
 
 ---
 
+## Intro
+
+We have 2 layers here: background dimmer and popup content. You can customize the dimmer by setting `BackgroundColor` of the popup and control the level of tint and transparency. This one will cover all the screen.  
+When you set popup's layout/padding/anchor properties you are controlling the content. Animations are separate for dimmer and content, first one only uses fade and content is fully animated upon settings, please see below.
+
 ## 🚀 Quick Start
 
-### 1. Setup 
+### Setup 
 
 **Install from nuget:**
 ```bash
@@ -57,7 +61,7 @@ public static class MauiProgram
 
 When in any doubt check out the included `SampleApp` project!
 
-### 2. Create and Show Popups
+### Create and Show Popups
 ```csharp
 // Simple popup
 var popup = new Popup
@@ -732,5 +736,5 @@ var popup = new Popup
 
 ---
 
-Please feel free to contribute!
+Please feel free to contribute! The next lib improvement might be to add more background layer customization, mainly thinking about blurring te background with it, instead of placing a blurred screenshot inside the content - what I am actually doing when needed.
 
