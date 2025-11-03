@@ -29,7 +29,8 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 ## Intro
 
 We have 2 layers here: background dimmer and popup content. You can customize the dimmer by setting `BackgroundColor` of the popup and control the level of tint and transparency. This one will cover all the screen.  
-When you set popup's layout/padding/anchor properties you are controlling the content. Animations are separate for dimmer and content, first one only uses fade and content is fully animated upon settings, please see below.
+When you set popup's layout/padding/anchor properties you are controlling the content. Animations are separate for dimmer and content, first one only uses fade and content is fully animated upon settings, please see below.  
+If you need to wait until the popup is closed use `ShowPopupAsync` it can even return a result. For a fire a forget scenario use `Show`. But wait.. better read the full docs, no?
 
 ## 🚀 Quick Start
 
