@@ -11,7 +11,7 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 ## ✨ Key Features
 
 - **🛝 Crossplatform**: iOS, MacCatalyst, Android, Windows
-- **↕️ Full Screen**: Choose to display content inside safe area or full screen
+- **↕️ Full Screen**: Choose to display content in safe area or full screen
 - **🌖 Overlay Customization**: Configurable colors and transparency
 - **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
 - **📍 Flexible Positioning**: Anchored ot aligned positioning
