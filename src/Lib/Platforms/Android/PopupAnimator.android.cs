@@ -69,6 +69,15 @@ public class PopupAnimator
                 return;
             }
 
+            // Check if cancellation was already requested
+            if (cancellationToken.IsCancellationRequested)
+            {
+                // Set views to final visible state
+                contentView.Alpha = 1f;
+                overlayView.Alpha = 1f;
+                return;
+            }
+
             // Set pivot point to CENTER of content view for scale/rotation animations
             // This MUST be done after the view has been measured and has proper size
             if (NeedsCenterPivot(animationType))
@@ -85,9 +94,27 @@ public class PopupAnimator
             _showAnimatorSet.AnimationEnd += (s, e) => tcs.TrySetResult(true);
             _showAnimatorSet.AnimationCancel += (s, e) => tcs.TrySetCanceled();
 
-            _showAnimatorSet.Start();
+            // Register cancellation callback
+            using (cancellationToken.Register(() =>
+            {
+                _showAnimatorSet?.Cancel();
+                tcs.TrySetCanceled();
+            }))
+            {
+                _showAnimatorSet.Start();
 
-            await tcs.Task;
+                try
+                {
+                    await tcs.Task;
+                }
+                catch (OperationCanceledException)
+                {
+                    // Animation was canceled - this is expected behavior
+                    // Set views to final visible state
+                    contentView.Alpha = 1f;
+                    overlayView.Alpha = 1f;
+                }
+            }
         }
         finally
         {
@@ -122,6 +149,14 @@ public class PopupAnimator
                 return;
             }
 
+            // Check if cancellation was already requested
+            if (cancellationToken.IsCancellationRequested)
+            {
+                contentView.Alpha = 0f;
+                overlayView.Alpha = 0f;
+                return;
+            }
+
             // Create hide animation
             _hideAnimatorSet = CreateHideAnimation(contentView, overlayView, animationType, duration, easing);
 
@@ -130,9 +165,27 @@ public class PopupAnimator
             _hideAnimatorSet.AnimationEnd += (s, e) => tcs.TrySetResult(true);
             _hideAnimatorSet.AnimationCancel += (s, e) => tcs.TrySetCanceled();
 
-            _hideAnimatorSet.Start();
+            // Register cancellation callback
+            using (cancellationToken.Register(() =>
+            {
+                _hideAnimatorSet?.Cancel();
+                tcs.TrySetCanceled();
+            }))
+            {
+                _hideAnimatorSet.Start();
 
-            await tcs.Task;
+                try
+                {
+                    await tcs.Task;
+                }
+                catch (OperationCanceledException)
+                {
+                    // Animation was canceled - this is expected behavior
+                    // Set views to final state
+                    contentView.Alpha = 0f;
+                    overlayView.Alpha = 0f;
+                }
+            }
         }
         finally
         {
