@@ -4,7 +4,7 @@
 
 ## About
 
-Initially built on top of CommunityToolkit popups version 1, the code that is no longer used by CommunityToolkit. 
+Initially built on top of CommunityToolkit popups version 1, the code that is no longer used by CommunityToolkit, so merging there wasn't possible.
 It was found to be the fastest for opening popups among different libraries, was definitely worth adding new features like full-screen, navigation stack and much more.
 
 ---
@@ -217,107 +217,7 @@ private async void OnAnchoredPopupClicked(object sender, EventArgs e)
 
 ---
 
-## API Reference
-
-### Two Simple Ways to Work with Popups
-
-AppoMobi.Maui.FastPopups provides a clean, simple approach with two complementary parts:
-
-#### 1. 🎯 Create and Show Popups (Direct Approach)
-Simple, powerful, and gives you full control:
-
-```csharp
-// Create popup manually
-var popup = new Popup
-{
-    Content = new Label { Text = "Hello World!" },
-    HeightRequest = 200,
-    WidthRequest = 300,
-    CloseWhenBackgroundIsClicked = true
-};
-
-// Show popup using extension methods
-var result = await this.ShowPopupAsync(popup);
-// OR
-this.ShowPopup(popup);
-```
-
-**Perfect for:** All scenarios - simple messages, complex forms, MVVM patterns, everything!
-
-#### 2. 🗂️ PopupNavigationStack (Global Stack Management)
-Automatic tracking and global operations for all popups:
-
-```csharp
-// Access the global navigation stack (automatically tracks ALL popups)
-var stackCount = PopupNavigationStack.Instance.Count;
-var topPopup = PopupNavigationStack.Instance.Peek();
-
-// Global operations
-PopupNavigationStack.Instance.Clear(); // Close all popups
-var popup = PopupNavigationStack.Instance.Pop(); // Get and remove top popup
-```
-
-**Perfect for:** Managing multiple popups, global operations, navigation-like experiences
-
----
-
-### How They Work Together
-
-Both parts work seamlessly together:
-
-```mermaid
-graph TD
-    A[Create Popup] --> B[Extension Methods]
-    B --> C[Platform Display]
-    C --> D[PopupNavigationStack]
-    D --> E[Automatic Tracking]
-    E --> F[Global Operations]
-```
-
-**Key Points:**
-- ✅ **All popups are automatically tracked** in NavigationStack
-- ✅ **Simple and powerful** - no complex setup or registration needed
-- ✅ **Global operations work on all popups** - close all, peek, count, etc.
-- ✅ **Automatic cleanup** - popups are removed from stack when closed
-- ✅ **Full control** - customize every aspect of your popups
-
----
-
-### Popup Properties Reference
-
-```csharp
-var popup = new Popup
-{
-    // Content and layout
-    Content = new Label { Text = "Hello World" },
-    HeightRequest = 200,
-    WidthRequest = 300,
-    HorizontalOptions = LayoutOptions.Center,
-    VerticalOptions = LayoutOptions.Center,
-
-    // Background and overlay
-    BackgroundColor = Colors.Black.WithAlpha(0.5f), // Semi-transparent dimmer
-    Color = Colors.White, // Popup content background
-
-    // Spacing and padding
-    Padding = new Thickness(20), // 20px padding on all sides
-    // or Padding = new Thickness(10, 20, 10, 20), // left, top, right, bottom
-
-    // Behavior
-    CloseWhenBackgroundIsClicked = true,
-    IsFullScreen = false,
-
-    // Positioning
-    Anchor = someButton, // Position relative to this element
-
-    // Results
-    ResultWhenUserTapsOutsideOfPopup = "cancelled"
-};
-```
-
----
-
-## Setup and Usage Guide
+## Usage Guide
 
 ### Simple Setup (One Line!)
 
@@ -575,7 +475,7 @@ public class PopupManager
 - ✅ **Stack Inspection**: Peek at the top popup without removing it
 - ✅ **Global Access**: Static singleton accessible from anywhere
 
-### Why This Approach is Better
+### Why This Approach
 
 | ✅ **Simplified** | ❌ **Complex Alternatives** |
 |------------------|----------------------------|
@@ -618,9 +518,7 @@ public class RealWorldExample
 
 ## Advanced Usage
 
-### Custom Popup Behavior
-
-#### Custom Validation
+### Custom Validation
 
 Override `OnBackgroundClicked()` to implement custom dismissal logic:
 
@@ -642,52 +540,9 @@ public class ConfirmationPopup : Popup
 }
 ```
 
-#### Popup Lifecycle Events
+## Examples
 
-```csharp
-public class MyPopup : Popup
-{
-    protected override void OnOpened()
-    {
-        base.OnOpened();
-        // Popup has been displayed
-        StartAnimations();
-    }
-
-    protected override async Task OnClosed(object? result, bool wasDismissedByTappingOutside, CancellationToken token)
-    {
-        // Popup is about to close
-        await SaveData();
-        await base.OnClosed(result, wasDismissedByTappingOutside, token);
-    }
-}
-```
-
-### Platform-Specific Features
-
-#### Consistent Cross-Platform Behavior
-
-The library ensures consistent popup dismissal behavior across all platforms:
-
-- **Android**: Uses overlay click detection with proper touch handling
-- **iOS**: Uses `UITapGestureRecognizer` with unified validation
-- **Windows**: Uses `PointerPressed` events with consistent logic
-- **Tizen**: Uses native outside click events
-
-All platforms now use the same validation logic through `ShouldDismissOnOutsideClick()`.
-
-#### Platform Handlers
-
-Custom platform handlers provide enhanced performance and reliability:
-
-```csharp
-// In MauiProgram.cs
-builder.ConfigurePopups(); // Registers enhanced platform handlers
-```
-
-### Advanced Usage Examples
-
-#### Modal Dialog with Result
+### Modal Dialog with Result
 
 ```csharp
 public class ConfirmDialog : Popup
@@ -726,7 +581,7 @@ if (result?.ToString() == "confirmed")
 }
 ```
 
-#### Context Menu
+### Context Menu
 
 ```csharp
 public class ContextMenu : Popup
@@ -751,7 +606,7 @@ public class ContextMenu : Popup
 }
 ```
 
-#### Loading Overlay
+### Loading Overlay
 
 ```csharp
 public class LoadingPopup : Popup
@@ -777,18 +632,103 @@ public class LoadingPopup : Popup
 
 ---
 
-## TODO
+## API Reference
 
-### Required
+### Two Simple Ways to Work with Popups
 
-* Test orientation changes when already open
-* Test and possibly fix Tizen
+AppoMobi.Maui.FastPopups provides a clean, simple approach with two complementary parts:
 
-### Roadmap
+#### 1. 🎯 Create and Show Popups (Direct Approach)
+Simple, powerful, and gives you full control:
 
-* Add Blur effect below
-* Add background layer custom content
-* Add animations like we had in RG popups, working separately separate for overlay and content
+```csharp
+// Create popup manually
+var popup = new Popup
+{
+    Content = new Label { Text = "Hello World!" },
+    HeightRequest = 200,
+    WidthRequest = 300,
+    CloseWhenBackgroundIsClicked = true
+};
+
+// Show popup using extension methods
+var result = await this.ShowPopupAsync(popup);
+// OR
+this.ShowPopup(popup);
+```
+
+**Perfect for:** All scenarios - simple messages, complex forms, MVVM patterns, everything!
+
+#### 2. 🗂️ PopupNavigationStack (Global Stack Management)
+Automatic tracking and global operations for all popups:
+
+```csharp
+// Access the global navigation stack (automatically tracks ALL popups)
+var stackCount = PopupNavigationStack.Instance.Count;
+var topPopup = PopupNavigationStack.Instance.Peek();
+
+// Global operations
+PopupNavigationStack.Instance.Clear(); // Close all popups
+var popup = PopupNavigationStack.Instance.Pop(); // Get and remove top popup
+```
+
+**Perfect for:** Managing multiple popups, global operations, navigation-like experiences
+
+---
+
+### How They Work Together
+
+Both parts work seamlessly together:
+
+```mermaid
+graph TD
+    A[Create Popup] --> B[Extension Methods]
+    B --> C[Platform Display]
+    C --> D[PopupNavigationStack]
+    D --> E[Automatic Tracking]
+    E --> F[Global Operations]
+```
+
+**Key Points:**
+- ✅ **All popups are automatically tracked** in NavigationStack
+- ✅ **Simple and powerful** - no complex setup or registration needed
+- ✅ **Global operations work on all popups** - close all, peek, count, etc.
+- ✅ **Automatic cleanup** - popups are removed from stack when closed
+- ✅ **Full control** - customize every aspect of your popups
+
+---
+
+### Popup Properties Reference
+
+```csharp
+var popup = new Popup
+{
+    // Content and layout
+    Content = new Label { Text = "Hello World" },
+    HeightRequest = 200,
+    WidthRequest = 300,
+    HorizontalOptions = LayoutOptions.Center,
+    VerticalOptions = LayoutOptions.Center,
+
+    // Background and overlay
+    BackgroundColor = Colors.Black.WithAlpha(0.5f), // Semi-transparent dimmer
+    Color = Colors.White, // Popup content background
+
+    // Spacing and padding
+    Padding = new Thickness(20), // 20px padding on all sides
+    // or Padding = new Thickness(10, 20, 10, 20), // left, top, right, bottom
+
+    // Behavior
+    CloseWhenBackgroundIsClicked = true,
+    IsFullScreen = false,
+
+    // Positioning
+    Anchor = someButton, // Position relative to this element
+
+    // Results
+    ResultWhenUserTapsOutsideOfPopup = "cancelled"
+};
+```
 
 ---
 
