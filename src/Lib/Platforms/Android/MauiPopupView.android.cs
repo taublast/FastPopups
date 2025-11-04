@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Content.Res;
 using Android.Views;
+using AppoMobi.Maui.FastPopups;
 using AView = Android.Views.View;
 
 namespace FastPopups;
@@ -45,10 +46,11 @@ public class MauiPopupView : AView
 	/// </summary>
 	/// <param name="context">Android Context.</param>
 	/// <param name="mauiContext">MAUI Context.</param>
-	public void CreateDialog(Context context, Microsoft.Maui.IMauiContext mauiContext, bool ignoreSafeArea)
+	/// <param name="displayMode">The display mode for the popup.</param>
+	public void CreateDialog(Context context, Microsoft.Maui.IMauiContext mauiContext, PopupDisplayMode displayMode)
 	{
 		dialog?.Dispose();
-		dialog = new MauiPopup(context, mauiContext, ignoreSafeArea);
+		dialog = new MauiPopup(context, mauiContext, displayMode);
 	}
 
 	/// <summary>
@@ -78,12 +80,12 @@ public class MauiPopupView : AView
 	}
 
 	/// <summary>
-	/// Sets fullscreen mode on the internal dialog.
+	/// Sets display mode on the internal dialog.
 	/// </summary>
-	/// <param name="fullscreen">Whether to use fullscreen mode.</param>
-	public void SetFullScreen(bool fullscreen)
+	/// <param name="displayMode">The display mode to use.</param>
+	public void SetDisplayMode(PopupDisplayMode displayMode)
 	{
-		dialog?.SetFullScreen(fullscreen);
+		dialog?.SetDisplayMode(displayMode);
 	}
 
 	/// <summary>

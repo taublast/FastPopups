@@ -105,16 +105,25 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
     }
 
     /// <summary>
+    /// Action that's triggered when the Popup DisplayMode property changes.
+    /// </summary>
+    /// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+    /// <param name="view">An instance of <see cref="IPopup"/>.</param>
+    public static void MapDisplayMode(PopupHandler handler, IPopup view)
+    {
+        handler.PlatformView.DisplayMode = view.DisplayMode;
+        handler.PlatformView.Layout();
+        handler.PlatformView.UpdateContentPositioning();
+    }
+
+    /// <summary>
     /// Action that's triggered when the Popup <see cref="IPopup.Size"/> property changes.
     /// </summary>
     /// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
     /// <param name="view">An instance of <see cref="IPopup"/>.</param>
     public static void MapSize(PopupHandler handler, IPopup view)
     {
-        handler.PlatformView.IsFullScreen = view.IsFullScreen;
         handler.PlatformView.Layout();
-
-
         handler.PlatformView.UpdateContentPositioning();
     }
 

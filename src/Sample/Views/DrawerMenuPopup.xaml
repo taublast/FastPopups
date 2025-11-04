@@ -10,7 +10,7 @@
     BackgroundColor="#99000000"
     CloseWhenBackgroundIsClicked="True"
     HorizontalOptions="Start"
-    IsFullScreen="True"
+    DisplayMode="Cover"
     WidthRequest="280"
     VerticalOptions="Fill">
 

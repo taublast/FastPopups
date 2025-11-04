@@ -47,6 +47,7 @@ public class MauiPopupView : UIView
     public Microsoft.Maui.Handlers.PageHandler? SetElement(IPopup popupElement)
     {
         popup?.SetElement(popupElement);
+        popup?.SetDisplayMode(popupElement.DisplayMode);
         return popup?.Control;
     }
 

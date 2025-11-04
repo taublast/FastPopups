@@ -34,7 +34,15 @@
                 BackgroundColor="DarkCyan"
                 Clicked="OnDrawerMenuDemoClicked"
                 HorizontalOptions="Fill"
-                Text="Drawer Simulation"
+                Text="Drawer Popup"
+                TextColor="White" />
+
+            <Button
+                Margin="0,5"
+                BackgroundColor="Purple"
+                Clicked="OnCustomSizePopupClicked"
+                HorizontalOptions="Fill"
+                Text="Display Modes"
                 TextColor="White" />
 
             <Button
@@ -62,13 +70,6 @@
                 Text="Show Anchored Popup"
                 TextColor="White" />
 
-            <Button
-                Margin="0,5"
-                BackgroundColor="Purple"
-                Clicked="OnCustomSizePopupClicked"
-                HorizontalOptions="Fill"
-                Text="Custom Popup Code"
-                TextColor="White" />
 
             <Button
                 Margin="0,5"

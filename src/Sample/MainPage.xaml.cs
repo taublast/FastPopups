@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+using AppoMobi.Maui.FastPopups;
+using Microsoft.Maui.Controls.Shapes;
 using SampleApp.Views;
 
 namespace SampleApp;
@@ -34,13 +35,15 @@ public partial class MainPage : ContentPage
     private async void OnCustomSizePopupClicked(object? sender, EventArgs e)
     {
         Popup popup = null!;
+        Label displayModeLabel = null!;
+
         popup = new Popup
         {
-            IsFullScreen = false,
+            DisplayMode = PopupDisplayMode.Default,
             WidthRequest = 400,
             BackgroundColor = Colors.Red.WithAlpha(0.85f),
             CloseWhenBackgroundIsClicked = true,
-            HorizontalOptions = LayoutOptions.Start,
+            HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.End,
             Content = new Border
             {
@@ -70,14 +73,29 @@ public partial class MainPage : ContentPage
                             HorizontalTextAlignment = TextAlignment.Center,
                             TextColor = Colors.DarkSlateGray
                         },
+                        (displayModeLabel = new Label
+                        {
+                            Text = "DisplayMode: Default",
+                            FontSize = 14,
+                            FontAttributes = FontAttributes.Bold,
+                            HorizontalOptions = LayoutOptions.Center,
+                            TextColor = Colors.DarkBlue
+                        }),
                         new Button
                         {
-                            Text = "Toggle IsFullScreen",
+                            Text = "Toggle DisplayMode",
                             BackgroundColor = Colors.Orange,
                             TextColor = Colors.White,
                             Command = new Command(() =>
                             {
-                                popup.IsFullScreen = !popup.IsFullScreen;
+                                popup.DisplayMode = popup.DisplayMode switch
+                                {
+                                    PopupDisplayMode.Default => PopupDisplayMode.Cover,
+                                    PopupDisplayMode.Cover => PopupDisplayMode.FullScreen,
+                                    PopupDisplayMode.FullScreen => PopupDisplayMode.Default,
+                                    _ => PopupDisplayMode.Default
+                                };
+                                displayModeLabel.Text = $"DisplayMode: {popup.DisplayMode}";
                             })
                         },
                         new Button

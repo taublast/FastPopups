@@ -11,7 +11,7 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 ## ✨ Key Features
 
 - **🛝 Crossplatform**: iOS, MacCatalyst, Android, Windows
-- **↕️ Full Screen**: Choose to display content in safe area or full screen
+- **↕️ Display Modes**: Default (safe area), Cover (edge-to-edge with bars), FullScreen (hide system UI)
 - **🌖 Overlay Customization**: Configurable colors and transparency
 - **🗂️ Navigation Stack**: Thread-safe automatic tracking of all popups
 - **📍 Flexible Positioning**: Anchored ot aligned positioning
@@ -21,9 +21,34 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.1.0.1
+## ⬆️ What's New 1.2.0.1
 
-- Animations! See sample app.
+The boolean `IsFullScreen` property has been replaced with `DisplayMode` enum to support more display scenarios:
+
+**Old API:**
+```csharp
+var popup = new Popup
+{
+    IsFullScreen = false  // or true
+};
+```
+
+**New API:**
+```csharp
+var popup = new Popup
+{
+    DisplayMode = PopupDisplayMode.Default  // or Cover, or FullScreen
+};
+```
+
+**Migration:**
+- `IsFullScreen = false` → `DisplayMode = PopupDisplayMode.Default`
+- `IsFullScreen = true` → `DisplayMode = PopupDisplayMode.Cover`
+
+**New Features:**
+- `PopupDisplayMode.Default` - Content respects safe area insets (status bar, navigation bar visible, content positioned within safe areas)
+- `PopupDisplayMode.Cover` - Content can position itsself fullscreen, like the dimmer layer 
+- `PopupDisplayMode.FullScreen` - Cover + hide system UI if platform allows (for video players, immersive experiences)
 
 ---
 
@@ -113,7 +138,11 @@ You can hide the layer by setting popup `BackgroundColor` property to a totally 
 
 This is your logical popup, layout properties like `HorizontalOptions`, `VerticalOptions` will affect its positioning.
 
-`IsFullScreen` controls if you want to consider full screen or not to go over safe insets, like status bar etc.
+`DisplayMode` controls how the popup content relates to system UI (status bar, navigation bar, etc.):
+
+- **`PopupDisplayMode.Default`** - Content respects safe area insets and positions within safe areas
+- **`PopupDisplayMode.Cover`** - Content can extend edge-to-edge while system UI remains visible (great for drawer menus)
+- **`PopupDisplayMode.FullScreen`** - System UI is hidden and content can extend fully edge-to-edge (for immersive experiences)
 
 ### Padding
 
@@ -125,7 +154,7 @@ var popup = new Popup
     Content = new Label { Text = "Content with padding" },
     Padding = new Thickness(50), // 50 pts padding on all sides
     BackgroundColor = Colors.Red, // You'll see the red border around content
-    IsFullScreen = true
+    DisplayMode = PopupDisplayMode.FullScreen
 };
 
 // Or specify different padding for each side
@@ -290,7 +319,7 @@ public async Task ShowPaddedDialog()
         },
         Padding = new Thickness(30, 50, 30, 20), // Different padding per side
         BackgroundColor = Colors.Black.WithAlpha(0.7f),
-        IsFullScreen = true,
+        DisplayMode = PopupDisplayMode.FullScreen,
         CloseWhenBackgroundIsClicked = true
     };
 
@@ -726,7 +755,7 @@ var popup = new Popup
 
     // Behavior
     CloseWhenBackgroundIsClicked = true,
-    IsFullScreen = false,
+    DisplayMode = PopupDisplayMode.Default, // or Cover, or FullScreen
 
     // Positioning
     Anchor = someButton, // Position relative to this element

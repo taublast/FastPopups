@@ -1,3 +1,4 @@
+using AppoMobi.Maui.FastPopups;
 using Microsoft.Maui.Platform;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
@@ -112,7 +113,7 @@ public static partial class PopupExtensions
         var fullBounds = popupParent.Bounds;
 
         var popupParentFrame = fullBounds;
-        if (!popup.IsFullScreen)
+        if (popup.DisplayMode == PopupDisplayMode.Default)
         {
             popupParentFrame = GetSafeArea(mauiContext);
         }
@@ -188,7 +189,7 @@ public static partial class PopupExtensions
         
         // Get safe area if needed
         Microsoft.Maui.Thickness safeAreaInsets = default;
-        if (!popup.IsFullScreen)
+        if (popup.DisplayMode == PopupDisplayMode.Default)
         {
             var safeArea = GetSafeArea(mauiContext);
             safeAreaInsets = new Microsoft.Maui.Thickness(

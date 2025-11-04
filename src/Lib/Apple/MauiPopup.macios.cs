@@ -31,6 +31,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 	bool _isAnimating = false;
 	UIView? overlay;
 	UIView? _contentView;
+	PopupDisplayMode _displayMode = PopupDisplayMode.Default;
 
 	/// <summary>
 	/// The native fullscreen overlay
@@ -62,11 +63,29 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 	public void SetElementSize(Size size) =>
 		Control?.ContainerView?.SizeThatFits(size);
 
+	/// <summary>
+	/// Gets a value indicating whether the status bar should be hidden.
+	/// </summary>
+	public override bool PrefersStatusBarHidden() => _displayMode == PopupDisplayMode.FullScreen;
+
+	/// <summary>
+	/// Updates the display mode and refreshes the status bar appearance.
+	/// </summary>
+	/// <param name="displayMode">The new display mode.</param>
+	public void SetDisplayMode(PopupDisplayMode displayMode)
+	{
+		if (_displayMode != displayMode)
+		{
+			_displayMode = displayMode;
+			SetNeedsStatusBarAppearanceUpdate();
+		}
+	}
+
 	/// <inheritdoc/>
 	public override void ViewDidLoad()
 	{
 		base.ViewDidLoad();
-		
+
 		// Set transparent background to avoid white background behind rounded corners
 		if (View != null)
 		{
@@ -168,6 +187,12 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 		VirtualView = element;
 		ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen;
 		ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+
+		// CRITICAL: This allows the presented view controller to control status bar appearance
+		ModalPresentationCapturesStatusBarAppearance = true;
+
+		// Set initial display mode
+		_displayMode = element.DisplayMode;
 
 		_ = View ?? throw new InvalidOperationException($"{nameof(View)} cannot be null.");
 		_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null.");

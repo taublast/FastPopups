@@ -1,4 +1,4 @@
-
+using AppoMobi.Maui.FastPopups;
 using System.Diagnostics;
 
 namespace SampleApp.Views;
@@ -25,6 +25,12 @@ public partial class AnchoredPopup : Popup
 
     private void OnInsetsClicked(object? sender, EventArgs e)
     {
-        IsFullScreen = !IsFullScreen;
+        DisplayMode = DisplayMode switch
+        {
+            PopupDisplayMode.Default => PopupDisplayMode.Cover,
+            PopupDisplayMode.Cover => PopupDisplayMode.FullScreen,
+            PopupDisplayMode.FullScreen => PopupDisplayMode.Default,
+            _ => PopupDisplayMode.Default
+        };
     }
 }

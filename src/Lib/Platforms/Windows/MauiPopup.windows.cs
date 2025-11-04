@@ -45,7 +45,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
     /// </summary>
     public bool CloseWhenBackgroundIsClicked { get; set; }
 
-    public bool IsFullScreen { get; set; }
+    public PopupDisplayMode DisplayMode { get; set; }
 
     partial class BackgroundDimmer : Microsoft.UI.Xaml.Controls.Grid
     {
@@ -228,7 +228,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
 
         var popupParentFrame = parentBounds;
         Microsoft.Maui.Thickness safeAreaInsets = default;
-        if (!IsFullScreen)
+        if (DisplayMode == PopupDisplayMode.Default)
         {
             var safeArea = PopupExtensions.GetSafeArea(mauiContext);
             popupParentFrame = new Rect(safeArea.Left, safeArea.Y, safeArea.Width, safeArea.Height);
@@ -361,7 +361,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
         var windowBounds = window?.Bounds ?? new Windows.Foundation.Rect(0, 0, 1000, 1000);
         var availableSize = new Size(windowBounds.Width, windowBounds.Height);
 
-        if (!IsFullScreen)
+        if (DisplayMode == PopupDisplayMode.Default)
         {
             var safeArea = PopupExtensions.GetSafeArea(mauiContext!);
             availableSize = new Size(safeArea.Width, safeArea.Height);

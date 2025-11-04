@@ -1,5 +1,6 @@
 #if MACCATALYST || IOS
 
+using AppoMobi.Maui.FastPopups;
 using Microsoft.Maui.Platform;
 using ObjCRuntime;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
@@ -127,7 +128,7 @@ public static partial class PopupExtensions
 	{
 		ArgumentNullException.ThrowIfNull(popup.Content);
 
-		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IsFullScreen);
+		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.DisplayMode != PopupDisplayMode.Default);
 
 		CGSize currentSize;
 
@@ -280,7 +281,7 @@ public static partial class PopupExtensions
 		CGRect originalFrame = UIScreen.MainScreen.Bounds;
 
 		// Get the adjusted frame based on safe areas (and MacCatalyst margins).
-		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.IsFullScreen);
+		CGRect adjustedFrame = GetAdjustedFrame(mauiPopup, popup.DisplayMode != PopupDisplayMode.Default);
 
 		// Calculate the padded size for content arrangement
 		var paddedWidth = Math.Max(0, adjustedFrame.Width - popup.Padding.Left - popup.Padding.Right);

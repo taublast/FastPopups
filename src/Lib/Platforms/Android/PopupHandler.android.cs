@@ -118,18 +118,18 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	{
 		if (handler.Content != null && handler.PlatformView.Dialog != null)
 		{
-			handler.PlatformView.SetFullScreen(view.IsFullScreen);
+			handler.PlatformView.SetDisplayMode(view.DisplayMode);
 			handler.PlatformView.Dialog.SetSize(view, handler.Content, handler);
 		}
 	}
 
 	/// <summary>
-	/// Action that's triggered when the Popup <see cref="IPopup.IsFullScreen"/> property changes.
-	/// Recreates the dialog with the new safe area setting.
+	/// Action that's triggered when the Popup <see cref="IPopup.DisplayMode"/> property changes.
+	/// Recreates the dialog with the new display mode setting.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
 	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
-	public static void MapIsFullScreen(PopupHandler handler, IPopup view)
+	public static void MapDisplayMode(PopupHandler handler, IPopup view)
 	{
 		var wasShowing = handler.PlatformView.Dialog?.IsShowing ?? false;
 
@@ -167,7 +167,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 		CleanupExistingDialog(handler);
 
 		// Create new dialog
-		popupView.CreateDialog(handler.MauiContext.Context, handler.MauiContext, view.IsFullScreen);
+		popupView.CreateDialog(handler.MauiContext.Context, handler.MauiContext, view.DisplayMode);
 
 		// Set up content and handlers
 		SetupDialogContent(handler, view);
@@ -212,10 +212,10 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 		// Set the element to create content
 		handler.Content = handler.PlatformView.SetElement(view);
 
-		// Apply fullscreen and sizing
+		// Apply display mode and sizing
 		if (handler.Content is not null && handler.PlatformView.Dialog is not null)
 		{
-			handler.PlatformView.SetFullScreen(view.IsFullScreen);
+			handler.PlatformView.SetDisplayMode(view.DisplayMode);
 			handler.PlatformView.Dialog.SetSize(view, handler.Content, handler);
 
 			// Attach layout change handler

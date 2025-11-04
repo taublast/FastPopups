@@ -89,10 +89,10 @@ public partial class Popup : View, IPopup
 
 
 	/// <summary>
-	/// Backing BindableProperty for the <see cref="IsFullScreen"/> property.
+	/// Backing BindableProperty for the <see cref="DisplayMode"/> property.
 	/// </summary>
-	public static readonly BindableProperty IsFullScreenProperty =
-		BindableProperty.Create(nameof(IsFullScreen), typeof(bool), typeof(Popup), false);
+	public static readonly BindableProperty DisplayModeProperty =
+		BindableProperty.Create(nameof(DisplayMode), typeof(PopupDisplayMode), typeof(Popup), PopupDisplayMode.Default);
 
 
 	/// <summary>
@@ -187,12 +187,12 @@ public partial class Popup : View, IPopup
 
 
 	/// <summary>
-	/// Controls whether the popup should respect safe insets like status bar etc. 
+	/// Controls how the popup should be displayed in relation to system UI (status bar, navigation bar, etc.).
 	/// </summary>
-	public bool IsFullScreen
+	public PopupDisplayMode DisplayMode
 	{
-		get => (bool)GetValue(IsFullScreenProperty);
-		set => SetValue(IsFullScreenProperty, value);
+		get => (PopupDisplayMode)GetValue(DisplayModeProperty);
+		set => SetValue(DisplayModeProperty, value);
 	}
 
 	/// <summary>
@@ -351,7 +351,7 @@ public partial class Popup : View, IPopup
 
         ((IPopup)this).OnClosed(result);
 
-		RemoveBinding(Popup.IsFullScreenProperty);
+		RemoveBinding(Popup.DisplayModeProperty);
 		RemoveBinding(Popup.ContentProperty);
 		RemoveBinding(Popup.CloseWhenBackgroundIsClickedProperty);
 		RemoveBinding(Popup.PaddingProperty);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Primitives;
+﻿using AppoMobi.Maui.FastPopups;
+using Microsoft.Maui.Primitives;
 using MauiThickness = Microsoft.Maui.Thickness;
 using LayoutAlignment = Microsoft.Maui.Primitives.LayoutAlignment;
 
@@ -24,7 +25,7 @@ public static class PopupLayoutCalculator
 		MauiThickness safeAreaInsets = default)
 	{
 		// Apply safe area adjustments if not ignored
-		var adjustedBounds = popup.IsFullScreen 
+		var adjustedBounds = popup.DisplayMode != PopupDisplayMode.Default 
 			? parentBounds
 			: new Rect(
 				parentBounds.X + safeAreaInsets.Left,
@@ -38,7 +39,7 @@ public static class PopupLayoutCalculator
 		{
 			// When IsFullScreen=false, Start should respect safe area insets
 			// When IsFullScreen=true, Start should position at true edge
-			LayoutAlignment.Start => popup.IsFullScreen ? parentBounds.X : adjustedBounds.X,
+			LayoutAlignment.Start => popup.DisplayMode != PopupDisplayMode.Default ? parentBounds.X : adjustedBounds.X,
 			LayoutAlignment.End => adjustedBounds.Right - contentSize.Width,
 			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.X + (adjustedBounds.Width - contentSize.Width) / 2,
@@ -51,7 +52,7 @@ public static class PopupLayoutCalculator
 		{
 			// When IsFullScreen=false, Start should respect safe area insets
 			// When IsFullScreen=true, Start should position at true edge
-			LayoutAlignment.Start => popup.IsFullScreen ? parentBounds.Y : adjustedBounds.Y,
+			LayoutAlignment.Start => popup.DisplayMode != PopupDisplayMode.Default ? parentBounds.Y : adjustedBounds.Y,
 			LayoutAlignment.End => adjustedBounds.Bottom - contentSize.Height,
 			LayoutAlignment.Center or LayoutAlignment.Fill =>
 				adjustedBounds.Y + (adjustedBounds.Height - contentSize.Height) / 2,
@@ -138,7 +139,7 @@ public static class PopupLayoutCalculator
 		MauiThickness safeAreaInsets = default)
 	{
 		// Apply safe area adjustments if not ignored
-		var adjustedBounds = popup.IsFullScreen
+		var adjustedBounds = popup.DisplayMode != PopupDisplayMode.Default
 			? parentBounds
 			: new Rect(
 				parentBounds.X + safeAreaInsets.Left,

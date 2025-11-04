@@ -48,31 +48,33 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     /// </summary>
     /// <param name="context">An instance of <see cref="Context"/>.</param>
     /// <param name="mauiContext">An instance of <see cref="IMauiContext"/>.</param>
+    /// <param name="displayMode">The display mode for this popup.</param>
     /// <exception cref="ArgumentNullException">If <paramref name="mauiContext"/> is null an exception will be thrown. </exception>
-    public MauiPopup(Context context, IMauiContext mauiContext, bool ignoreSafeArea)
-        : base(context, GetDialogTheme(ignoreSafeArea))
+    public MauiPopup(Context context, IMauiContext mauiContext, PopupDisplayMode displayMode)
+        : base(context, GetDialogTheme(displayMode))
     {
         RequestWindowFeature((int)WindowFeatures.NoTitle);
         this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
     }
 
-    static int GetDialogTheme(bool ignoreSafeArea)
+    static int GetDialogTheme(PopupDisplayMode displayMode)
     {
-        return ignoreSafeArea
+        return displayMode == PopupDisplayMode.FullScreen
             ? Android.Resource.Style.ThemeTranslucentNoTitleBarFullScreen
-            : Android.Resource.Style.ThemeTranslucentNoTitleBar; // or another appropriate theme
+            : Android.Resource.Style.ThemeTranslucentNoTitleBar;
     }
 
     /// <summary>
-    /// Switch fullscreen mode on/off for native Dialog with enhanced compatibility
+    /// Sets the display mode for the native Dialog
     /// </summary>
-    /// <param name="value"></param>
-    public void SetFullScreen(bool value)
+    /// <param name="mode">The display mode to apply</param>
+    public void SetDisplayMode(PopupDisplayMode mode)
     {
         if (Window != null)
         {
-            if (value)
+            if (mode == PopupDisplayMode.FullScreen)
             {
+                // FullScreen mode: Hide system UI completely
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
                 {
                     Window.SetDecorFitsSystemWindows(false);
@@ -91,7 +93,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     Window.AddFlags(WindowManagerFlags.LayoutInScreen);
                     Window.ClearFlags(WindowManagerFlags.ForceNotFullscreen);
 
-
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
                         var layoutParams = Window.Attributes;
@@ -102,23 +103,24 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             }
             else
             {
+                // Default and Cover modes: Keep system UI visible, window extends edge-to-edge
                 Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
                 Window.ClearFlags(WindowManagerFlags.TranslucentNavigation);
             }
 
+            // Apply cutout handling for all modes
             if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
             {
                 var layoutParams = Window.Attributes;
 
-                // CRITICAL: Allow drawing in cutout area with ShortEdges
+                // Allow drawing in cutout area
                 layoutParams.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
 
-                // For API 30+, also try the newer Always mode for maximum coverage
+                // For API 30+, try the Always mode for maximum coverage
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
                 {
                     try
                     {
-                        // This allows drawing even in the cutout area itself
                         layoutParams.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Always;
                     }
                     catch
@@ -130,7 +132,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 
                 Window.Attributes = layoutParams;
                 System.Diagnostics.Debug.WriteLine(
-                    $"[CUTOUT FULLSCREEN] Set cutout mode: {layoutParams.LayoutInDisplayCutoutMode}");
+                    $"[DISPLAY MODE] Set mode: {mode}, cutout mode: {layoutParams.LayoutInDisplayCutoutMode}");
             }
         }
     }
@@ -241,7 +243,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     {
         if (VirtualView == null || Context == null) return;
 
-        // Get screen dimensions
         var windowManager = Context.GetSystemService(Context.WindowService) as IWindowManager;
         if (windowManager == null) return;
 
@@ -272,7 +273,9 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                 hasCutout = true;
             }
 
-            if (!VirtualView.IsFullScreen)
+            // Only Default mode applies safe area insets
+            // Cover and FullScreen modes: content can go edge-to-edge
+            if (VirtualView.DisplayMode == PopupDisplayMode.Default)
             {
                 if (hasCutout)
                 {
@@ -287,7 +290,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 
                 offsetY = statusBarHeight;
             }
-            else if (hasCutout)
+            else if (VirtualView.DisplayMode == PopupDisplayMode.FullScreen && hasCutout)
             {
                 var hasNabBar = HasNavBar();
 
@@ -302,8 +305,9 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                         new Microsoft.Maui.Thickness(0, statusBarHeight, 0, 0);
                 }
             }
+            // Cover mode: no safe insets at all
 
-            if (VirtualView.IsFullScreen)
+            if (VirtualView.DisplayMode == PopupDisplayMode.FullScreen)
             {
                 parentBounds = new(
                     parentBounds.Left + safeAreaInsets.Left,
@@ -311,7 +315,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     parentBounds.Width - safeAreaInsets.HorizontalThickness,
                     parentBounds.Height - safeAreaInsets.VerticalThickness + offsetY);
             }
-            else
+            else if (VirtualView.DisplayMode == PopupDisplayMode.Default)
             {
                 parentBounds = new(
                     parentBounds.Left + safeAreaInsets.Left,
@@ -319,18 +323,21 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     parentBounds.Width - safeAreaInsets.HorizontalThickness,
                     parentBounds.Height - safeAreaInsets.VerticalThickness);
             }
+            // else Cover mode: parentBounds stays full screen (no adjustments)
         }
         else
         {
-            if (!VirtualView.IsFullScreen)
+            // Only Default mode applies safe area insets
+            if (VirtualView.DisplayMode == PopupDisplayMode.Default)
             {
                 //offsetY = statusBarHeight;
 
                 safeAreaInsets =
                     new Microsoft.Maui.Thickness(0, statusBarHeight, 0, navigationBarHeight - statusBarHeight);
             }
+            // Cover and FullScreen: no safe insets
 
-            if (VirtualView.IsFullScreen)
+            if (VirtualView.DisplayMode == PopupDisplayMode.FullScreen)
             {
                 parentBounds = new(
                     parentBounds.Left + safeAreaInsets.Left,
@@ -338,7 +345,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     parentBounds.Width - safeAreaInsets.HorizontalThickness,
                     parentBounds.Height - safeAreaInsets.VerticalThickness + offsetY);
             }
-            else
+            else if (VirtualView.DisplayMode == PopupDisplayMode.Default)
             {
                 parentBounds = new(
                     parentBounds.Left + safeAreaInsets.Left,
@@ -346,6 +353,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
                     parentBounds.Width - safeAreaInsets.HorizontalThickness,
                     parentBounds.Height - safeAreaInsets.VerticalThickness);
             }
+            // else Cover mode: parentBounds stays full screen (no adjustments)
         }
 
 
@@ -465,14 +473,14 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             {
                 if (hasCutout)
                 {
-                    if (!VirtualView.IsFullScreen)
+                    if (VirtualView.DisplayMode == PopupDisplayMode.Default)
                     {
                         y -= statusBarHeight;
                     }
                 }
                 else
                 {
-                    if (VirtualView.IsFullScreen)
+                    if (VirtualView.DisplayMode == PopupDisplayMode.FullScreen)
                     {
                         y -= statusBarHeight;
                     }

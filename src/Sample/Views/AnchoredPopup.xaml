@@ -26,7 +26,7 @@
                    FontSize="12"
                    TextColor="Gray" />
 
-            <Button Text="Toggle IsFullScreen"
+            <Button Text="Toggle DisplayMode"
                     BackgroundColor="Orange"
                     TextColor="White"
                     Clicked="OnInsetsClicked" />

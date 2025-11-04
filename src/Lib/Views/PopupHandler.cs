@@ -17,11 +17,7 @@ public partial class PopupHandler
 		[nameof(IPopup.VerticalOptions)] = MapSize,
 		[nameof(IPopup.HorizontalOptions)] = MapSize,
 		[nameof(IPopup.Padding)] = MapSize,
-#if ANDROID
-		[nameof(IPopup.IsFullScreen)] = MapIsFullScreen,
-#else
-		[nameof(IPopup.IsFullScreen)] = MapSize,
-#endif
+		[nameof(IPopup.DisplayMode)] = MapDisplayMode,
 		[nameof(IPopup.CloseWhenBackgroundIsClicked)] = MapCloseWhenBackgroundIsClicked,
 		[nameof(IPopup.AnimationType)] = MapAnimation,
 		[nameof(IPopup.AnimationDuration)] = MapAnimation,

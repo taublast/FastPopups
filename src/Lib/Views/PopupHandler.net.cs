@@ -74,6 +74,16 @@ public partial class PopupHandler : Microsoft.Maui.Handlers.ElementHandler<IPopu
 	}
 
 	/// <summary>
+	/// Action that's triggered when the Popup DisplayMode property changes.
+	/// </summary>
+	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>
+	/// <param name="view">An instance of <see cref="IPopup"/>.</param>
+	public static void MapDisplayMode(PopupHandler handler, IPopup view)
+	{
+		throw new NotSupportedException();
+	}
+
+	/// <summary>
 	/// Action that's triggered when the Popup <see cref="IPopup.Size"/> property changes.
 	/// </summary>
 	/// <param name="handler">An instance of <see cref="PopupHandler"/>.</param>

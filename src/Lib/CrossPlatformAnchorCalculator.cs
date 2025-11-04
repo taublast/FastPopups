@@ -1,3 +1,4 @@
+using AppoMobi.Maui.FastPopups;
 using Microsoft.Maui.Primitives;
 
 namespace FastPopups;
@@ -25,7 +26,7 @@ public static class CrossPlatformAnchorCalculator
         Microsoft.Maui.Thickness safeAreaInsets = default)
     {
         // Apply safe area adjustments if not ignored
-        var adjustedBounds = popup.IsFullScreen 
+        var adjustedBounds = popup.DisplayMode != PopupDisplayMode.Default 
             ? containerBounds
             : new Rect(
                 containerBounds.X + safeAreaInsets.Left,

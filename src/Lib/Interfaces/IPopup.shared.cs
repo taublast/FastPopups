@@ -25,9 +25,9 @@ public interface IPopup : IView, IVisualTreeElement, IAsynchronousHandler
 	LayoutOptions HorizontalOptions { get; }
 
 	/// <summary>
-	/// Controls whether the popup should respect safe insets like status bar etc.
+	/// Controls how the popup should be displayed in relation to system UI.
 	/// </summary>
-	bool IsFullScreen { get; }
+	PopupDisplayMode DisplayMode { get; }
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the popup can be dismissed by tapping anywhere where gestures are not processed.
