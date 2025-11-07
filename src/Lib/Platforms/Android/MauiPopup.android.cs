@@ -868,7 +868,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         }
         else
         {
-            SetOnCancelListener(null);
             _sizeChangeListener?.Release();
             _sizeChangeListener = null;
             _compositeContainer = null;
