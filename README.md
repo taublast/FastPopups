@@ -21,34 +21,9 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.2.0.1
+## ⬆️ What's New 1.2.0.2
 
-The boolean `IsFullScreen` property has been replaced with `DisplayMode` enum to support more display scenarios:
-
-**Old API:**
-```csharp
-var popup = new Popup
-{
-    IsFullScreen = false  // or true
-};
-```
-
-**New API:**
-```csharp
-var popup = new Popup
-{
-    DisplayMode = PopupDisplayMode.Default  // or Cover, or FullScreen
-};
-```
-
-**Migration:**
-- `IsFullScreen = false` → `DisplayMode = PopupDisplayMode.Default`
-- `IsFullScreen = true` → `DisplayMode = PopupDisplayMode.Cover`
-
-**New Features:**
-- `PopupDisplayMode.Default` - Content respects safe area insets (status bar, navigation bar visible, content positioned within safe areas)
-- `PopupDisplayMode.Cover` - Content can position itsself fullscreen, like the dimmer layer 
-- `PopupDisplayMode.FullScreen` - Cover + hide system UI if platform allows (for video players, immersive experiences)
+Fix Android disposal stability when closing programatically.
 
 ---
 
