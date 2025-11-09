@@ -21,9 +21,9 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.2.0.2
+## ⬆️ What's New 1.2.1
 
-Fix Android disposal stability when closing programatically.
+Fix MAUI crashing us on Android with "PlatformView cannot be null here", rare case.
 
 ---
 
