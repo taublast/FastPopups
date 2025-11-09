@@ -33,6 +33,8 @@ We have 2 layers here: background dimmer and popup content. You can customize th
 When you set popup's layout/padding/anchor properties you are controlling the content. Animations are separate for dimmer and content, first one only uses fade and content is fully animated upon settings, please see below.  
 If you need to wait until the popup is closed use `ShowPopupAsync` it can even return a result. For a fire a forget scenario use `Show`. But wait.. better read the full docs, no?
 
+Please give this a ⭐️ if you find it useful!
+
 ## 🚀 Quick Start
 
 ### Setup 
