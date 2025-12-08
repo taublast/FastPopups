@@ -79,7 +79,7 @@ public partial class NavigationStackPopup : Popup, INotifyPropertyChanged
             var nextPopup = new NavigationStackPopup(_level + 1);
 
             // Get the current page to show the popup
-            var currentPage = Application.Current?.MainPage;
+            var currentPage = Application.Current?.Windows[0].Page;
             if (currentPage != null)
             {
                 await currentPage.ShowPopupAsync(nextPopup);

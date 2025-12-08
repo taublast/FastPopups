@@ -622,7 +622,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     /// <returns>The status bar height in DIPs.</returns>
     double GetStatusBarHeight(Context context)
     {
-        double heightPixels = 0;
+        //double heightPixels = 0;
 
         //if (OperatingSystem.IsAndroidVersionAtLeast(30))
         //{
@@ -660,7 +660,6 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             var windowMetrics = windowManager.CurrentWindowMetrics;
             var insets = windowMetrics.WindowInsets;
             var windowInsets = insets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
-            var windowInsets2 = insets.HasSystemWindowInsets;
 
             var windowWidth = windowMetrics.Bounds.Width();
             var windowHeight = windowMetrics.Bounds.Height();
