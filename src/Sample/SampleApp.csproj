@@ -21,7 +21,8 @@
 		<Nullable>enable</Nullable>
 
 		<MauiXamlInflator>SourceGen</MauiXamlInflator>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>-->
 
 		<!-- Display name -->
 		<ApplicationTitle>FastPopups Sample</ApplicationTitle>
