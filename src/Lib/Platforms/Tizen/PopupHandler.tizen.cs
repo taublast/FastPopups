@@ -30,7 +30,7 @@ public partial class PopupHandler : Microsoft.Maui.Handlers.ViewHandler<IPopup, 
 
 		view.HandlerCompleteTCS.TrySetResult();
 
-		handler.DisconnectHandler(handler.PlatformView);
+		((IElementHandler)handler).DisconnectHandler();
 	}
 
 	/// <summary>

@@ -282,13 +282,18 @@ public partial class Popup : View, IPopup
 	/// <inheritdoc/>
 	TaskCompletionSource IAsynchronousHandler.HandlerCompleteTCS => popupDismissedTaskCompletionSource;
 
-	/// <summary>
-	/// Resets the Popup.
-	/// </summary>
-	public void Reset()
+	/// <inheritdoc/>
+	protected override void OnHandlerChanged()
 	{
-		resultTaskCompletionSource = new();
-		popupDismissedTaskCompletionSource = new();
+		base.OnHandlerChanged();
+
+		if (Handler != null)
+		{
+			// New handler assigned means popup is being shown (fresh or re-shown).
+			// Auto-reset TCS so Result and internal completion are clean.
+			resultTaskCompletionSource = new();
+			popupDismissedTaskCompletionSource = new();
+		}
 	}
 
 	/// <summary>
@@ -331,10 +336,17 @@ public partial class Popup : View, IPopup
     }
 
     /// <summary>
-    /// Invokes the <see cref="Opened"/> event.
+    /// Called when the popup has been fully opened and its open animation has completed.
+    /// Override this method to execute logic after the popup is visible.
     /// </summary>
-    internal virtual void OnOpened() =>
+    public virtual void OnOpened() =>
 		openedWeakEventManager.HandleEvent(this, PopupOpenedEventArgs.Empty, nameof(Opened));
+
+	/// <summary>
+	/// Called when the popup has been fully closed and its close animation has completed.
+	/// Override this method to execute logic after the popup is dismissed.
+	/// </summary>
+	public virtual void OnClosed() { }
 
 	/// <summary>
 	/// Invokes the <see cref="Closed"/> event.
@@ -363,6 +375,8 @@ public partial class Popup : View, IPopup
 		await popupDismissedTaskCompletionSource.Task.WaitAsync(token);
 
 		Parent?.RemoveLogicalChild(this);
+
+		OnClosed();
 
 		dismissWeakEventManager.HandleEvent(this, new PopupClosedEventArgs(result, wasDismissedByTappingOutsideOfPopup),
 			nameof(Closed));
