@@ -21,9 +21,11 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.2.1
+## ⬆️ What's New 1.3.1
 
-Fix MAUI crashing us on Android with "PlatformView cannot be null here", rare case.
+* Add virtual methods one could override: OnOpened, OnClosed.
+* Fix MAUI virtual method OnHandlerChanged was never invoked when handler was destroyed.
+* Will disconnect Handler of Content on closing to avoid leaks, will re-create content if re-opening same popup.
 
 ---
 

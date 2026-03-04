@@ -188,6 +188,9 @@ internal static IWindow GetWindow(this IElement element) =>
 
     static void CreatePopup(Page page, Popup popup)
     {
+        if (popup.Handler != null)
+            return; // Already showing — ignore duplicate show call.
+
         var mauiContext = GetMauiContext(page);
 
         var parent = page.GetCurrentPage();

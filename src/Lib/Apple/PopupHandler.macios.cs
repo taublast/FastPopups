@@ -46,7 +46,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 
             view.HandlerCompleteTCS.TrySetResult();
 
-            handler.DisconnectHandler(handler.PlatformView);
+            ((IElementHandler)handler).DisconnectHandler();
         }
         catch (Exception e)
         {
@@ -167,6 +167,14 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	/// <inheritdoc/>
 	protected override void DisconnectHandler(MauiPopupView platformView)
 	{
+		// Disconnect the wrapping PageHandler created in ShowPopup()
+		if (platformView.Control is IElementHandler controlHandler)
+			controlHandler.DisconnectHandler();
+
+		// Disconnect popup content's own handler
+		if (VirtualView?.Content?.Handler is IElementHandler contentHandler)
+			contentHandler.DisconnectHandler();
+
 		platformView.Dispose();
 	}
 }

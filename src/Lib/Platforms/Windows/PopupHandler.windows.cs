@@ -33,7 +33,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
             }
 
             view.HandlerCompleteTCS.TrySetResult();
-            handler.DisconnectHandler(handler.PlatformView);
+            ((IElementHandler)handler).DisconnectHandler();
         }
         catch (Exception e)
         {
@@ -70,7 +70,7 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
     public static void MapOnDismissedByTappingOutsideOfPopup(PopupHandler handler, IPopup view, object? result)
     {
         view.OnDismissedByTappingOutsideOfPopup();
-        handler.DisconnectHandler(handler.PlatformView);
+        ((IElementHandler)handler).DisconnectHandler();
     }
 
     /// <summary>
@@ -141,6 +141,10 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopup>
     /// <inheritdoc/>
     protected override void DisconnectHandler(MauiPopup platformView)
     {
+        // Disconnect content handler BEFORE SetElement(null) clears VirtualView
+        if (VirtualView?.Content?.Handler is IElementHandler contentHandler)
+            contentHandler.DisconnectHandler();
+
         // CRITICAL: Always call SetElement(null) to ensure proper cleanup
         // even if Parent is null (which happens when RemoveOverlay is called first)
         platformView.SetElement(null);
