@@ -1,43 +1,49 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<popups:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:popups="clr-namespace:FastPopups;assembly=FastPopups"
-             x:Class="SampleApp.Views.AnchoredPopup"
-             WidthRequest="250"
-             HeightRequest="150"
-             BackgroundColor="#80000000"
-             CloseWhenBackgroundIsClicked="True">
-    
-    <Border BackgroundColor="LightYellow" 
-            StrokeThickness="1" 
-            Stroke="Orange"
-            StrokeShape="RoundRectangle 8">
+<popups:Popup
+    x:Class="SampleApp.Views.AnchoredPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popups="clr-namespace:FastPopups;assembly=FastPopups"
+    BackgroundColor="#80000000"
+    CloseWhenBackgroundIsClicked="True"
+    HeightRequest="-1"
+    WidthRequest="250">
+
+    <Border
+        BackgroundColor="LightYellow"
+        Stroke="Orange"
+        StrokeShape="RoundRectangle 8"
+        StrokeThickness="1">
 
         <StackLayout Padding="15" Spacing="10">
-            <Label Text="Anchored Popup" 
-                   FontSize="16" 
-                   FontAttributes="Bold" 
-                   HorizontalOptions="Center" 
-                   TextColor="DarkOrange" />
-            
-            <Label Text="This popup is anchored to a specific button!" 
-                   HorizontalOptions="Center" 
-                   HorizontalTextAlignment="Center"
-                   FontSize="12"
-                   TextColor="Gray" />
+            <Label
+                FontAttributes="Bold"
+                FontSize="16"
+                HorizontalOptions="Center"
+                Text="Anchored Popup"
+                TextColor="DarkOrange" />
 
-            <Button Text="Toggle DisplayMode"
-                    BackgroundColor="Orange"
-                    TextColor="White"
-                    Clicked="OnInsetsClicked" />
+            <Label
+                FontSize="12"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="This popup is anchored to a specific button!"
+                TextColor="Gray" />
+
+            <Button
+                BackgroundColor="Orange"
+                Clicked="OnInsetsClicked"
+                Text="Toggle DisplayMode"
+                TextColor="White" />
 
 
-            <Button Text="Got it!" 
-                    BackgroundColor="DarkGreen" 
-                    TextColor="White"
-                    FontSize="12"
-                    Clicked="OnGotItClicked" />
+            <Button
+                BackgroundColor="DarkGreen"
+                Clicked="OnGotItClicked"
+                FontSize="12"
+                Text="Got it!"
+                TextColor="White" />
         </StackLayout>
     </Border>
-    
+
 </popups:Popup>

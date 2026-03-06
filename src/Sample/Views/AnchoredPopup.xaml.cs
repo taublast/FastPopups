@@ -10,6 +10,13 @@ public partial class AnchoredPopup : Popup
         InitializeComponent();
     }
 
+    public override void OnOpened()
+    {
+        base.OnOpened();
+
+        Debug.WriteLine($"DisplayMode is: {DisplayMode}");
+    }
+
     private void OnGotItClicked(object sender, EventArgs e)
     {
         Close();
@@ -32,5 +39,6 @@ public partial class AnchoredPopup : Popup
             PopupDisplayMode.FullScreen => PopupDisplayMode.Default,
             _ => PopupDisplayMode.Default
         };
+        Debug.WriteLine($"DisplayMode changed to: {DisplayMode}");
     }
 }

@@ -282,6 +282,10 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
                     actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
                 }
                 width = actualContent.DesiredSize.Width;
+                if (width > 0)
+                {
+                    width = Math.Max(0, width - actualContent.Margin.Left - actualContent.Margin.Right);
+                }
                 if (width == 0)
                 {
                     width = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Width;
@@ -301,6 +305,10 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
                 // Measure content for height with the determined width
                 actualContent.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
                 height = actualContent.DesiredSize.Height;
+                if (height > 0)
+                {
+                    height = Math.Max(0, height - actualContent.Margin.Top - actualContent.Margin.Bottom);
+                }
                 if (height == 0)
                 {
                     height = PopupLayoutCalculator.CalculateContentSize(VirtualView, parentBounds, safeAreaInsets).Height;
@@ -324,7 +332,9 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
                 {
                     actualContent.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
                 }
-                contentSize = new Size(actualContent.DesiredSize.Width, actualContent.DesiredSize.Height);
+                double w = actualContent.ActualWidth > 0 ? actualContent.ActualWidth : Math.Max(0, actualContent.DesiredSize.Width - actualContent.Margin.Left - actualContent.Margin.Right);
+                double h = actualContent.ActualHeight > 0 ? actualContent.ActualHeight : Math.Max(0, actualContent.DesiredSize.Height - actualContent.Margin.Top - actualContent.Margin.Bottom);
+                contentSize = new Size(w, h);
             }
 
             if (contentSize.Width == 0 || contentSize.Height == 0)
