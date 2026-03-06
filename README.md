@@ -21,11 +21,14 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.3.1
+## ⬆️ What's New 1.10.1.1
 
-* Add virtual methods one could override: OnOpened, OnClosed.
-* Fix MAUI virtual method OnHandlerChanged was never invoked when handler was destroyed.
-* Will disconnect Handler of Content on closing to avoid leaks, will re-create content if re-opening same popup.
+* **Added support for .NET 10** by [yurkinh](https://github.com/yurkinh).
+* **Whirl hide rotation direction fixed on Android and Windows**: The `Whirl` animation was rotating in the same clockwise direction on both show and hide. Hide now rotates counter-clockwise (reverse of show), matching iOS behavior.
+* **Sprint show alpha flash fixed on Android**: `SprintBottom`, `SprintTop`, `SprintLeft`, `SprintRight` were setting initial alpha to `1` (fully visible) before the show animation started from `0.5`, causing a brief visible flash. Initial alpha is now correctly `0.5` for all Sprint types, matching iOS.
+* **Sprint show opacity mismatch fixed on Windows**: Sprint show animations set `Opacity = 0.5` initially but the storyboard animation started `From = 0`, causing an immediate jump to transparent at animation start. Animation now correctly starts `From = 0.5`.
+* **DisplayMode change fix for Windows**: Popup now re-opens at correct position on Windows when changing `DisplayMode`, matching other platforms.
+* **Fixes for SampleApp**: Removed Anchored popup limited height.
 
 ---
 
