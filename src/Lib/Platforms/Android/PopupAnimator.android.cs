@@ -257,21 +257,24 @@ public class PopupAnimator
         view.Alpha = 0f;
         break;
 
-        case PopupAnimationType.SprintBottom:
         case PopupAnimationType.Bottom:
         view.Alpha = 1f;
         view.TranslationY = viewContainer.Height - view.GetY();
         break;
 
-        case PopupAnimationType.SprintTop:
+        case PopupAnimationType.SprintBottom:
+        view.Alpha = 0.5f;
+        view.TranslationY = viewContainer.Height - view.GetY();
+        break;
+
         case PopupAnimationType.Top:
         view.Alpha = 1f;
         view.TranslationY = -(view.GetY() + viewContainer.Height);
         break;
 
-        case PopupAnimationType.SprintRight:
-        view.Alpha = 0f;
-        view.TranslationX = viewContainer.Width - view.GetX();
+        case PopupAnimationType.SprintTop:
+        view.Alpha = 0.5f;
+        view.TranslationY = -(view.GetY() + viewContainer.Height);
         break;
 
         case PopupAnimationType.Right:
@@ -279,9 +282,18 @@ public class PopupAnimator
         view.TranslationX = viewContainer.Width - view.GetX();
         break;
 
-        case PopupAnimationType.SprintLeft:
+        case PopupAnimationType.SprintRight:
+        view.Alpha = 0.5f;
+        view.TranslationX = viewContainer.Width - view.GetX();
+        break;
+
         case PopupAnimationType.Left:
         view.Alpha = 1f;
+        view.TranslationX = -(view.Width + view.GetX());
+        break;
+
+        case PopupAnimationType.SprintLeft:
+        view.Alpha = 0.5f;
         view.TranslationX = -(view.Width + view.GetX());
         break;
 
@@ -622,7 +634,7 @@ public class PopupAnimator
 
         case PopupAnimationType.Whirl:
         animators.Add(CreatePropertyAnimator(view, "alpha", currentAlpha, 0f, duration, interpolator));
-        animators.Add(CreatePropertyAnimator(view, "rotation", currentRotation, 1080f, duration, interpolator));
+        animators.Add(CreatePropertyAnimator(view, "rotation", currentRotation, -1080f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(view, "scaleX", currentScaleX, 0.3f, duration, interpolator));
         animators.Add(CreatePropertyAnimator(view, "scaleY", currentScaleY, 0.3f, duration, interpolator));
         break;

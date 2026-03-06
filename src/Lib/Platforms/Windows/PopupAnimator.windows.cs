@@ -302,7 +302,7 @@ internal class PopupAnimator
         // Elastic slide from bottom
         view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", 0, 1, duration, easingFunction));
+            view, "Opacity", 0.5, 1, duration, easingFunction));
         transform.TranslateY = viewContainer.Height - view.ActualOffset.Y;
         var elasticEasingBottom = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -313,7 +313,7 @@ internal class PopupAnimator
         // Elastic slide from top
         view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", 0, 1, duration, easingFunction));
+            view, "Opacity", 0.5, 1, duration, easingFunction));
         transform.TranslateY = -(view.ActualOffset.Y + view.ActualHeight);
         var elasticEasingTop = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -324,7 +324,7 @@ internal class PopupAnimator
         // Elastic slide from left
         view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", 0, 1, duration, easingFunction));
+            view, "Opacity", 0.5, 1, duration, easingFunction));
         transform.TranslateX = -(view.ActualOffset.X + view.ActualWidth);
         var elasticEasingLeft = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -335,7 +335,7 @@ internal class PopupAnimator
         // Elastic slide from right
         view.Opacity = 0.5;
         storyboard.Children.Add(CreateDoubleAnimation(
-            view, "Opacity", 0, 1, duration, easingFunction));
+            view, "Opacity", 0.5, 1, duration, easingFunction));
         transform.TranslateX = viewContainer.ActualWidth - view.ActualOffset.X;
         var elasticEasingRight = new ElasticEase { EasingMode = EasingMode.EaseOut, Oscillations = 1, Springiness = 5 };
         storyboard.Children.Add(CreateDoubleAnimation(
@@ -456,13 +456,12 @@ internal class PopupAnimator
         break;
 
         case PopupAnimationType.Whirl:
-        // Reverse rotation + zoom + fade
-        var targetRotation = type == PopupAnimationType.Whirl ? 1080 : 180;
-        var whirlDuration = type == PopupAnimationType.Whirl ? Math.Max(duration, 400) : duration;
+        // Reverse rotation + zoom + fade (counter-clockwise, opposite of show)
+        var whirlDuration = Math.Max(duration, 400);
         storyboard.Children.Add(CreateDoubleAnimation(
             view, "Opacity", currentOpacity, 0, whirlDuration, easingFunction));
         storyboard.Children.Add(CreateDoubleAnimation(
-            transform, "Rotation", currentRotation, targetRotation, whirlDuration, easingFunction));
+            transform, "Rotation", currentRotation, -1080, whirlDuration, easingFunction));
         storyboard.Children.Add(CreateDoubleAnimation(
             transform, "ScaleX", currentScaleX, 0.3, whirlDuration, easingFunction));
         storyboard.Children.Add(CreateDoubleAnimation(
