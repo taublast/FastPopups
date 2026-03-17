@@ -308,6 +308,12 @@ public partial class Popup : View, IPopup
 	public async void Close(object? result = null) => await CloseAsync(result, CancellationToken.None);
 
 	/// <summary>
+	/// Gets a value indicating whether this popup is in the process of closing.
+	/// Used by the presentation queue to avoid showing a new popup before the current one has fully cleaned up.
+	/// </summary>
+	public bool IsClosing { get; private set; }
+
+	/// <summary>
 	/// Close the current popup.
 	/// </summary>
 	/// <remarks>
@@ -317,6 +323,7 @@ public partial class Popup : View, IPopup
 	/// <param name="token"><see cref="CancellationToken"/></param>
 	public async Task CloseAsync(object? result = null, CancellationToken token = default)
 	{
+		IsClosing = true;
 		await OnClosed(result, false, token);
 		resultTaskCompletionSource.TrySetResult(result);
 	}

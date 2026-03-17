@@ -186,10 +186,21 @@ internal static IWindow GetWindow(this IElement element) =>
 #endif
     }
 
-    static void CreatePopup(Page page, Popup popup)
+    static async void CreatePopup(Page page, Popup popup)
     {
         if (popup.Handler != null)
             return; // Already showing — ignore duplicate show call.
+
+        // If the topmost popup is actively closing, wait for its full cleanup (animation +
+        // native dismiss + handler disconnect) before presenting the new one.
+        // This prevents iOS cascade-dismissal: if Popup B were presented from Popup A before
+        // Popup A finishes, iOS would auto-dismiss Popup B when Popup A closes.
+        var topPopup = PopupNavigationStack.Instance.Peek();
+        if (topPopup is { IsClosing: true } closingPopup)
+        {
+            try { await ((IAsynchronousHandler)closingPopup).HandlerCompleteTCS.Task; }
+            catch { /* swallow — we still want to show the new popup */ }
+        }
 
         var mauiContext = GetMauiContext(page);
 

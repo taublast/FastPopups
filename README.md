@@ -21,6 +21,12 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
+## ⬆️ What's New 1.10.2.1
+
+* **iOS crash fix when simultaineously opening/closing** - when one is closing and the second one is opening, now the second one would open only after the closing one finished cleaning up.
+
+---
+
 ## ⬆️ What's New 1.10.1.1
 
 * **Added support for .NET 10** by [yurkinh](https://github.com/yurkinh).

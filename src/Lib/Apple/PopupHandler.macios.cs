@@ -167,6 +167,12 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
 	/// <inheritdoc/>
 	protected override void DisconnectHandler(MauiPopupView platformView)
 	{
+		// Null out VirtualView on the native side BEFORE disconnecting handlers.
+		// After DisconnectHandler completes, MAUI clears VirtualView.Handler = null on the IPopup.
+		// iOS can still fire ViewDidLayoutSubviews after that, and MauiPopup.VirtualView would
+		// be non-null while VirtualView.Handler is null, causing the MauiContext crash.
+		platformView.Popup?.CleanUp();
+
 		// Disconnect the wrapping PageHandler created in ShowPopup()
 		if (platformView.Control is IElementHandler controlHandler)
 			controlHandler.DisconnectHandler();
