@@ -23,10 +23,12 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 
 ## ⬆️ What's New 1.10.2.1
 
-* **iOS crash fix when simultaineously opening/closing** - when one is closing and the second one is opening, now the second one would open only after the closing one finished cleaning up.
-* **Android crash fix — `JavaProxyThrowable` on touch after dismiss**: Added the required `(IntPtr, JniHandleOwnership)` JNI resurrection constructor to `MauiPopup`. Without it, `TypeManager.CreateInstance` crashed whenever Android dispatched a touch event to a still-alive native Dialog whose managed C# peer had already been disposed. Added `[Preserve(AllMembers = true)]` so the release-mode linker cannot strip the JNI type registration. Also removed the premature `Dispose()` call in `CleanupExistingDialog` that raced with queued native events, and cleared the `SetOnCancelListener` on cleanup to prevent late-firing callbacks into a cleaned-up instance.
-* **iOS memory leak fix — `UITapGestureRecognizer` never removed**: The tap gesture recognizer added to the popup view in `CreateControl` was never removed on close, creating a retain cycle (`View → tapGesture → closure → MauiPopup → View`) that kept the popup object alive after dismissal. The recognizer is now stored and explicitly removed and disposed in `CleanUp()`. Also removed a redundant null-guard `throw` that was dead code inside an already-null-checked branch.
-* **Windows double-close fix — `PopupView.Closed` fired during cleanup**: In `SetElement(null)`, `PopupView.IsOpen = false` was set before `PopupView.Closed -= OnClosed`. Because WinUI fires `Popup.Closed` synchronously, `OnClosed` fired while `VirtualView` was still set, invoking `MapOnDismissedByTappingOutsideOfPopup` and triggering a second disconnect on every normal close. The unsubscribe is now done before setting `IsOpen = false`. Also cleared the `overlay` reference in `SetElement(null)` and added a null guard in `OnSizeChanged` for `Content`.
+Do not miss this one:
+
+* **iOS crash fix** -  when simultaineously opening/closing different popups, fix is now the second one would open only after the closing one finished cleaning up.
+* **Android crash fix** - for similar scenario, added the required `(IntPtr, JniHandleOwnership)` JNI resurrection constructor to `MauiPopup`. Without it, `TypeManager.CreateInstance` crashed whenever Android dispatched a touch event to a still-alive native Dialog whose managed C# peer had already been disposed. 
+* **iOS memory leak fix**  - `UITapGestureRecognizer` was leaking.
+* **Windows double-close fix** - `OnClosed` was triggering a second disconnect on every normal close. 
 
 ---
 
