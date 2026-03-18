@@ -106,8 +106,11 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
     {
         if (element == null)
         {
-            PopupView.IsOpen = false;
+            // Unsubscribe BEFORE setting IsOpen = false — WinUI fires Popup.Closed
+            // synchronously, so leaving the handler attached causes OnClosed to fire
+            // while VirtualView is still set, triggering a spurious double-close.
             PopupView.Closed -= OnClosed;
+            PopupView.IsOpen = false;
 
             try
             {
@@ -123,6 +126,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
             }
 
             VirtualView = null;
+            overlay = null;
 
             if (Content is not null)
             {
@@ -508,7 +512,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
     {
         UpdateLayout();
 
-        if (Content.ActualSize != Vector2.Zero)
+        if (Content?.ActualSize != Vector2.Zero)
         {
             if (!_appeared)
             {

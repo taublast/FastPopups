@@ -25,6 +25,7 @@ namespace FastPopups;
 /// <summary>
 /// The native implementation of Popup control.
 /// </summary>
+[Android.Runtime.Preserve(AllMembers = true)]
 public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
 {
     readonly IMauiContext mauiContext;
@@ -55,6 +56,18 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     {
         RequestWindowFeature((int)WindowFeatures.NoTitle);
         this.mauiContext = mauiContext ?? throw new ArgumentNullException(nameof(mauiContext));
+    }
+
+    /// <summary>
+    /// JNI resurrection constructor required by TypeManager.CreateInstance.
+    /// Called when Android dispatches a native callback (e.g. onTouchEvent) to a Java Dialog
+    /// whose managed C# peer was already disposed. Without this constructor TypeManager
+    /// cannot wrap the still-alive Java object and throws JavaProxyThrowable.
+    /// The resurrected instance will have VirtualView == null; all callbacks guard for that.
+    /// </summary>
+    protected MauiPopup(IntPtr javaReference, Android.Runtime.JniHandleOwnership transfer)
+        : base(javaReference, transfer)
+    {
     }
 
     static int GetDialogTheme(PopupDisplayMode displayMode)
@@ -753,10 +766,12 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     /// <param name="dialog">An instance of the <see cref="IDialogInterface"/>.</param>
     public void OnDismissedByTappingOutsideOfPopup(IDialogInterface dialog)
     {
-        _ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null");
-        _ = VirtualView.Handler ?? throw new InvalidOperationException($"{nameof(VirtualView.Handler)} cannot be null");
+        // Guard: VirtualView is null on a resurrected instance (managed peer was already
+        // disposed when this callback fired from a still-alive native Dialog)
+        if (VirtualView?.Handler == null)
+            return;
 
-        VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
+        VirtualView.Handler.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
     }
 
     /// <summary>
@@ -867,6 +882,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         }
         else
         {
+            SetOnCancelListener(null); // clear so a resurrected instance can't fire OnCancel
             _sizeChangeListener?.Release();
             _sizeChangeListener = null;
             _compositeContainer = null;

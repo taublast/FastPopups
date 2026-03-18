@@ -199,14 +199,16 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
             parent.RemoveView(handler.Content);
         }
 
-        // Properly dismiss and dispose the old dialog
+        // Dismiss the old dialog; do NOT dispose here because Android may still
+        // dispatch queued touch events to the native Dialog after Dismiss() returns,
+        // and disposing the managed peer immediately causes TypeManager.CreateInstance
+        // to crash. The dialog will be disposed when CreateDialog replaces it.
         if (handler.PlatformView.Dialog != null)
         {
             if (handler.PlatformView.Dialog.IsShowing)
             {
-                handler.PlatformView.Dialog.Dismiss(); // Remove from WindowManager first
+                handler.PlatformView.Dialog.Dismiss();
             }
-            handler.PlatformView.Dialog.Dispose(); // Then dispose managed resources
         }
     }
 

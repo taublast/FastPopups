@@ -32,6 +32,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 	UIView? overlay;
 	UIView? _contentView;
 	PopupDisplayMode _displayMode = PopupDisplayMode.Default;
+	UITapGestureRecognizer? _tapGesture;
 
 	/// <summary>
 	/// The native fullscreen overlay
@@ -219,6 +220,15 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 		VirtualView = null;
 
+		// Remove and dispose the tap gesture recognizer to break the retain cycle:
+		// View → _tapGesture → lambda closure → this (MauiPopup) → View
+		if (_tapGesture != null)
+		{
+			View?.RemoveGestureRecognizer(_tapGesture);
+			_tapGesture.Dispose();
+			_tapGesture = null;
+		}
+
 		if (PresentationController is UIPopoverPresentationController presentationController)
 		{
 			presentationController.Delegate = null;
@@ -256,7 +266,7 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 			if (virtualView.CloseWhenBackgroundIsClicked)
 			{
-				var tapGesture = new UITapGestureRecognizer(tapEvent =>
+				_tapGesture = new UITapGestureRecognizer(tapEvent =>
 				{
 					if (CanBeDismissedByTappingInternal && VirtualView is Popup popup && popup.ShouldDismissOnOutsideClick())
 					{
@@ -272,14 +282,13 @@ public partial class MauiPopup(IMauiContext mauiContext) : UIViewController
 
 						// DON'T dismiss here - let the handler flow run the animation first
 						// The actual dismissal will happen in MapOnClosed after animation completes
-						_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} cannot be null.");
-						VirtualView.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
+						VirtualView?.Handler?.Invoke(nameof(IPopup.OnDismissedByTappingOutsideOfPopup));
 					}
 				})
 				{
 					CancelsTouchesInView = false
 				};
-				View.AddGestureRecognizer(tapGesture);
+				View.AddGestureRecognizer(_tapGesture);
 			}
 
 			this.View.InsertSubview(overlay, 0);
