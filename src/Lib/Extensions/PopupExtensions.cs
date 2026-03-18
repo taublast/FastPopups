@@ -202,11 +202,12 @@ internal static IWindow GetWindow(this IElement element) =>
             catch { /* swallow — we still want to show the new popup */ }
         }
 
+        Page? parent = null;
         try
         {
             var mauiContext = GetMauiContext(page);
 
-            var parent = page.GetCurrentPage();
+            parent = page.GetCurrentPage();
             parent?.AddLogicalChild(popup);
 
             // Add to navigation stack
@@ -219,6 +220,10 @@ internal static IWindow GetWindow(this IElement element) =>
         catch (Exception e)
         {
             Trace.WriteLine(e);
+            // Roll back partial state so the queue doesn't stall on a popup that never opened.
+            parent?.RemoveLogicalChild(popup);
+            PopupNavigationStack.Instance.Remove(popup);
+            popup.OnCreationFailed();
         }
     }
 

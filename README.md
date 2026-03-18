@@ -26,6 +26,7 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 * **Popup reuse fix** - `IsClosing` flag was not reset when a popup instance was shown again after closing, causing the presentation queue to stall permanently on reused popups.
 * **Windows animation fix** - `_appeared` could be prematurely set when `Content` was null permanently skipping the show animation.
 * **Stability** - Code paths before the try/catch in `CreatePopup` are now guarded.
+* **Creation failure rollback** - If handler creation throws, the popup is now removed from the navigation stack and logical tree, and any awaiting `ShowPopupAsync` call is cancelled instead of hanging indefinitely.
 ---
 
 ## Intro

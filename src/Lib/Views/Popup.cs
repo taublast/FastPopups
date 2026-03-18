@@ -315,6 +315,16 @@ public partial class Popup : View, IPopup
 	public bool IsClosing { get; private set; }
 
 	/// <summary>
+	/// Called by the presentation layer when handler creation fails so that any awaiting
+	/// <see cref="Result"/> task is cancelled rather than hanging indefinitely.
+	/// </summary>
+	internal void OnCreationFailed()
+	{
+		resultTaskCompletionSource.TrySetCanceled();
+		popupDismissedTaskCompletionSource.TrySetCanceled();
+	}
+
+	/// <summary>
 	/// Close the current popup.
 	/// </summary>
 	/// <remarks>
