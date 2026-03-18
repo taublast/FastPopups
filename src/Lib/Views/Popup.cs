@@ -291,6 +291,7 @@ public partial class Popup : View, IPopup
 		{
 			// New handler assigned means popup is being shown (fresh or re-shown).
 			// Auto-reset TCS so Result and internal completion are clean.
+			IsClosing = false;
 			resultTaskCompletionSource = new();
 			popupDismissedTaskCompletionSource = new();
 		}

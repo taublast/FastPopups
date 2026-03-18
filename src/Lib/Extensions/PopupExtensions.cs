@@ -202,16 +202,16 @@ internal static IWindow GetWindow(this IElement element) =>
             catch { /* swallow — we still want to show the new popup */ }
         }
 
-        var mauiContext = GetMauiContext(page);
-
-        var parent = page.GetCurrentPage();
-        parent?.AddLogicalChild(popup);
-
-        // Add to navigation stack
-        PopupNavigationStack.Instance.Push(popup);
-
         try
         {
+            var mauiContext = GetMauiContext(page);
+
+            var parent = page.GetCurrentPage();
+            parent?.AddLogicalChild(popup);
+
+            // Add to navigation stack
+            PopupNavigationStack.Instance.Push(popup);
+
             var platformPopup = popup.ToHandler(mauiContext);
 
             platformPopup.Invoke(nameof(IPopup.OnOpened));
