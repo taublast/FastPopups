@@ -21,15 +21,11 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.10.2.1
+## ⬆️ What's New 1.10.2.2
 
-Do not miss this one:
-
-* **iOS crash fix** -  when simultaineously opening/closing different popups, fix is now the second one would open only after the closing one finished cleaning up.
-* **Android crash fix** - for similar scenario, added the required `(IntPtr, JniHandleOwnership)` JNI resurrection constructor to `MauiPopup`. Without it, `TypeManager.CreateInstance` crashed whenever Android dispatched a touch event to a still-alive native Dialog whose managed C# peer had already been disposed. 
-* **iOS memory leak fix**  - `UITapGestureRecognizer` was leaking.
-* **Windows double-close fix** - `OnClosed` was triggering a second disconnect on every normal close. 
-
+* **Popup reuse fix** - `IsClosing` flag was not reset when a popup instance was shown again after closing, causing the presentation queue to stall permanently on reused popups.
+* **Windows animation fix** - `_appeared` could be prematurely set when `Content` was null permanently skipping the show animation.
+* **Stability** - Code paths before the try/catch in `CreatePopup` are now guarded.
 ---
 
 ## Intro
