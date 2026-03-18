@@ -21,14 +21,14 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.10.1.1
+## ⬆️ What's New 1.10.2.1
 
-* **Added support for .NET 10** by [yurkinh](https://github.com/yurkinh).
-* **Whirl hide rotation direction fixed on Android and Windows**: The `Whirl` animation was rotating in the same clockwise direction on both show and hide. Hide now rotates counter-clockwise (reverse of show), matching iOS behavior.
-* **Sprint show alpha flash fixed on Android**: `SprintBottom`, `SprintTop`, `SprintLeft`, `SprintRight` were setting initial alpha to `1` (fully visible) before the show animation started from `0.5`, causing a brief visible flash. Initial alpha is now correctly `0.5` for all Sprint types, matching iOS.
-* **Sprint show opacity mismatch fixed on Windows**: Sprint show animations set `Opacity = 0.5` initially but the storyboard animation started `From = 0`, causing an immediate jump to transparent at animation start. Animation now correctly starts `From = 0.5`.
-* **DisplayMode change fix for Windows**: Popup now re-opens at correct position on Windows when changing `DisplayMode`, matching other platforms.
-* **Fixes for SampleApp**: Removed Anchored popup limited height.
+Do not miss this one:
+
+* **iOS crash fix** -  when simultaineously opening/closing different popups, fix is now the second one would open only after the closing one finished cleaning up.
+* **Android crash fix** - for similar scenario, added the required `(IntPtr, JniHandleOwnership)` JNI resurrection constructor to `MauiPopup`. Without it, `TypeManager.CreateInstance` crashed whenever Android dispatched a touch event to a still-alive native Dialog whose managed C# peer had already been disposed. 
+* **iOS memory leak fix**  - `UITapGestureRecognizer` was leaking.
+* **Windows double-close fix** - `OnClosed` was triggering a second disconnect on every normal close. 
 
 ---
 
