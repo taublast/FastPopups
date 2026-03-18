@@ -512,7 +512,7 @@ public partial class MauiPopup : Microsoft.UI.Xaml.Controls.Grid
     {
         UpdateLayout();
 
-        if (Content?.ActualSize != Vector2.Zero)
+        if (Content != null && Content.ActualSize != Vector2.Zero)
         {
             if (!_appeared)
             {

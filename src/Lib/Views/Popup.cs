@@ -291,6 +291,7 @@ public partial class Popup : View, IPopup
 		{
 			// New handler assigned means popup is being shown (fresh or re-shown).
 			// Auto-reset TCS so Result and internal completion are clean.
+			IsClosing = false;
 			resultTaskCompletionSource = new();
 			popupDismissedTaskCompletionSource = new();
 		}
@@ -312,6 +313,16 @@ public partial class Popup : View, IPopup
 	/// Used by the presentation queue to avoid showing a new popup before the current one has fully cleaned up.
 	/// </summary>
 	public bool IsClosing { get; private set; }
+
+	/// <summary>
+	/// Called by the presentation layer when handler creation fails so that any awaiting
+	/// <see cref="Result"/> task is cancelled rather than hanging indefinitely.
+	/// </summary>
+	internal void OnCreationFailed()
+	{
+		resultTaskCompletionSource.TrySetCanceled();
+		popupDismissedTaskCompletionSource.TrySetCanceled();
+	}
 
 	/// <summary>
 	/// Close the current popup.
