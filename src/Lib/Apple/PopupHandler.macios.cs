@@ -44,13 +44,16 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
                 PopupNavigationStack.Instance.Remove(popupInstance);
             }
 
-            view.HandlerCompleteTCS.TrySetResult();
-
             ((IElementHandler)handler).DisconnectHandler();
         }
         catch (Exception e)
         {
             Console.WriteLine(e); //avoid MAUI crashing us with "PlatformView cannot be null here" in rare scenarios
+        }
+        finally
+        {
+            // Always complete the TCS so OnClosed never hangs, even if dismissal threw.
+            view.HandlerCompleteTCS.TrySetResult();
         }
 	}
 

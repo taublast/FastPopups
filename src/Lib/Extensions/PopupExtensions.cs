@@ -186,7 +186,7 @@ internal static IWindow GetWindow(this IElement element) =>
 #endif
     }
 
-    static async void CreatePopup(Page page, Popup popup)
+    static async Task CreatePopup(Page page, Popup popup)
     {
         if (popup.Handler != null)
             return; // Already showing — ignore duplicate show call.
@@ -233,17 +233,17 @@ internal static IWindow GetWindow(this IElement element) =>
         return page.Handler?.MauiContext ?? throw new InvalidOperationException("Could not locate MauiContext.");
     }
 
-    static void CreateAndShowPopup<TPopup>(Page page, TPopup popup) where TPopup : Popup
+    static async void CreateAndShowPopup<TPopup>(Page page, TPopup popup) where TPopup : Popup
     {
-        CreatePopup(page, popup);
+        await CreatePopup(page, popup);
     }
 
-    static Task<object?> CreateAndShowPopupAsync<TPopup>(this Page page, TPopup popup, CancellationToken token)
+    static async Task<object?> CreateAndShowPopupAsync<TPopup>(this Page page, TPopup popup, CancellationToken token)
         where TPopup : Popup
     {
-        CreatePopup(page, popup);
+        await CreatePopup(page, popup);
 
-        return popup.Result.WaitAsync(token);
+        return await popup.Result.WaitAsync(token);
     }
 
 }
