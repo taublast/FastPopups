@@ -37,14 +37,6 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
                 // Dismiss WITHOUT animation (animated: false) because our custom animation already ran
                 await presentationViewController.DismissViewControllerAsync(false);
             }
-
-            // Remove from navigation stack if it's a Popup
-            if (view is Popup popupInstance)
-            {
-                PopupNavigationStack.Instance.Remove(popupInstance);
-            }
-
-            ((IElementHandler)handler).DisconnectHandler();
         }
         catch (Exception e)
         {
@@ -52,7 +44,15 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
         }
         finally
         {
-            // Always complete the TCS so OnClosed never hangs, even if dismissal threw.
+            // Always clean up and complete the TCS regardless of whether dismissal threw,
+            // so the navigation stack stays consistent and OnClosed never hangs.
+            if (view is Popup popupInstance)
+            {
+                try { PopupNavigationStack.Instance.Remove(popupInstance); } catch { }
+            }
+
+            try { ((IElementHandler)handler).DisconnectHandler(); } catch { }
+
             view.HandlerCompleteTCS.TrySetResult();
         }
 	}
