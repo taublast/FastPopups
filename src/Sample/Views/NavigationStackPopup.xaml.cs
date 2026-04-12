@@ -10,6 +10,15 @@ public partial class NavigationStackPopup : Popup, INotifyPropertyChanged
     private bool _canShowNext = true;
     private int _level = 1;
 
+    private static readonly Color[] LevelColors =
+    [
+        Colors.DarkBlue,
+        Colors.DarkGreen,
+        Colors.DarkOrange,
+        Colors.DarkRed,
+        Colors.Purple,
+    ];
+
     public NavigationStackPopup()
     {
         InitializeComponent();
@@ -23,6 +32,7 @@ public partial class NavigationStackPopup : Popup, INotifyPropertyChanged
         Title = $"Popup Level {level}";
         Description = $"This is popup number {level} in the navigation stack.";
         CanShowNext = level < 5; // Limit to 5 levels for demo
+        LevelBorder.Stroke = new SolidColorBrush(LevelColors[(level - 1) % LevelColors.Length]);
         UpdateStackInfo();
     }
 

@@ -10,10 +10,10 @@
     WidthRequest="350">
 
     <Border
+        x:Name="LevelBorder"
         BackgroundColor="White"
-        Stroke="DarkBlue"
         StrokeShape="RoundRectangle 15"
-        StrokeThickness="2">
+        StrokeThickness="3">
 
         <StackLayout Padding="20" Spacing="15">
 
