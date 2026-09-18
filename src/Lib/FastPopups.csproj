@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;net9.0-android;net9.0-ios;net9.0-maccatalyst;net9.0-windows10.0.19041.0;net10.0;net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0.19041.0</TargetFrameworks>
@@ -21,7 +21,7 @@
     <PackageId>AppoMobi.Maui.FastPopups</PackageId>
     <Description>Popup controls for .NET MAUI derived from CommunityToolkit Popups</Description>
     <PackageTags>fastpopups popups maui popup modal dialog</PackageTags>
-    <Version>1.10.2.3</Version>
+    <Version>1.10.2.4</Version>
     <Authors>Nick Kovalsky aka AppoMobi and contributors</Authors>
     <RepositoryUrl>https://github.com/taublast/popups</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -32,12 +32,18 @@
   </PropertyGroup>
 
   <!-- .NET 9 MAUI packages -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+    <DefineConstants>$(DefineConstants);NET9</DefineConstants>
+  </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.70" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.70" />
   </ItemGroup>
 
   <!-- .NET 10 MAUI packages -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
+    <DefineConstants>$(DefineConstants);NET10</DefineConstants>
+  </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.11" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.11" />

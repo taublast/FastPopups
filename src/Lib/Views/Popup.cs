@@ -334,6 +334,14 @@ public partial class Popup : View, IPopup
 	/// <param name="token"><see cref="CancellationToken"/></param>
 	public async Task CloseAsync(object? result = null, CancellationToken token = default)
 	{
+		if (IsClosing)
+		{
+			// already closing (repeated Close/CloseTop while the hide animation runs): a second pass would
+			// touch the platform popup the first pass disposes. Just wait for the running close to finish.
+			await resultTaskCompletionSource.Task.WaitAsync(token);
+			return;
+		}
+
 		IsClosing = true;
 		await OnClosed(result, false, token);
 		resultTaskCompletionSource.TrySetResult(result);
@@ -405,6 +413,12 @@ public partial class Popup : View, IPopup
 	/// </summary>
 	protected internal virtual async Task OnDismissedByTappingOutsideOfPopup(CancellationToken token = default)
 	{
+		if (IsClosing)
+		{
+			return;
+		}
+
+		IsClosing = true;
 		await OnClosed(ResultWhenUserTapsOutsideOfPopup, true, token);
 		resultTaskCompletionSource.TrySetResult(ResultWhenUserTapsOutsideOfPopup);
 	}
