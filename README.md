@@ -21,9 +21,9 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.10.2.3
+## ⬆️ What's New 1.10.2.4
 
-* **Fix iOS `ShowPopupAsync`** - could never return with a result after closing
+* **Fix crash on repeated close** - calling `Close`/`CloseTop` again while the popup was still playing its hide animation could throw `ObjectDisposedException` on Android; a popup that is already closing now ignores further close requests
 
 ---
 
