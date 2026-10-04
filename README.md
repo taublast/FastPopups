@@ -21,9 +21,9 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 - **🔄 HotReload Support**: Preview changes in realtime
 ---
 
-## ⬆️ What's New 1.10.2.4
+## ⬆️ What's New 1.10.2.5
 
-* **Fix crash on repeated close** - calling `Close`/`CloseTop` again while the popup was still playing its hide animation could throw `ObjectDisposedException` on Android; a popup that is already closing now ignores further close requests
+* **Fix popup left on screen on Android** - when the page that showed a popup was replaced or disposed while the popup was open or still closing (for example an app rebuilding its UI after a language change), the popup window and its overlay stayed on top of the app and took every touch. The popup now goes away together with its page, like on iOS, and a pending `CloseAsync` completes
 
 ---
 
