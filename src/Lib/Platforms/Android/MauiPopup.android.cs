@@ -184,7 +184,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
     AView CreateCompositePopupContent(AView actualContent)
     {
         // Create a full-screen container
-        var container = new FrameLayout(Context)
+        var container = new PopupContainer(Context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MatchParent,
@@ -194,6 +194,11 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
         if (VirtualView == null)
         {
             return container;
+        }
+
+        if (VirtualView.DisplayMode == PopupDisplayMode.Default && OperatingSystem.IsAndroidVersionAtLeast(30))
+        {
+            container.Measuring = OnDefaultContainerMeasuring;
         }
 
         // Store content reference for animations
@@ -369,6 +374,85 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             // else Cover mode: parentBounds stays full screen (no adjustments)
         }
 
+        var anchorShiftY = 0.0;
+        if (OperatingSystem.IsAndroidVersionAtLeast(30))
+        {
+            if (hasCutout
+                    ? VirtualView.DisplayMode == PopupDisplayMode.Default
+                    : VirtualView.DisplayMode == PopupDisplayMode.FullScreen)
+            {
+                anchorShiftY = -statusBarHeight;
+            }
+        }
+
+        actualContent.LayoutParameters = CalculateContentLayout(actualContent, parentBounds, anchorShiftY);
+        container.AddView(actualContent);
+    }
+
+    int _containerWidth;
+    int _containerHeight;
+    AndroidX.Core.Graphics.Insets? _containerInsets;
+
+    /// <summary>
+    /// Default mode, API 30+: places the content inside the safe area the dialog window really has.
+    /// A dialog window is edge-to-edge (Android 15+ with targetSdk 35+) or kept below the system bars by its decor
+    /// (older targets), so the bars and cutout to avoid are the insets this container receives, not the screen ones.
+    /// Runs inside the container measure pass, before anything is drawn.
+    /// </summary>
+    void OnDefaultContainerMeasuring(int width, int height, AndroidX.Core.Graphics.Insets insets)
+    {
+        if (VirtualView == null || content == null || width <= 0 || height <= 0)
+            return;
+
+        if (width == _containerWidth && height == _containerHeight && insets.Equals(_containerInsets))
+            return;
+
+        _containerWidth = width;
+        _containerHeight = height;
+        _containerInsets = insets;
+
+        var density = GetDensity();
+        var parentBounds = new Rect(
+            insets.Left / density,
+            insets.Top / density,
+            (width - insets.Left - insets.Right) / density,
+            (height - insets.Top - insets.Bottom) / density);
+
+        // anchor bounds are screen coordinates, the container starts below the part of the bars its decor already avoided
+        var anchorShiftY = 0.0;
+        if (OperatingSystem.IsAndroidVersionAtLeast(30) &&
+            Context?.GetSystemService(Context.WindowService) is IWindowManager windowManager)
+        {
+            var screenTop = windowManager.CurrentWindowMetrics.WindowInsets
+                .GetInsets(WindowInsets.Type.SystemBars() | WindowInsets.Type.DisplayCutout()).Top;
+            anchorShiftY = -Math.Max(0, screenTop - insets.Top) / density;
+        }
+
+        var calculated = CalculateContentLayout(content, parentBounds, anchorShiftY);
+        if (content.LayoutParameters is FrameLayout.LayoutParams current)
+        {
+            // still inside the parent measure pass: update in place, the child is measured right after
+            current.Width = calculated.Width;
+            current.Height = calculated.Height;
+            current.LeftMargin = calculated.LeftMargin;
+            current.TopMargin = calculated.TopMargin;
+        }
+        else
+        {
+            content.LayoutParameters = calculated;
+        }
+    }
+
+    /// <summary>
+    /// Sizes and positions the popup content inside <paramref name="parentBounds"/> (DIPs, container coordinates).
+    /// </summary>
+    /// <param name="actualContent">The popup content view.</param>
+    /// <param name="parentBounds">Area available to the content, in container coordinates.</param>
+    /// <param name="anchorShiftY">Added to an anchored position: anchor bounds are in screen coordinates while the container can start lower.</param>
+    FrameLayout.LayoutParams CalculateContentLayout(AView actualContent, Rect parentBounds, double anchorShiftY)
+    {
+        if (VirtualView == null)
+            return new FrameLayout.LayoutParams(0, 0);
 
         // Check if popup has explicit size requests first
         // Cast to VisualElement to access HeightRequest/WidthRequest properties
@@ -482,23 +566,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             (x, y) = PopupLayoutCalculator.CalculateAnchoredPosition(VirtualView, contentSize, anchorBounds,
                 parentBounds);
 
-            if (OperatingSystem.IsAndroidVersionAtLeast(30))
-            {
-                if (hasCutout)
-                {
-                    if (VirtualView.DisplayMode == PopupDisplayMode.Default)
-                    {
-                        y -= statusBarHeight;
-                    }
-                }
-                else
-                {
-                    if (VirtualView.DisplayMode == PopupDisplayMode.FullScreen)
-                    {
-                        y -= statusBarHeight;
-                    }
-                }
-            }
+            y += anchorShiftY;
         }
         else
         {
@@ -532,9 +600,7 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             TopMargin = DipsToPixels(adjustedY)
         };
 
-
-        actualContent.LayoutParameters = layoutParams;
-        container.AddView(actualContent);
+        return layoutParams;
     }
 
     /// <summary>
@@ -885,7 +951,55 @@ public partial class MauiPopup : Dialog, IDialogInterfaceOnCancelListener
             SetOnCancelListener(null); // clear so a resurrected instance can't fire OnCancel
             _sizeChangeListener?.Release();
             _sizeChangeListener = null;
+            if (_compositeContainer is PopupContainer container)
+                container.Measuring = null;
             _compositeContainer = null;
+        }
+    }
+
+    /// <summary>
+    /// Fullscreen root of the dialog content. Reports its real size together with the system bars and cutout
+    /// insets it receives, so the content can be placed in the safe area the dialog window actually has.
+    /// </summary>
+    public class PopupContainer : FrameLayout
+    {
+        AndroidX.Core.Graphics.Insets _insets = AndroidX.Core.Graphics.Insets.None;
+
+        /// <summary>
+        /// Called at the start of every measure pass with the container width, height (pixels) and safe insets.
+        /// </summary>
+        public Action<int, int, AndroidX.Core.Graphics.Insets>? Measuring;
+
+        /// <summary>
+        /// Creates the container.
+        /// </summary>
+        /// <param name="context">Android context.</param>
+        public PopupContainer(Context? context) : base(context)
+        {
+        }
+
+        /// <inheritdoc/>
+        public override WindowInsets? OnApplyWindowInsets(WindowInsets? insets)
+        {
+            if (insets != null)
+            {
+                var safe = WindowInsetsCompat.ToWindowInsetsCompat(insets, this)
+                    .GetInsets(WindowInsetsCompat.Type.SystemBars() | WindowInsetsCompat.Type.DisplayCutout());
+                if (!safe.Equals(_insets))
+                {
+                    _insets = safe;
+                    RequestLayout();
+                }
+            }
+
+            return base.OnApplyWindowInsets(insets);
+        }
+
+        /// <inheritdoc/>
+        protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
+        {
+            Measuring?.Invoke(MeasureSpec.GetSize(widthMeasureSpec), MeasureSpec.GetSize(heightMeasureSpec), _insets);
+            base.OnMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
 

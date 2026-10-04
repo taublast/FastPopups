@@ -253,6 +253,20 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
     /// <inheritdoc/>
     protected override void DisconnectHandler(MauiPopupView platformView)
     {
+        // The Dialog is a window of its own and outlives the page that showed it. When the handler goes away
+        // while the dialog is still showing (its page was replaced or disposed, e.g. during the close animation),
+        // disposing it without Dismiss leaves the window and its overlay on top of the app, taking every touch.
+        // iOS drops a presented popup together with its page, dismiss here to match.
+        var dialog = platformView.Dialog;
+        if (dialog != null && !dialog.IsDisposed() && !dialog.Context.IsDisposed()
+            && dialog.IsShowing && dialog.Context.GetActivity() is { IsDestroyed: false })
+        {
+            dialog.Dismiss();
+        }
+
+        // a CloseAsync waiting for the dismissal would never complete: MapOnClosed cannot run without a platform view
+        VirtualView?.HandlerCompleteTCS.TrySetResult();
+
         if (VirtualView?.Content?.Handler is IElementHandler contentHandler)
             contentHandler.DisconnectHandler();
 
