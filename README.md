@@ -23,6 +23,7 @@ Initially built on top of CommunityToolkit popups version one, it was found to b
 
 ## ⬆️ What's New 1.10.2.5
 
+* **Fix `Default` popups position on Android 15+** - apps targeting API 35+ draw popups edge to edge, so the content went under the status bar, stopped short of the navigation bar, and anchored popups sat a status bar too high. Popups now use the space the system really leaves free, on every Android version. `Cover` and `FullScreen` are unchanged
 * **Fix popup left on screen on Android** - when the page that showed a popup was replaced or disposed while the popup was open or still closing (for example an app rebuilding its UI after a language change), the popup window and its overlay stayed on top of the app and took every touch. The popup now goes away together with its page, like on iOS, and a pending `CloseAsync` completes
 
 ---
