@@ -23,42 +23,39 @@ public partial class PopupHandler : ViewHandler<IPopup, MauiPopupView>
     /// <param name="result">The result that should return from this Popup.</param>
     public static void MapOnClosed(PopupHandler? handler, IPopup view, object? result)
     {
+        // Untyped on purpose: the typed PlatformView getter throws "PlatformView cannot be null here" when the
+        // handler is already disconnected, which happens when the page that showed the popup is torn down
+        // while the close animation runs (DisconnectHandler then dismissed the dialog itself).
+        var popupView = (handler as IElementHandler)?.PlatformView as MauiPopupView;
         try
         {
-            var popupView = handler?.PlatformView; //sometimes MAUI can crash PlatformView cannot be null here
             var popup = popupView?.Dialog;
-
-            if (popup == null || popup.IsDisposed() || popup.Context.IsDisposed())
+            if (popup != null && !popup.IsDisposed() && !popup.Context.IsDisposed()
+                && popup.IsShowing && popup.Context.GetActivity() is { IsDestroyed: false })
             {
-                return;
+                popup.Dismiss();
             }
-
-            if (!popup.Context.GetActivity().IsDestroyed)
-            {
-                if (popup.IsShowing)
-                {
-                    popup.Dismiss();
-                }
-            }
-
-            // Remove from navigation stack if it's a Popup
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        finally
+        {
+            // Same contract as Apple: a closed popup always leaves the navigation stack and CloseAsync always
+            // completes, otherwise a dead popup stays on top of the stack for CloseTop/Clear and the next show.
             if (view is Popup popupInstance)
             {
-                PopupNavigationStack.Instance.Remove(popupInstance);
+                try { PopupNavigationStack.Instance.Remove(popupInstance); } catch { }
             }
 
             view.HandlerCompleteTCS.TrySetResult();
 
             if (popupView != null)
             {
-                ((IElementHandler?)handler)?.DisconnectHandler();
+                try { ((IElementHandler?)handler)?.DisconnectHandler(); } catch { }
             }
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e); //avoid MAUI crashing us with "PlatformView cannot be null here" in rare scenarios
-        }
-
     }
 
     /// <summary>
